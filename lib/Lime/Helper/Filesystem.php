@@ -10,14 +10,22 @@
 
 namespace Lime\Helper;
 
+use Cockpit\Framework\PathResolver;
 
-class Filesystem extends \Lime\Helper {
+class Filesystem {
+    /** @var PathResolver */
+    private $pathResolver;
+
+    public function __construct(PathResolver $pathResolver)
+    {
+        $this->pathResolver = $pathResolver;
+    }
 
     /**
      * @return mixed
      */
     public function path($path) {
-        return $this->app->path($path);
+        return $this->pathResolver->path($path);
     }
 
     /**
@@ -34,11 +42,11 @@ class Filesystem extends \Lime\Helper {
             case 0:
                 $dir = \getcwd();
             case 1:
-                $dir = (\strpos($args[0], ':')) ? $this->app->path($args[0]) : $args[0];
+                $dir = (\strpos($args[0], ':')) ? $this->pathResolver->path($args[0]) : $args[0];
                 break;
             case 2:
                 $pattern = $args[0];
-                $dir = (\strpos($args[1], ':')) ? $this->app->path($args[1]) : $args[1];
+                $dir = (\strpos($args[1], ':')) ? $this->pathResolver->path($args[1]) : $args[1];
                 break;
             default:
                 return $lst;
@@ -73,7 +81,7 @@ class Filesystem extends \Lime\Helper {
             return false;
         }
 
-        $args[0] = \strpos($args[0], ':') ? $this->app->path($args[0]) : $args[0];
+        $args[0] = \strpos($args[0], ':') ? $this->pathResolver->path($args[0]) : $args[0];
 
         return $args[0] ? \call_user_func_array('file_get_contents', $args) : '';
     }
@@ -89,15 +97,15 @@ class Filesystem extends \Lime\Helper {
             return false;
         }
 
-        if (\strpos($args[0], ':') !== false && !$this->app->isAbsolutePath($args[0])) {
+        if (\strpos($args[0], ':') !== false && !$this->pathResolver->isAbsolutePath($args[0])) {
 
             list($namespace, $additional) = \explode(":",$args[0], 2);
 
-            if (!$this->app->path("{$namespace}:")) {
+            if (!$this->pathResolver->path("{$namespace}:")) {
                 return false;
             }
 
-            $args[0] = $this->app->path("{$namespace}:").$additional;
+            $args[0] = $this->pathResolver->path("{$namespace}:").$additional;
         }
 
         // create file path
@@ -115,7 +123,7 @@ class Filesystem extends \Lime\Helper {
      */
     public function mkdir($path, $mode = 0755) {
 
-        if (\strpos($path, ':') !== false && !$this->app->isAbsolutePath($path)) {
+        if (\strpos($path, ':') !== false && !$this->pathResolver->isAbsolutePath($path)) {
             list($namespace, $additional) = \explode(":", $path, 2);
             $dir = $this->app->path("{$namespace}:").$additional;
         } else {
@@ -135,7 +143,7 @@ class Filesystem extends \Lime\Helper {
      */
     public function delete($path) {
 
-        $path = $this->app->path($path);
+        $path = $this->pathResolver->path($path);
 
         if (\is_file($path) || \is_link($path)) {
             $func = DIRECTORY_SEPARATOR === '\\' && \is_dir($path) ? 'rmdir' : 'unlink';
@@ -161,8 +169,8 @@ class Filesystem extends \Lime\Helper {
     public function copy($path, $dest, $_init = true) {
 
         if ($_init) {
-            if (\strpos($path, ':')) $path = $this->app->path($path);
-            if (\strpos($dest, ':')) $dest = $this->app->path($dest);
+            if (\strpos($path, ':')) $path = $this->pathResolver->path($path);
+            if (\strpos($dest, ':')) $dest = $this->pathResolver->path($dest);
         }
 
         if (\is_dir($path)) {
@@ -174,7 +182,7 @@ class Filesystem extends \Lime\Helper {
             if (\sizeof($items) > 0) {
                 foreach($items as $file) {
 
-                    if ($file == "." || $file == "..") continue;
+                    if ($file === "." || $file === "..") continue;
 
                     if (\is_dir("{$path}/{$file}")) {
                         $this->copy("{$path}/{$file}", "{$dest}/{$file}", false);
@@ -186,7 +194,9 @@ class Filesystem extends \Lime\Helper {
 
             return true;
 
-        } elseif (\is_file($path)) {
+        }
+
+        if (\is_file($path)) {
             return \copy($path, $dest);
         }
 
@@ -202,20 +212,21 @@ class Filesystem extends \Lime\Helper {
      */
     public function rename($path, $newpath, $overwrite = true) {
 
-        $path = $this->app->path($path);
+        $path = $this->pathResolver->path($path);
 
         if (!$overwrite && \file_exists($newpath)) {
             return false;
+        }
 
-        } elseif (!\file_exists($path)) {
+        if (!\file_exists($path)) {
             return false;
 
-        } else {
-            $this->mkdir(dirname($newpath));
-            $this->delete($newpath);
-            if (!@\rename($path, $newpath)) {
-               return false;
-            }
+        }
+
+        $this->mkdir(dirname($newpath));
+        $this->delete($newpath);
+        if (!@\rename($path, $newpath)) {
+           return false;
         }
 
         return true;
@@ -229,7 +240,7 @@ class Filesystem extends \Lime\Helper {
 
         $size = 0;
 
-        if ($path = $this->app->path($dir)) {
+        if ($path = $this->pathResolver->path($dir)) {
 
             $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::SELF_FIRST);
 
@@ -251,7 +262,7 @@ class Filesystem extends \Lime\Helper {
      */
     public function removeEmptySubFolders($dir, $selfremove = false) {
 
-        if ($path = $this->app->path($dir)) {
+        if ($path = $this->pathResolver->path($dir)) {
 
             $empty = true;
 

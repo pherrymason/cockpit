@@ -13,17 +13,13 @@ namespace Lime\Helper;
 /**
  * I18n class. Manage translations
  */
-class I18n extends \Lime\Helper {
+class I18n {
 
-    /**
-     * @var $locale current language
-     */
+    /** @var string $locale Current language */
     public  $locale     = "en";
-    private $_languages = array();
+    private $_languages = [];
 
-
-    public static $locals = array(
-
+    public static $locals = [
         'aa' => 'Afar',
         'ab' => 'Abkhazian',
         'ae' => 'Avestan',
@@ -208,11 +204,9 @@ class I18n extends \Lime\Helper {
         'za' => 'Zhuang',
         'zh' => 'Chinese',
         'zu' => 'Zulu'
-    );
+    ];
 
-
-    public static $countries = array(
-
+    public static $countries = [
         'AF' => 'Afghanistan',
         'AL' => 'Albania',
         'DZ' => 'Algeria',
@@ -452,9 +446,9 @@ class I18n extends \Lime\Helper {
         'YE' => 'Yemen',
         'ZM' => 'Zambia',
         'ZW' => 'Zimbabwe'
-    );
+    ];
 
-    public static $currencies = array(
+    public static $currencies = [
         'ALL' => 'Lek',
         'ARS' => '$',
         'AWG' => 'f',
@@ -536,14 +530,18 @@ class I18n extends \Lime\Helper {
         'UYU' => '$U',
         'VEF' => 'Bs',
         'ZWD' => 'Z$'
-    );
+    ];
+
+    public function __construct(string $locale)
+    {
+        $this->locale = $locale;
+    }
 
     /**
      * @inherit
      */
     public function initialize(){
-
-        $this->locale = $this->app->getClientLang();
+       // $this->locale = $this->app->getClientLang();
     }
 
     /**
