@@ -25,7 +25,7 @@
 
 namespace Lime;
 
-
+use Cockpit\Framework\EventSystem;
 use Cockpit\Framework\PathResolver;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -33,8 +33,11 @@ use Psr\Container\NotFoundExceptionInterface;
 class App implements \ArrayAccess {
 
     protected static $apps = [];
+    /** @var EventSystem */
+    protected $eventSystem;
 
-    protected $registry = [];
+    /** @var array */
+    protected $modules  = [];
     protected $routes   = [];
     protected $paths    = [];
     protected $events   = [];
@@ -44,8 +47,7 @@ class App implements \ArrayAccess {
 
     /** @var Response|null  */
     public $response    = null;
-
-    public $helpers;
+    /** ? */
     public $layout      = false;
 
     /* global view variables */
@@ -179,30 +181,13 @@ class App implements \ArrayAccess {
     */
     public function __construct (ContainerInterface $container, array $settings = []) {
         $this->container = $container;
+        $this->eventSystem = $container->get('events');
         $self = $this;
         $base_url = implode('/', \array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1));
         $this->autoload = new \ArrayObject([]);
-        /*
-        $this->registry = \array_merge([
-            'debug'        => true,
-            'app.name'     => 'LimeApp',
-            'session.name' => 'limeappsession',
-            'autoload'     => new \ArrayObject([]),
-            'sec-key'      => 'xxxxx-SiteSecKeyPleaseChangeMe-xxxxx',
-            'route'        => $_SERVER['PATH_INFO'] ?? '/',
-            'charset'      => 'UTF-8',
-            'helpers'      => [],
-            'base_url'     => $base_url,
-            'base_route'   => $base_url,
-            'base_host'    => $_SERVER['SERVER_NAME'] ?? \php_uname('n'),
-            'base_port'    => $_SERVER['SERVER_PORT'] ?? 80,
-            'docs_root'    => null,
-            'site_url'     => null
-        ], $settings);
-        */
 
         // app modules container
-        $this->registry['modules'] = new \ArrayObject([]);
+        $this->modules = new \ArrayObject([]);
 
         // try to guess site url
         if (!isset($this['site_url'])) {
@@ -228,7 +213,7 @@ class App implements \ArrayAccess {
         $this['base_url']   = \rtrim($this->container->get('base_url'), '/');
         $this['base_route'] = \rtrim($this->container->get('base_route'), '/');
 
-        // default global viewvars
+        // default global view vars
         $this->viewvars['app']        = $this;
         $this->viewvars['base_url']   = $this['base_url'];
         $this->viewvars['base_route'] = $this['base_route'];
@@ -493,61 +478,24 @@ class App implements \ArrayAccess {
     * @param  Integer $priority
     * @return void
     */
-    public function on($event, $callback, $priority = 0){
-
-        if (\is_array($event)) {
-
-            foreach ($event as &$evt) {
-                $this->on($evt, $callback, $priority);
-            }
-            return $this;
-        }
-
-        if (!isset($this->events[$event])) $this->events[$event] = [];
-
+    public function on($event, $callback, $priority = 0): self
+    {
         // make $this available in closures
         if (\is_object($callback) && $callback instanceof \Closure) {
             $callback = $callback->bindTo($this, $this);
         }
 
-        $this->events[$event][] = ['fn' => $callback, 'prio' => $priority];
+        $this->eventSystem->on($event, $callback, $priority);
 
         return $this;
     }
 
     /**
-    * Trigger event.
-    * @param  String $event
-    * @param  Array  $params
-    * @return Boolean
-    */
-    public function trigger($event,$params=[]){
-
-        if (!isset($this->events[$event])){
-            return $this;
-        }
-
-        if (!\count($this->events[$event])){
-            return $this;
-        }
-
-        $queue = new \SplPriorityQueue();
-
-        foreach ($this->events[$event] as $index => $action){
-            $queue->insert($index, $action['prio']);
-        }
-
-        $queue->top();
-
-        while ($queue->valid()){
-            $index = $queue->current();
-            if (\is_callable($this->events[$event][$index]['fn'])){
-                if (\call_user_func_array($this->events[$event][$index]['fn'], $params) === false) {
-                    break; // stop Propagation
-                }
-            }
-            $queue->next();
-        }
+     * Trigger event.
+     */
+    public function trigger(string $event, array $params=[]): self
+    {
+        $this->eventSystem->trigger($event, $params);
 
         return $this;
     }
@@ -1211,14 +1159,14 @@ class App implements \ArrayAccess {
     }
 
     public function module($name) {
-        return $this->registry['modules']->offsetExists($name) && $this->registry['modules'][$name] ? $this->registry['modules'][$name] : null;
+        return $this->modules->offsetExists($name) && $this->modules[$name] ? $this->modules[$name] : null;
     }
 
     public function registerModule($name, $dir) {
 
         $name = \strtolower($name);
 
-        if (!isset($this->registry['modules'][$name])) {
+        if (!isset($this->modules[$name])) {
 
             $module = new Module($this);
 
@@ -1226,11 +1174,11 @@ class App implements \ArrayAccess {
             $module->_bootfile = "{$dir}/bootstrap.php";
 
             $this->path($name, $dir);
-            $this->registry['modules'][$name] = $module;
+            $this->modules[$name] = $module;
             $this->bootModule($module);
         }
 
-        return $this->registry['modules'][$name];
+        return $this->modules[$name];
     }
 
     public function loadModules($dirs, $autoload = true, $prefix = false) {
