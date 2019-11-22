@@ -21,8 +21,13 @@ $services = [
         return new \Cockpit\Framework\PathResolver($c->get('paths'), $c->get('site_url'), $c->get('docs_root'));
     },
 
+    'events' => function (ContainerInterface $c) {
+        return new \Cockpit\Framework\EventSystem();
+    },
+
     'filestorage' => function (ContainerInterface $c) {
         $pathResolver = $c->get('path');
+        $customConfig = $c->get('filestorage.config');
         $storages = array_replace_recursive([
             'root' => [
                 'adapter' => 'League\Flysystem\Adapter\Local',
@@ -66,7 +71,12 @@ $services = [
                 'url' => $pathResolver->pathToUrl('#uploads:', true)
             ]
 
-        ], $config['filestorage']);
+        ], $customConfig);
+
+        $events = $c->get('events');
+        $events->trigger('cockpit.filestorages.init', [&$storages]);
+
+        return new FileStorage($storages);
     },
 
     'memory' => function (ContainerInterface $c) {
