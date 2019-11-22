@@ -8,7 +8,7 @@ use Psr\Container\ContainerInterface;
 
 $services = [
     // nosql storage
-    'storage' => function(ContainerInterface $c) {
+    'storage' => function (ContainerInterface $c) {
         $config = $c->get('database.config');
         return new \MongoHybrid\Client(
             $config['server'],
@@ -18,7 +18,7 @@ $services = [
     },
 
     'path' => function (ContainerInterface $c) {
-        return new \Cockpit\Framework\PathResolver($c->get('paths'), $c->get('site_url'));
+        return new \Cockpit\Framework\PathResolver($c->get('paths'), $c->get('site_url'), $c->get('docs_root'));
     },
 
     'filestorage' => function (ContainerInterface $c) {
@@ -69,12 +69,12 @@ $services = [
         ], $config['filestorage']);
     },
 
-    'memory' => function(ContainerInterface $c) {
+    'memory' => function (ContainerInterface $c) {
         $config = $c->get('memory.config');
         return new SimpleStorage\Client($config['server'], $config['options']);
     },
 
-    'mailer' => function(ContainerInterface $c) {
+    'mailer' => function (ContainerInterface $c) {
         $config = $c->get('mailer.config');
         return new \Mailer($config['transport'] ?? 'mail', $config);
     },
@@ -91,7 +91,7 @@ $services = [
         return new \Lime\Helper\Filesystem($c->get('path'));
     },
 
-    'image'   => function (ContainerInterface $c) {
+    'image' => function (ContainerInterface $c) {
         return new \Lime\Helper\Image();
     },
     'user.language' => function (ContainerInterface $c) {
@@ -124,25 +124,25 @@ $services = [
         $renderer = new \Lexy();
 
         //register app helper functions
-        $renderer->extend(function($content){
+        $renderer->extend(function ($content) {
 
             $replace = [
-                'extend'   => '<?php $extend(expr); ?>',
-                'base'     => '<?php $app->base(expr); ?>',
-                'route'    => '<?php $app->route(expr); ?>',
-                'trigger'  => '<?php $app->trigger(expr); ?>',
-                'assets'   => '<?php echo $app->assets(expr); ?>',
-                'start'    => '<?php $app->start(expr); ?>',
-                'end'      => '<?php $app->end(expr); ?>',
-                'block'    => '<?php $app->block(expr); ?>',
-                'url'      => '<?php echo $app->pathToUrl(expr); ?>',
-                'view'     => '<?php echo $app->view(expr); ?>',
-                'render'   => '<?php echo $app->view(expr); ?>',
-                'include'  => '<?php echo include($app->path(expr)); ?>',
-                'lang'     => '<?php echo $app("i18n")->get(expr); ?>',
+                'extend' => '<?php $extend(expr); ?>',
+                'base' => '<?php $app->base(expr); ?>',
+                'route' => '<?php $app->route(expr); ?>',
+                'trigger' => '<?php $app->trigger(expr); ?>',
+                'assets' => '<?php echo $app->assets(expr); ?>',
+                'start' => '<?php $app->start(expr); ?>',
+                'end' => '<?php $app->end(expr); ?>',
+                'block' => '<?php $app->block(expr); ?>',
+                'url' => '<?php echo $app->pathToUrl(expr); ?>',
+                'view' => '<?php echo $app->view(expr); ?>',
+                'render' => '<?php echo $app->view(expr); ?>',
+                'include' => '<?php echo include($app->path(expr)); ?>',
+                'lang' => '<?php echo $app("i18n")->get(expr); ?>',
             ];
 
-            $content = \preg_replace_callback('/\B@(\w+)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function($match) use($replace) {
+            $content = \preg_replace_callback('/\B@(\w+)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function ($match) use ($replace) {
 
                 if (isset($match[3], $replace[$match[1]]) && \trim($match[1])) {
                     return \str_replace('(expr)', $match[3], $replace[$match[1]]);

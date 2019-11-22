@@ -8,15 +8,28 @@ final class PathResolver
     private $pathMap;
     /** @var string|null */
     private $siteURL;
+    /** @var string */
+    private $docsRoot;
 
-    public function __construct(array $pathMap, ?string $siteURL)
+    public function __construct(array $pathMap, ?string $siteURL, string $docsRoot)
     {
         $this->pathMap = [];
         foreach ($pathMap as $key => $path) {
+            $path = rtrim($path,  DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
             $this->pathMap[$key] = [$path];
         }
 
         $this->siteURL = $siteURL;
+        $this->docsRoot = $docsRoot;
+    }
+
+    public function paths($namespace = null)
+    {
+        if (!$namespace) {
+            return $this->pathMap;
+        }
+
+        return $this->pathMap[$namespace] ?? [];
     }
 
     /**
@@ -30,14 +43,14 @@ final class PathResolver
 
         $parts = \explode(':', $file, 2);
 
-        if (count($parts)==2){
+        if (count($parts) === 2) {
             if (!isset($this->pathMap[$parts[0]])) {
                 return false;
             }
 
             foreach ($this->pathMap[$parts[0]] as $path) {
-                if (\file_exists($path.$parts[1])){
-                    return $path.$parts[1];
+                if (\file_exists($path . $parts[1])) {
+                    return $path . $parts[1];
                 }
             }
         }
@@ -50,7 +63,7 @@ final class PathResolver
         if (!isset($this->paths[$a])) {
             $this->pathMap[$a] = [];
         }
-        \array_unshift($this->pathMap[$a], \rtrim(\str_replace(DIRECTORY_SEPARATOR, '/', $b), '/').'/');
+        \array_unshift($this->pathMap[$a], \rtrim(\str_replace(DIRECTORY_SEPARATOR, '/', $b), '/') . '/');
     }
 
     public function isAbsolutePath(string $path): bool
@@ -67,13 +80,13 @@ final class PathResolver
         if ($file = $this->path($path)) {
 
             $file = \str_replace(DIRECTORY_SEPARATOR, '/', $file);
-            $root = \str_replace(DIRECTORY_SEPARATOR, '/', $this['docs_root']);
+            $root = \str_replace(DIRECTORY_SEPARATOR, '/', $this->docsRoot);
 
-            $url = '/'.\ltrim(\str_replace($root, '', $file), '/');
+            $url = '/' . \ltrim(\str_replace($root, '', $file), '/');
             $url = \implode('/', \array_map('rawurlencode', explode('/', $url)));
 
             if ($full) {
-                $url = \rtrim($this->siteURL, '/').$url;
+                $url = \rtrim($this->siteURL, '/') . $url;
             }
         }
 

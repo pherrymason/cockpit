@@ -538,20 +538,13 @@ class I18n {
     }
 
     /**
-     * @inherit
-     */
-    public function initialize(){
-       // $this->locale = $this->app->getClientLang();
-    }
-
-    /**
      * Get translated string by key
      *
      * @param   string $key translation key
      * @param   array $alternative  returns if $key doesn''t exist
      * @return  string
      */
-    public function get($key, $alternative=null, $lang=null){
+    public function get(string $key, $alternative=null, $lang=null){
 
         if (!$lang) {
             $lang = $this->locale;
@@ -561,7 +554,7 @@ class I18n {
             $alternative = $key;
         }
 
-        return isset($this->_languages[$lang][$key]) ? $this->_languages[$lang][$key]:$alternative;
+        return $this->_languages[$lang][$key] ?? $alternative;
     }
 
     /**

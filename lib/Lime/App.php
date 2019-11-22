@@ -181,6 +181,7 @@ class App implements \ArrayAccess {
         $this->container = $container;
         $self = $this;
         $base_url = implode('/', \array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1));
+        $this->autoload = new \ArrayObject([]);
         /*
         $this->registry = \array_merge([
             'debug'        => true,
@@ -237,7 +238,7 @@ class App implements \ArrayAccess {
 
         // register simple autoloader
         spl_autoload_register(function ($class) use($self){
-            foreach ($self->retrieve('autoload', []) as $dir) {
+            foreach ($self->autoload as $dir) {
 
                 $class_file = $dir.'/'.\str_replace('\\', '/', $class).'.php';
 
@@ -260,6 +261,11 @@ class App implements \ArrayAccess {
         }
     }
 
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
     /**
     * Get App instance
     * @param  String $name Lime app name
@@ -267,27 +273,6 @@ class App implements \ArrayAccess {
     */
     public static function instance($name) {
         return self::$apps[$name];
-    }
-
-    /**
-    * Returns a closure that stores the result of the given closure
-    * @param  String  $name
-    * @param  \Closure $callable
-    * @return Object
-    */
-    public function service($name, $callable) {
-/*
-        $this->registry[$name] = function($c) use($callable) {
-            static $object;
-
-            if (null === $object) {
-                $object = $callable($c);
-            }
-
-            return $object;
-        };
-*/
-        return $this;
     }
 
     /**
@@ -466,12 +451,10 @@ class App implements \ArrayAccess {
      * @return array
      */
     public function paths($namespace = null) {
+        /** @var PathResolver $pathResolver */
+        $pathResolver = $this->container->get('path');
 
-        if (!$namespace) {
-            return $this->paths;
-        }
-
-        return $this->paths[$namespace] ?? [];
+        return $pathResolver->paths($namespace);
     }
 
     /**
@@ -479,23 +462,10 @@ class App implements \ArrayAccess {
      * @return bool|string
      */
     public function pathToUrl($path, $full = false) {
+        /** @var PathResolver $pathResolver */
+        $pathResolver = $this->container->get('path');
 
-        $url = false;
-
-        if ($file = $this->path($path)) {
-
-            $file = \str_replace(DIRECTORY_SEPARATOR, '/', $file);
-            $root = \str_replace(DIRECTORY_SEPARATOR, '/', $this['docs_root']);
-
-            $url = '/'.\ltrim(\str_replace($root, '', $file), '/');
-            $url = \implode('/', \array_map('rawurlencode', explode('/', $url)));
-
-            if ($full) {
-                $url = \rtrim($this->container->get('site_url'), '/').$url;
-            }
-        }
-
-        return $url;
+        return $pathResolver->pathToUrl($path, $full);
     }
 
     /**
@@ -814,7 +784,9 @@ class App implements \ArrayAccess {
     * @return void
     */
     public function get($path, $callback, $condition = true){
-        if (!$this->req_is('get')) return;
+        if (!$this->req_is('get')) {
+            return;
+        }
         $this->bind($path, $callback, $condition);
     }
 
@@ -1075,7 +1047,7 @@ class App implements \ArrayAccess {
         switch (\strtolower($type)){
             case 'ajax':
                 return (
-                    (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'))       ||
+                    (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest'))       ||
                     (isset($_SERVER["CONTENT_TYPE"]) && \stripos($_SERVER["CONTENT_TYPE"],'application/json')!==false)           ||
                     (isset($_SERVER["HTTP_CONTENT_TYPE"]) && \stripos($_SERVER["HTTP_CONTENT_TYPE"],'application/json')!==false)
                 );
@@ -1122,16 +1094,19 @@ class App implements \ArrayAccess {
     */
     public function getClientIp(){
 
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             // Use the forwarded IP address, typically set when the
             // client is using a proxy server.
             return $_SERVER['HTTP_X_FORWARDED_FOR'];
-        }elseif (isset($_SERVER['HTTP_CLIENT_IP'])){
+        }
+
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             // Use the forwarded IP address, typically set when the
             // client is using a proxy server.
             return $_SERVER['HTTP_CLIENT_IP'];
         }
-        elseif (isset($_SERVER['REMOTE_ADDR'])){
+
+        if (isset($_SERVER['REMOTE_ADDR'])) {
             // The remote IP address
             return $_SERVER['REMOTE_ADDR'];
         }
@@ -1222,11 +1197,13 @@ class App implements \ArrayAccess {
     }
 
     public function helper($helper) {
+        return $this->container->get($helper);
+        /*
         if (isset($this->helpers[$helper]) && !\is_object($this->helpers[$helper])) {
             $this->helpers[$helper] = new $this->helpers[$helper]($this);
         }
 
-        return $this->helpers[$helper];
+        return $this->helpers[$helper];*/
     }
 
     public function isAbsolutePath($path) {
@@ -1282,7 +1259,9 @@ class App implements \ArrayAccess {
                     $modules[] = \strtolower($module);
                 }
 
-                if ($autoload) $this['autoload']->append($dir);
+                if ($autoload) {
+                    $this->autoload->append($dir);
+                }
             }
         }
 
@@ -1327,8 +1306,8 @@ class App implements \ArrayAccess {
     }
 
     // Invoke call
-    public function __invoke($helper) {
-        return $this->container->get($helper);
+    public function __invoke($id) {
+        return $this->container->get($id);
     }
 } // End site
 
