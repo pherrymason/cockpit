@@ -14,7 +14,15 @@ return [
     'session.name' => md5(COCKPIT_ENV_ROOT),
     'session.init' => (COCKPIT_ADMIN && !COCKPIT_API_REQUEST),
     'sec-key'      => 'c3b40c4c-db44-s5h7-a814-b4931a15e5e1',
-    'i18n'         => 'en',
+    // Interface language
+    'ui.i18n'         => 'en',
+
+    // Content languages
+    'languages' => [
+        //'default' => 'English',       #setting a default language is optional
+        'fr' => 'French',
+        'de' => 'German'
+    ],
     'modules.disabled' => [],
     'database.config'     => [
         'server' => 'mongolite://'.(COCKPIT_STORAGE_FOLDER.'/data'),
@@ -72,5 +80,5 @@ return [
         'site'      => COCKPIT_SITE_DIR
     ],
 
-    'filestorage' => [],
+    'filestorage.config' => [],
 ];
