@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Psr\Container\ContainerInterface;
+
 /**
  * Helpers
  */
@@ -15,14 +17,20 @@
 // because auto-load not ready yet
 include(__DIR__.'/Helper/Admin.php');
 
-$app->helpers['admin'] = 'Cockpit\\Helper\\Admin';
-$app->helpers['csfr']  = 'Cockpit\\Helper\\Csfr';
+$container = $app->getContainer();
+$container->set('admin', function(ContainerInterface $c) use ($app) {
+    return new \Cockpit\Helper\Admin($app);
+});
+$container->set('csfr', function (ContainerInterface $c) use ($app)  {
+    return new \Cockpit\Helper\Csfr($app);
+});
 
 // init + load i18n
+/** @var \Lime\Helper\I18n $i18n */
+$i18n = $container->get('i18n');
+$i18n->locale = $app->retrieve('ui.i18n', 'en');
 
-$app('i18n')->locale = $app->retrieve('i18n', 'en');
-
-$locale = $app->module('cockpit')->getUser('i18n', $app('i18n')->locale);
+$locale = $app->module('cockpit')->getUser('i18n', $i18n->locale);
 
 if ($translationspath = $app->path("#config:cockpit/i18n/{$locale}.php")) {
     $app('i18n')->locale = $locale;
