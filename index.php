@@ -45,4 +45,5 @@ if (COCKPIT_API_REQUEST) {
 
 
 // run backend
+/** @var \LimeExtra\App $cockpit */
 $cockpit->set('route', COCKPIT_ADMIN_ROUTE)->trigger('admin.init')->run();

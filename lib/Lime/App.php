@@ -555,7 +555,7 @@ class App implements \ArrayAccess {
     /**
     * Render view.
     * @param  String $____template Path to view
-    * @param  Array  $_____slots   Passed variables
+    * @param  array  $_____slots   Passed variables
     * @return String               Rendered view
     */
     public function render($____template, $_____slots = []) {
