@@ -10,14 +10,15 @@
 
 namespace Cockpit\Helper;
 
-class Revisions extends \Lime\Helper {
-
+class Revisions
+{
+    /** @var ??? */
     protected $storage;
 
-    public function initialize(){
-        $this->storage = $this->app->storage;
+    public function __construct($storage)
+    {
+        $this->storage = $storage;
     }
-
 
     public function count($id) {
         return $this->storage->count('cockpit/revisions', ['_oid' => $id]);
@@ -31,17 +32,8 @@ class Revisions extends \Lime\Helper {
         ])->toArray();
     }
 
-    public function add($id, $data, $meta = null, $creator = null) {
-
-        if ($creator === true) {
-            $creator = null;
-            $user = $this->app->module('cockpit')->getUser();
-
-            if ($user) {
-                $creator = $user['_id'];
-            }
-        }
-
+    public function add($id, $data, $creator, $meta = null)
+    {
         $entry = [
             '_oid' => $id,
             'data' => $data,

@@ -376,7 +376,8 @@ $this->module('collections')->extend([
             $this->app->trigger("collections.save.after.{$name}", [$name, &$entry, $isUpdate]);
 
             if ($ret && $options['revision']) {
-                $this->app->helper('revisions')->add($entry['_id'], $entry, "collections/{$collection}", true);
+                $user = $this->app->module('cockpit')->getUser();
+                $this->app->helper('revisions')->add($entry['_id'], $entry, $user['_id'], "collections/{$collection}");
             }
 
             $return[] = $ret ? $entry : false;
@@ -738,7 +739,7 @@ if (COCKPIT_API_REQUEST) {
 
 // ADMIN
 if (COCKPIT_ADMIN_CP) {
-    include_once(__DIR__.'/admin.php');
+   include_once(__DIR__.'/admin.php');
 }
 
 // CLI
