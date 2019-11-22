@@ -14,7 +14,7 @@ namespace Lime\Helper;
  * Class Utils
  * @package Lime\Helper
  */
-class Utils extends \Lime\Helper {
+class Utils {
 
     /**
      * @param $email
@@ -194,7 +194,9 @@ class Utils extends \Lime\Helper {
 
         if (\preg_match('/^('.$yes_words.')$/i', $string)) {
             return true;
-        } else if (\preg_match('/^('.$no_words.')$/i', $string)) {
+        }
+
+        if (\preg_match('/^('.$no_words.')$/i', $string)) {
             return false;
         }
 
