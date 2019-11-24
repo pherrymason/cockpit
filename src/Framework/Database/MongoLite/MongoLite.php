@@ -6,7 +6,7 @@ use Cockpit\Framework\Database\DatabaseConnection;
 use Cockpit\Framework\Database\MongoLite\MongoHybrid\MongoLite as Driver;
 
 /**
- * Replaces \MongoHybrid\Client
+ * Wraps \MongoHybrid\MongoLite
  */
 final class MongoLite implements DatabaseConnection
 {
@@ -35,11 +35,6 @@ final class MongoLite implements DatabaseConnection
 
     public function findOne(string $collection, array $filter = [], $projection = null)
     {
-        // cockpit/assets_folders
-        // cockpit/assets
-        // collections/Post239476124712
-        // [$db, $table] = expode('/', $collectionName);
-
         return $this->driver->getCollection($collection)->findOne($filter, $projection);
     }
 
