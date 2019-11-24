@@ -25,8 +25,10 @@ return [
     ],
     'modules.disabled' => [],
     'database.config'     => [
+        'driver' => 'mongolite',
         'server' => 'mongolite://'.(COCKPIT_STORAGE_FOLDER.'/data'),
-        'options' => ['db' => 'cockpitdb'], 'driverOptions' => []
+        'options' => ['db' => 'cockpitdb'],
+        'driverOptions' => []
     ],
     'memory.config'       => [
         'server' => 'redislite://'.(COCKPIT_STORAGE_FOLDER.'/data/cockpit.memory.sqlite'),

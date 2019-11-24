@@ -7,14 +7,28 @@ use Psr\Container\ContainerInterface;
  */
 
 $services = [
+    'mongolite' => function (ContainerInterface $c) {
+        $config = $c->get('database.config');
+
+        return new \Cockpit\Framework\Database\MongoLite\MongoLite($config['server'], $config['options']);
+    },
+
+    'mongo' => function (ContainerInterface $c) {
+        $config = $c->get('database.config');
+
+        return new \Cockpit\Framework\Database\MongoDB\Mongo($config['server'], $config['options'], $config['driverOptions']);
+    },
+
     // nosql storage
     'storage' => function (ContainerInterface $c) {
         $config = $c->get('database.config');
-        return new \MongoHybrid\Client(
-            $config['server'],
-            $config['options'],
-            $config['driverOptions']
-        );
+        $service = $c->get($config['driver']);
+
+        if (!$service instanceof \Cockpit\Framework\Database\DatabaseConnection) {
+            throw new \RuntimeException('Invalid database driver selected.');
+        }
+
+        return $service;
     },
 
     'path' => function (ContainerInterface $c) {
