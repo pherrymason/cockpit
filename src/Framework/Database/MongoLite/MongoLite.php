@@ -71,7 +71,7 @@ final class MongoLite implements DatabaseConnection
         return $this->driver->remove($collection, ['key' => (is_array($key) ? ['$in' => $key] : $key)]);
     }
 
-    public function rpush(string $collection, $key, $value)
+    public function rpush(string $collection, string $key, $value)
     {
         $list = $this->getKey($collection, $key, []);
 
