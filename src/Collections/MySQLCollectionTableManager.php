@@ -96,7 +96,7 @@ final class MySQLCollectionTableManager
         $info = $stmt->fetchAll();
 
         $currentTable = [];
-        $skippableFields = ['id'];
+        $skippableFields = ['id', '_by', '_mby', '_created', '_modified'];
         foreach ($info as $row) {
             if (in_array($row['Field'], $skippableFields)) {
                 continue;
@@ -132,8 +132,10 @@ final class MySQLCollectionTableManager
             $changes[] = ' DROP `'.$field['Field'].'`';
         }
 
-        $sql = 'ALTER TABLE `'.$tableName.'` ';
-        $sql.= implode(', ', $changes) . ';';
-        $this->db->query($sql);
+        if (count($changes) > 0) {
+            $sql = 'ALTER TABLE `' . $tableName . '` ';
+            $sql .= implode(', ', $changes) . ';';
+            $this->db->query($sql);
+        }
     }
 }

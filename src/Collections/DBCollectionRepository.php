@@ -83,8 +83,8 @@ final class DBCollectionRepository implements CollectionRepository
             'label' => $collection['label'],
             'color' => $collection['color'],
             'description' => $collection['description'],
-            'fields' => json_encode($collection['fields']),
-            'acl' => json_encode($collection['acl']),
+            'fields' => json_encode($collection['fields'], JSON_PRETTY_PRINT),
+            'acl' => json_encode($collection['acl'], JSON_PRETTY_PRINT),
             'sortable' => $collection['sortable'],
             'in_menu' => $collection['in_menu']
         ];
