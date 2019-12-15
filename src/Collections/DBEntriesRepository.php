@@ -21,7 +21,7 @@ final class DBEntriesRepository implements EntriesRepository
 
     public function byCollectionFiltered(Collection $collection, $options)
     {
-        $sql = 'SELECT * FROM '.$this->tableManager->tableName($collection->name()).';';
+        $sql = 'SELECT *, id as _id FROM '.$this->tableManager->tableName($collection->name()).';';
 
         return $this->db->query($sql)->fetchAll();
     }
