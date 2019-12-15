@@ -91,7 +91,7 @@ final class MySQLStorage implements DatabaseConnection
 
     public function insert(string $collection, &$doc)
     {
-        $this->save($collection, $doc);
+        $this->save($collection, $doc[0]);
     }
 
     public function insertBulk(string $string, array $docs)
