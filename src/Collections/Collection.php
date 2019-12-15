@@ -13,6 +13,8 @@ final class Collection
     /** @var string */
     private $label;
     /** @var string */
+    private $description;
+    /** @var string */
     private $color;
     /** @var mixed */
     private $fields;
@@ -22,13 +24,15 @@ final class Collection
     private $sortable;
     /** @var bool */
     private $inMenu;
+    /** @var array */
+    private $rules;
 
     public static function create()
     {
-        return new self(IDs::new(), '', '', '', [], [], false, false);
+        return new self(IDs::new(), '', '', '', '', [], [], false, false);
     }
 
-    public function __construct(string $id, string $name, string $label, string $color, $fields, array $acl, bool $sortable, bool $inMenu)
+    public function __construct(string $id, string $name, string $label, string $description, string $color, $fields, array $acl, bool $sortable, bool $inMenu)
     {
         $this->id = $id;
         $this->name = $name;
@@ -38,11 +42,33 @@ final class Collection
         $this->acl = $acl;
         $this->sortable = $sortable;
         $this->inMenu = $inMenu;
+        $this->rules = [
+            'create' => ['enabled' => false],
+            'read' => ['enabled' => false],
+            'update' => ['enabled' => false],
+            'delete' => ['enabled' => false]
+        ];
+        $this->description = $description;
     }
 
     public function id(): string
     {
         return $this->id;
+    }
+
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function color(): string
+    {
+        return $this->color;
+    }
+
+    public function sortable(): bool
+    {
+        return $this->sortable;
     }
 
     public function hasAccess($role): bool
@@ -56,6 +82,7 @@ final class Collection
             '_id' => $this->id,
             'name' => $this->name,
             'label' => $this->label,
+            'description' => $this->description,
             'color' => $this->color,
             'fields' => $this->fields,
             'sortable' => (bool) $this->sortable,
@@ -63,12 +90,10 @@ final class Collection
             '_created' => (new \DateTimeImmutable())->getTimestamp(),
             '_updated' => (new \DateTimeImmutable())->getTimestamp(),
             'acl' => [],
-            'rules' => [
-                'create' => ['enabled' => false],
-                'read' => ['enabled' => false],
-                'update' => ['enabled' => false],
-                'delete' => ['enabled' => false]
-            ],
+            'rules' => $this->rules,
+
+            // Things templates need
+            'icon' => '',
             'meta' => [
                 'allowed' => [
                     'delete' => true,

@@ -53,7 +53,7 @@ final class Field
     private $options;
     /** @var string */
     private $width;
-    /** @var bool */
+    /** @var bool ¿Show on list? */
     private $lst;
     /** @var array */
     private $acl;
