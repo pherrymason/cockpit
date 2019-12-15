@@ -82,7 +82,7 @@ final class DBEntriesRepository implements EntriesRepository
                 $fields[]= '`'.$key.'`=:'.$key;
             }
 
-            $sql = 'UPDATE '.$tableName.' SET ' . implode(', ', $fields);
+            $sql = 'UPDATE '.$tableName.' SET ' . implode(', ', $fields) . ' ';
             $sql.= 'WHERE id=:id';
         }
 
