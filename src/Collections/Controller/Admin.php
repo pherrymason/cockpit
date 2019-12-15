@@ -289,7 +289,6 @@ final class Admin extends \Cockpit\AuthController
 //        }
 
         $collection = $this->collections->byName($collectionName);
-        $entry = new \ArrayObject([]);
         $excludeFields = [];
 
         if (!$collection) {
@@ -340,7 +339,7 @@ final class Admin extends \Cockpit\AuthController
 
         return $this->render($view, [
             'collection' => $collection->toFrontendArray(),
-            'entry' => $entry,
+            'entry' => $entry->toFrontendArray(),
             'excludeFields' => $excludeFields
         ]);
     }
@@ -387,14 +386,13 @@ final class Admin extends \Cockpit\AuthController
             $entry['_created'] = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
             $entry['_by'] = $entry['_mby'];
             $revision = true;
-
-            if ($collection->sortable()) {
-                $entry['_o'] = $this->app->storage->count("collections/{$collection['_id']}", ['_pid' => ['$exists' => false]]);
-            }
+//              @todo
+//            if ($collection->sortable()) {
+//                $entry['_o'] = $this->app->storage->count("collections/{$collection['_id']}", ['_pid' => ['$exists' => false]]);
+//            }
         }
 
         $entry = $this->entries->save($collection, $entry, ['revision' => $revision]);
-//        $entry = $this->module('collections')->save($collection['name'], $entry, ['revision' => $revision]);
 
         $this->app->helper('admin')->lockResourceId($entry->id());
 
