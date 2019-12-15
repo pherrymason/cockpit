@@ -2,6 +2,7 @@
 
 namespace Framework\Database;
 
+use Cockpit\Framework\Database\ResultSet;
 use Doctrine\DBAL\Connection;
 
 
@@ -75,7 +76,7 @@ final class MySQLStorage implements DatabaseConnection
         try {
             $stmt = $this->connection->executeQuery($query, $params);
 
-            return $stmt->fetchAll();
+            return new ResultSet($stmt->fetchAll());
         } catch (\Exception $e) {
             throw new DatabaseException($e->getMessage(), $e->getCode(), $e);
         }
@@ -85,7 +86,7 @@ final class MySQLStorage implements DatabaseConnection
     {
         $resultSet = $this->find($collection, ['filter' => $filter]);
 
-        return count($resultSet) > 0 ? $resultSet[0] : null;
+        return $resultSet->count() > 0 ? $resultSet[0] : null;
     }
 
     public function insert(string $collection, &$doc)
@@ -161,8 +162,9 @@ final class MySQLStorage implements DatabaseConnection
         }
     }
 
-    public function count(string $collection, array $filter = []): int
+    public function count(string $collection, ?array $filter = []): int
     {
+        $filter = $filter ?? [];
         [$assignment, $params] = $this->queryAssignmentValues($filter);
         $sql = 'SELECT COUNT(_id) from ' . $this->decodeTableName($collection);
         if (count($assignment)) {
