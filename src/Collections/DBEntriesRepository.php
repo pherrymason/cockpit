@@ -28,12 +28,23 @@ final class DBEntriesRepository implements EntriesRepository
 
     public function byId(Collection $collection, string $id): ?Entry
     {
-        $sql = 'SELECT * FROM '.$this->tableManager->tableName($collection->name()).' WHERE id=:id';
+        $sql = 'SELECT * FROM '.$this->tableManager->tableName($collection->name()).' WHERE id=:id ';
+        $sql.= 'ORDER BY _modified DESC LIMIT 1';
 
         $stmt = $this->db->executeQuery($sql, ['id' => $id]);
 
         return $this->hydrate($stmt->fetch());
     }
+
+    public function revisionsById(Collection $collection, string $id)
+    {
+        $sql = 'SELECT * FROM '.$this->tableManager->tableName($collection->name()).' WHERE id=:id ';
+
+        $stmt = $this->db->executeQuery($sql, ['id' => $id]);
+
+        return array_map([$this, 'hydrate'], $stmt->fetchAll());
+    }
+
 
     public function save(Collection $collection, array $entry, array $options): Entry
     {
@@ -93,6 +104,9 @@ final class DBEntriesRepository implements EntriesRepository
 
     private function hydrate(array $data): Entry
     {
+        $revisionID = $data['rev_id'] ?? null;
+        $previousRevisionID = $data['prev_rev_id'] ?? null;
+
         return new Entry($data['id'], $data);
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Cockpit\Collections;
 
-final class Entry
+use Cockpit\App\ContentUnit;
+
+final class Entry implements ContentUnit
 {
     /** @var string */
     private $id;
@@ -20,6 +22,17 @@ final class Entry
         return $this->id;
     }
 
+/*    public function freezeRevision(Entry $newEntry)
+    {
+        $this->revisionID = IDs::new();
+        $newEntry->setPreviousRevision($this);
+    }
+
+    public function setPreviousRevision(Entry $previousRevision)
+    {
+        $this->previousRevisionID = $previousRevision->revisionID();
+    }
+*/
     public function hasAccess(): bool
     {
         return true;
@@ -32,5 +45,10 @@ final class Entry
         ];
 
         return array_merge($data, $this->data);
+    }
+
+    public function toArray(): array
+    {
+        return $this->toFrontendArray();
     }
 }

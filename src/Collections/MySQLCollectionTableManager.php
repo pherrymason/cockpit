@@ -32,6 +32,8 @@ final class MySQLCollectionTableManager
         } else {
             $sql = 'CREATE TABLE `' . $tableName . '` (';
             $sql.= '`id` CHAR(36) NOT NULL, ';
+            $sql.= '`rev_id` CHAR(36) NULL, ';
+            $sql.= '`prev_rev_id` CHAR(36) NULL, ';
             foreach ($fields as $field) {
                 $columnType = $this->columnTypeFromField($field);
                 $default = 'DEFAULT NULL';

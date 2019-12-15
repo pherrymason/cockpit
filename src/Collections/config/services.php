@@ -8,12 +8,21 @@ return [
         return new \Cockpit\Collections\Controller\Admin(
             $c->get(\Cockpit\Collections\DBCollectionRepository::class),
             $c->get(\Cockpit\Collections\DBEntriesRepository::class),
+            $c->get(\Cockpit\App\Revisions::class),
             $c->get('app')
         );
     },
 
+    // Utils
     \Cockpit\Collections\MySQLCollectionTableManager::class => function (ContainerInterface $c) {
         return new \Cockpit\Collections\MySQLCollectionTableManager($c->get('dbal.mysql'));
+    },
+    \Cockpit\Collections\DBEntryHistoryRepository::class => function (ContainerInterface $c) {
+        return new \Cockpit\Collections\DBEntryHistoryRepository(
+            $c->get('dbal.mysql'),
+            $c->get(\Cockpit\Collections\MySQLCollectionTableManager::class),
+            $c->get(\Cockpit\Collections\DBEntriesRepository::class)
+        );
     },
 
     // Repositories

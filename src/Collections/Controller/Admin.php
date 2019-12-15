@@ -6,21 +6,23 @@ use Cockpit\Collections\Collection;
 use Cockpit\Collections\CollectionRepository;
 use Cockpit\Collections\EntriesRepository;
 use Cockpit\Collections\Role;
+use Cockpit\App\Revisions;
 use Lime\App;
 
 final class Admin extends \Cockpit\AuthController
 {
     /** @var CollectionRepository */
     private $collections;
-    /**
-     * @var EntriesRepository
-     */
+    /** @var EntriesRepository */
     private $entries;
+    /** @var Revisions */
+    private $revisions;
 
-    public function __construct(CollectionRepository $collections, EntriesRepository $entries, App $app)
+    public function __construct(CollectionRepository $collections, EntriesRepository $entries, Revisions $revisions, App $app)
     {
         $this->collections = $collections;
         $this->entries = $entries;
+        $this->revisions = $revisions;
         parent::__construct($app);
     }
 
@@ -368,7 +370,7 @@ final class Admin extends \Cockpit\AuthController
 
         $entry['_mby'] = $this->module('cockpit')->getUser('_id');
         $entry['_modified'] = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
-
+        $isUpdate = false;
         if (isset($entry['_id'])) {
             if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($entry['_id'])) {
                 $this->stop(['error' => "Saving failed! Entry is locked!"], 412);
@@ -386,15 +388,29 @@ final class Admin extends \Cockpit\AuthController
             $entry['_created'] = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
             $entry['_by'] = $entry['_mby'];
             $revision = true;
+            $isUpdate = true;
 //              @todo
 //            if ($collection->sortable()) {
 //                $entry['_o'] = $this->app->storage->count("collections/{$collection['_id']}", ['_pid' => ['$exists' => false]]);
 //            }
         }
 
-        $entry = $this->entries->save($collection, $entry, ['revision' => $revision]);
+        $this->app->trigger('collections.save.before', [$collection->name(), &$entry, $isUpdate]);
+        $this->app->trigger("collections.save.before.{$collection->name()}", [$collection->name(), &$entry, $isUpdate]);
 
-        $this->app->helper('admin')->lockResourceId($entry->id());
+        $options = ['revision' => $revision];
+        $entry = $this->entries->save($collection, $entry, $options);
+        $entryArray = $entry->toFrontendArray();
+
+        $this->app->trigger('collections.save.after', [$collection->name(), &$entryArray, $isUpdate]);
+        $this->app->trigger("collections.save.after.{$collection->name()}", [$collection->name(), &$entryArray, $isUpdate]);
+
+//        $this->app->helper('admin')->lockResourceId($entry->id());
+        if ($options['revision']) {
+            $user = $this->app->module('cockpit')->getUser();
+            $this->revisions->add($entry, $user['_id'], "collections/{$collection->name()}");
+//            $this->app->helper('revisions')->add($entry['_id'], $entry, $user['_id'], "collections/{$collection}");
+        }
 
         return $entry;
     }

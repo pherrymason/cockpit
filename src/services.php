@@ -210,6 +210,7 @@ $services = [
 ];
 
 
-$controllerServices = require('Collections/config/services.php');
+$cockpitServices = require('App/config/services.php');
+$collectionServices = require('Collections/config/services.php');
 
-return array_merge($configuration, $services, $controllerServices);
+return array_merge($configuration, $services, $cockpitServices, $collectionServices);
