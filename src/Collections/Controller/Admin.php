@@ -414,4 +414,31 @@ final class Admin extends \Cockpit\AuthController
 
         return $entry;
     }
+
+    public function revisions($collectionName, $id)
+    {
+//        if (!$this->module('collections')->hasaccess($collection, 'entries_edit')) {
+//            return $this->helper('admin')->denyRequest();
+//        }
+
+        $collection = $this->collections->byName($collectionName);
+
+        if (!$collection) {
+            return false;
+        }
+
+        $entry = $this->entries->byId($collection, $id);
+
+        if (!$entry) {
+            return false;
+        }
+
+        $revisions = $this->revisions->getList($id);
+
+        return $this->render('collections:views/revisions.php', [
+            'collection' => $collection->toFrontendArray(),
+            'entry' => $entry->toFrontendArray(),
+            'revisions' => $revisions
+        ]);
+    }
 }

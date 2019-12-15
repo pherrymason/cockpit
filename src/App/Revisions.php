@@ -28,17 +28,21 @@ class Revisions
 
     public function count($id) {
         $sql = 'SELECT COUNT(_id) FROM '.self::TABLE.' WHERE _oid=:id';
-        $stmt = $this->db->query($sql, ['_oid'=>$id]);
+        $stmt = $this->db->executeQuery($sql, ['_oid'=>$id]);
 
         return $stmt->fetch()['COUNT(_id)'];
     }
 
-    public function getList($id) {
+    public function getList($id)
+    {
+        $sql = 'SELECT * FROM '.self::TABLE.' WHERE _oid=:_oid ORDER BY `_created` DESC';
+        $stmt = $this->db->executeQuery($sql, ['_oid' => $id], ['_oid' => ParameterType::STRING]);
 
-        return $this->storage->find('cockpit/revisions', [
-            'filter' => ['_oid' => $id],
-            'sort'   => ['_created' => -1]
-        ])->toArray();
+        return $stmt->fetchAll();
+//        return $this->storage->find('cockpit/revisions', [
+//            'filter' => ['_oid' => $id],
+//            'sort'   => ['_created' => -1]
+//        ])->toArray();
     }
 
     public function add(ContentUnit $content, $creatorID, $meta = null)

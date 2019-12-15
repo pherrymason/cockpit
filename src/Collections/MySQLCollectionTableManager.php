@@ -53,6 +53,7 @@ final class MySQLCollectionTableManager
 
     private function columnTypeFromField(Field $field): string
     {
+        // @todo Complete with more field types
         switch ($field->type()) {
             default:
                 return 'TEXT';
