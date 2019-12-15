@@ -32,8 +32,6 @@ final class MySQLCollectionTableManager
         } else {
             $sql = 'CREATE TABLE `' . $tableName . '` (';
             $sql.= '`id` CHAR(36) NOT NULL, ';
-            $sql.= '`rev_id` CHAR(36) NULL, ';
-            $sql.= '`prev_rev_id` CHAR(36) NULL, ';
             foreach ($fields as $field) {
                 $columnType = $this->columnTypeFromField($field);
                 $default = 'DEFAULT NULL';
@@ -41,8 +39,8 @@ final class MySQLCollectionTableManager
             }
 
             // Add mandatory columns
-            $sql.= '`_by` CHAR(12) DEFAULT NULL, ';
-            $sql.= '`_mby` CHAR(12) DEFAULT NULL, ';
+            $sql.= '`_by` CHAR(32) DEFAULT NULL, ';
+            $sql.= '`_mby` CHAR(32) DEFAULT NULL, ';
             $sql.= '`_created` DATETIME DEFAULT NULL, ';
             $sql.= '`_modified` DATETIME DEFAULT NULL ';
 
