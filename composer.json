@@ -14,7 +14,8 @@
     "autoload": {
         "psr-4": {
             "\\": "lib/",
-            "Cockpit\\": "src/"
+            "Cockpit\\": "src/",
+            "Framework\\": "src/"
         }
     },
     "require": {
@@ -34,7 +35,8 @@
         "erusev/parsedown": "^1.7",
         "erusev/parsedown-extra": "^0.7.1",
         "maennchen/zipstream-php": "^0.5.2",
-        "php-di/php-di": "^6.0"
+        "php-di/php-di": "^6.0",
+        "ramsey/uuid": "^3.9"
     },
 
     "config": {

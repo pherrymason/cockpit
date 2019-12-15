@@ -86,7 +86,6 @@ $this->module('collections')->extend([
         }
 
         if ($rules) {
-
             foreach (['create', 'read', 'update', 'delete'] as $method) {
 
                 if (isset($rules[$method])) {

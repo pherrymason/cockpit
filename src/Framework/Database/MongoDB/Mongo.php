@@ -1,20 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace Cockpit\Framework\Database\MongoDB;
+namespace Framework\Database\MongoDB;
 
-use Cockpit\Framework\Database\DatabaseConnection;
+use Framework\Database\DatabaseConnection;
 
 /**
  * Wraps MongoLite\MongoHybrid\Mongo
  */
 final class Mongo implements DatabaseConnection
 {
-    /** @var \Cockpit\Framework\Database\MongoLite\MongoHybrid\Mongo */
+    /** @var \Framework\Database\MongoLite\MongoHybrid\Mongo */
     private $driver;
 
     public function __construct(string $server, array $options = [], array $driverOptions = [])
     {
-        $this->driver = new \Cockpit\Framework\Database\MongoLite\MongoHybrid\Mongo($server, $options, $driverOptions);
+        $this->driver = new \Framework\Database\MongoLite\MongoHybrid\Mongo($server, $options, $driverOptions);
     }
 
     public function type(): string
@@ -32,6 +32,9 @@ final class Mongo implements DatabaseConnection
         return $this->driver->findOne($collection, $filter, $projection);
     }
 
+    /**
+     * Not used
+     */
     public function findOneById(string $collection, string $id)
     {
         return $this->driver->findOneById($collection, $id);
@@ -42,7 +45,7 @@ final class Mongo implements DatabaseConnection
         return $this->driver->insert($collection, $doc);
     }
 
-    public function save(string $collection, &$data, bool $create = false)
+    public function save(string $collection, &$data)
     {
         return $this->driver->save($collection, $data, $create);
     }

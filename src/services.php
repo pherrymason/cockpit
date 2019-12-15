@@ -7,16 +7,41 @@ use Psr\Container\ContainerInterface;
  */
 
 $services = [
+    'dbal.mysql' => function (ContainerInterface $c) {
+        $config = new \Doctrine\DBAL\Configuration();
+        $params = $c->get('database.config');
+        $connectionParams = [
+            'driver' => 'pdo_mysql',
+            'host' => $params['server'],
+            'dbname' => $params['options']['db'],
+            'user' => $params['options']['user'],
+            'password' => $params['options']['password']
+        ];
+
+        return \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+    },
+
+    'sql' => function (ContainerInterface $c) {
+        $config = $c->get('database.config');
+        return new \Framework\Database\MySQLStorage(
+            $config['server'],
+            $config['options']['db'] ?? null,
+            $config['options']['user'] ?? null,
+            $config['options']['password'] ?? null
+        );
+    },
+
     'mongolite' => function (ContainerInterface $c) {
         $config = $c->get('database.config');
 
-        return new \Cockpit\Framework\Database\MongoLite\MongoLite($config['server'], $config['options']);
+        return new \Framework\Database\MongoLite\MongoLite($config['server'], $config['options']);
     },
+
 
     'mongo' => function (ContainerInterface $c) {
         $config = $c->get('database.config');
 
-        return new \Cockpit\Framework\Database\MongoDB\Mongo($config['server'], $config['options'], $config['driverOptions']);
+        return new \Framework\Database\MongoDB\Mongo($config['server'], $config['options'], $config['driverOptions']);
     },
 
     // nosql storage
@@ -24,7 +49,7 @@ $services = [
         $config = $c->get('database.config');
         $service = $c->get($config['driver']);
 
-        if (!$service instanceof \Cockpit\Framework\Database\DatabaseConnection) {
+        if (!$service instanceof \Framework\Database\DatabaseConnection) {
             throw new \RuntimeException('Invalid database driver selected.');
         }
 
@@ -32,11 +57,11 @@ $services = [
     },
 
     'path' => function (ContainerInterface $c) {
-        return new \Cockpit\Framework\PathResolver($c->get('paths'), $c->get('site_url'), $c->get('docs_root'));
+        return new \Framework\PathResolver($c->get('paths'), $c->get('site_url'), $c->get('docs_root'));
     },
 
     'events' => function (ContainerInterface $c) {
-        return new \Cockpit\Framework\EventSystem();
+        return new \Framework\EventSystem();
     },
 
     'filestorage' => function (ContainerInterface $c) {
@@ -184,4 +209,7 @@ $services = [
     }
 ];
 
-return array_merge($configuration, $services);
+
+$controllerServices = require('Collections/config/services.php');
+
+return array_merge($configuration, $services, $controllerServices);

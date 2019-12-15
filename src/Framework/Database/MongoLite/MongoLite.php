@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Cockpit\Framework\Database\MongoLite;
+namespace Framework\Database\MongoLite;
 
-use Cockpit\Framework\Database\DatabaseConnection;
-use Cockpit\Framework\Database\MongoLite\MongoHybrid\MongoLite as Driver;
+use Framework\Database\DatabaseConnection;
+use Framework\Database\MongoLite\MongoHybrid\MongoLite as Driver;
 
 /**
  * Wraps \MongoHybrid\MongoLite
@@ -36,11 +36,6 @@ final class MongoLite implements DatabaseConnection
     public function findOne(string $collection, array $filter = [], $projection = null)
     {
         return $this->driver->getCollection($collection)->findOne($filter, $projection);
-    }
-
-    public function findOneById(string $collection, string $id)
-    {
-        return $this->driver->findOneById($collection, $id);
     }
 
     public function getKey(string $collection, string $key, $default = null)
@@ -87,9 +82,9 @@ final class MongoLite implements DatabaseConnection
         return $this->driver->insert($collection, $doc);
     }
 
-    public function save(string $collection, &$data, bool $create = false)
+    public function save(string $collection, &$data)
     {
-        return $this->driver->save($collection, $data, $create);
+        return $this->driver->save($collection, $data);
     }
 
     public function update(string $collection, array $criteria, $data)

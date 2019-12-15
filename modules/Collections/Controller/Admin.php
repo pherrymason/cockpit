@@ -13,7 +13,6 @@ namespace Collections\Controller;
 
 class Admin extends \Cockpit\AuthController {
 
-
     public function index() {
 
         $_collections = $this->module('collections')->getCollectionsInGroup(null, false);

@@ -112,7 +112,7 @@ function cockpit($module = null) {
         $container = $builder->build();
 
         $app = new LimeExtra\App($container, $configuration);
-
+        $container->set('app', $app);
         $app['config'] = $configuration;
 
         // register paths
