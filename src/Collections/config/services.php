@@ -11,11 +11,15 @@ return [
         );
     },
 
-
-
+    \Cockpit\Collections\MySQLCollectionTableManager::class => function (ContainerInterface $c) {
+        return new \Cockpit\Collections\MySQLCollectionTableManager($c->get('dbal.mysql'));
+    },
 
     // Repositories
     \Cockpit\Collections\DBCollectionRepository::class => function (ContainerInterface $c) {
-        return new \Cockpit\Collections\DBCollectionRepository($c->get('dbal.mysql'));
+        return new \Cockpit\Collections\DBCollectionRepository(
+            $c->get('dbal.mysql'),
+            $c->get(\Cockpit\Collections\MySQLCollectionTableManager::class)
+        );
     }
 ];

@@ -9,10 +9,13 @@ final class DBCollectionRepository implements CollectionRepository
 {
     /** @var Connection */
     private $db;
+    /** @var MySQLCollectionTableManager */
+    private $tableManager;
 
-    public function __construct(Connection $db)
+    public function __construct(Connection $db, MySQLCollectionTableManager $tableManager)
     {
         $this->db = $db;
+        $this->tableManager = $tableManager;
     }
 
     public function byId(string $id): ?Collection
@@ -92,7 +95,13 @@ final class DBCollectionRepository implements CollectionRepository
             $sql = 'INSERT INTO cockpit_collections (`id`, `name`, `label`, `color`, `fields`, `acl`, `sortable`, `in_menu`) VALUES(:id, :name, :label, :color, :fields, :acl, :sortable, :in_menu);';
         }
 
-        $this->db->executeUpdate($sql, $params);
+        try {
+            $this->db->executeUpdate($sql, $params);
+            $this->tableManager->updateCollectionTable($this->tableName($collection['name']), $collection);
+        } catch (\Exception $e) {
+
+        }
+
     }
 
     private function hydrate($data)
@@ -107,5 +116,10 @@ final class DBCollectionRepository implements CollectionRepository
             (bool)$data['sortable'],
             (bool)$data['in_menu']
         );
+    }
+
+    private function tableName(string $collectionName): string
+    {
+        return 'cockpit_collection_'.$collectionName;
     }
 }
