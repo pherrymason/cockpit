@@ -259,13 +259,16 @@ $this->module('collections')->extend([
         return $entries[0] ?? null;
     },
 
+    // Saves an entry
     'save' => function($collection, $data, $options = []) {
 
         $options = array_merge(['revision' => false], $options);
 
         $_collection = $this->collection($collection);
 
-        if (!$_collection) return false;
+        if (!$_collection) {
+            return false;
+        }
 
         $name       = $collection;
         $collection = $_collection['_id'];
