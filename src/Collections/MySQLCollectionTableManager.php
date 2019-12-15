@@ -14,15 +14,20 @@ final class MySQLCollectionTableManager
         $this->db = $db;
     }
 
-    public function updateCollectionTable(string $tableName, array $collection)
+    public function tableName(string $collectionName): string
     {
+        return 'cockpit_collection_'.$collectionName;
+    }
+
+    public function updateCollectionTable(string $collectionName, array $collection)
+    {
+        $tableName = $this->tableName($collectionName);
         $fields = $collection['fields'];
         /** @var Field[] $fields */
         $fields = array_map([$this, 'hydrateField'], $fields);
 
         /** @var string $tableName */
         if ($this->tableExists($tableName)) {
-            // Update table
             $this->updateTableStructure($tableName, $fields);
         } else {
             $sql = 'CREATE TABLE `' . $tableName . '` (';
@@ -32,21 +37,17 @@ final class MySQLCollectionTableManager
                 $default = 'DEFAULT NULL';
                 $sql.= '`'.$field->name().'` '.$columnType . ' ' . $default.', ';
             }
+
+            // Add mandatory columns
+            $sql.= '`_by` CHAR(12) DEFAULT NULL, ';
+            $sql.= '`_mby` CHAR(12) DEFAULT NULL, ';
+            $sql.= '`_created` DATETIME DEFAULT NULL, ';
+            $sql.= '`_modified` DATETIME DEFAULT NULL ';
+
             $sql.= 'PRIMARY KEY (`id`)';
             $sql.= ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
             $this->db->query($sql);
-            /*
-            CREATE TABLE `shop_order_status` (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  `value` char(20) NOT NULL,
-  `color` char(7) DEFAULT NULL,
-  `email` char(50) DEFAULT NULL,
-  `order` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-            */
         }
     }
 

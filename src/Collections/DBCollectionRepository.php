@@ -82,6 +82,7 @@ final class DBCollectionRepository implements CollectionRepository
             'name' => $collection['name'],
             'label' => $collection['label'],
             'color' => $collection['color'],
+            'description' => $collection['description'],
             'fields' => json_encode($collection['fields']),
             'acl' => json_encode($collection['acl']),
             'sortable' => $collection['sortable'],
@@ -89,37 +90,28 @@ final class DBCollectionRepository implements CollectionRepository
         ];
 
         if ($saved) {
-            $sql = 'UPDATE cockpit_collections SET name=:name, label=:label, color=:color, fields=:fields, acl=:acl, sortable=:sortable, in_menu=:in_menu';
+            $sql = 'UPDATE cockpit_collections SET name=:name, label=:label, description=:description, color=:color, fields=:fields, acl=:acl, sortable=:sortable, in_menu=:in_menu WHERE id=:id';
+            $params['id'] = $saved->id();
         } else {
             $params['id'] = IDs::new();
-            $sql = 'INSERT INTO cockpit_collections (`id`, `name`, `label`, `color`, `fields`, `acl`, `sortable`, `in_menu`) VALUES(:id, :name, :label, :color, :fields, :acl, :sortable, :in_menu);';
+            $sql = 'INSERT INTO cockpit_collections (`id`, `name`, `label`, `description`, `color`, `fields`, `acl`, `sortable`, `in_menu`) VALUES(:id, :name, :label, :description, :color, :fields, :acl, :sortable, :in_menu);';
         }
 
         try {
             $this->db->executeUpdate($sql, $params);
-            $this->tableManager->updateCollectionTable($this->tableName($collection['name']), $collection);
+            $this->tableManager->updateCollectionTable($collection['name'], $collection);
         } catch (\Exception $e) {
 
         }
-
     }
 
     private function hydrate($data)
     {
         return new Collection(
-            $data['id'],
-            $data['name'],
-            $data['label'],
-            (string)$data['color'],
-            json_decode($data['fields'], true),
-            json_decode($data['acl'], true),
-            (bool)$data['sortable'],
-            (bool)$data['in_menu']
+            $data['id'], $data['name'], $data['label'], $data['description'] ?? '', (string)$data['color'], json_decode($data['fields'], true), json_decode($data['acl'], true), (bool)$data['sortable'], (bool)$data['in_menu']
         );
+        //json_decode($data['rules'], true)
     }
 
-    private function tableName(string $collectionName): string
-    {
-        return 'cockpit_collection_'.$collectionName;
-    }
+
 }
