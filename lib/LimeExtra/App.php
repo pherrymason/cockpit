@@ -10,6 +10,7 @@
 
 namespace LimeExtra;
 
+use DI\Definition\Exception\InvalidDefinition;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -148,8 +149,14 @@ class App extends \Lime\App {
     {
         // Check if existing in container
         if ($this->container->has($class)) {
-            $controller = $this->container->get($class);
-        } else {
+            try {
+                $controller = $this->container->get($class);
+            } catch (InvalidDefinition $e) {
+                $controller = null;
+            }
+        }
+
+        if ($controller === null) {
             $controller = new $class($this);
         }
 
