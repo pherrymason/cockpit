@@ -19,7 +19,7 @@ if (PHP_SAPI == 'cli-server' && is_file(__DIR__.parse_url($_SERVER['REQUEST_URI'
 }
 
 // bootstrap cockpit
-require(__DIR__.'/bootstrap.php');
+require(__DIR__.'/src/bootstrap.php');
 
 # admin route
 if (COCKPIT_ADMIN && !defined('COCKPIT_ADMIN_ROUTE')) {
@@ -45,4 +45,5 @@ if (COCKPIT_API_REQUEST) {
 
 
 // run backend
+/** @var \LimeExtra\App $cockpit */
 $cockpit->set('route', COCKPIT_ADMIN_ROUTE)->trigger('admin.init')->run();

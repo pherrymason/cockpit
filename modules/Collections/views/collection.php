@@ -205,7 +205,7 @@
 
         <cp-actionbar>
             <div class="uk-container uk-container-center">
-
+                <input type="hidden" name="raul" value="122343" bind="collection.group"/>
                 <div class="uk-button-group">
                     <button class="uk-button uk-button-large uk-button-primary">@lang('Save')</button>
                     <a class="uk-button uk-button-large" href="@route('/collections/entries')/{ collection.name }" if="{ collection._id }">@lang('Show entries')</a>

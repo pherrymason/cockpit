@@ -14,7 +14,7 @@ try {
 
 } catch (Exception $e) { }
 
-require(__DIR__.'/../bootstrap.php');
+require(__DIR__.'/../src/bootstrap.php');
 
 function ensure_writable($path) {
     try {

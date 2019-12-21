@@ -9,11 +9,19 @@
  */
 
 // Helpers
-
-$this->helpers['revisions']  = 'Cockpit\\Helper\\Revisions';
-$this->helpers['updater']    = 'Cockpit\\Helper\\Updater';
-$this->helpers['async']      = 'Cockpit\\Helper\\Async';
-$this->helpers['jobs']       = 'Cockpit\\Helper\\Jobs';
+$container = $app->getContainer();
+$container->set('revisions', function (\Psr\Container\ContainerInterface $c) {
+    return new \Cockpit\Helper\Revisions($c->get('storage'));
+});
+$container->set('updater', function () {
+    return new \Cockpit\Helper\Updater();
+});
+$container->set('async', function () {
+    return new \Cockpit\Helper\Async();
+});
+$container->set('jobs', function () {
+    return new \Cockpit\Helper\Jobs();
+});
 
 // API
 $this->module('cockpit')->extend([

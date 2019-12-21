@@ -11,7 +11,7 @@
 namespace MongoHybrid;
 
 class Client {
-
+    /** @var MongoLite  */
     protected $driver;
     public $type;
 

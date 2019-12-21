@@ -272,7 +272,6 @@
             }
 
             submit(e) {
-
                 if(e) e.preventDefault();
 
                 var required = [];

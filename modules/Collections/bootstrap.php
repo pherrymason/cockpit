@@ -86,7 +86,6 @@ $this->module('collections')->extend([
         }
 
         if ($rules) {
-
             foreach (['create', 'read', 'update', 'delete'] as $method) {
 
                 if (isset($rules[$method])) {
@@ -260,13 +259,16 @@ $this->module('collections')->extend([
         return $entries[0] ?? null;
     },
 
+    // Saves an entry
     'save' => function($collection, $data, $options = []) {
 
         $options = array_merge(['revision' => false], $options);
 
         $_collection = $this->collection($collection);
 
-        if (!$_collection) return false;
+        if (!$_collection) {
+            return false;
+        }
 
         $name       = $collection;
         $collection = $_collection['_id'];
@@ -376,7 +378,8 @@ $this->module('collections')->extend([
             $this->app->trigger("collections.save.after.{$name}", [$name, &$entry, $isUpdate]);
 
             if ($ret && $options['revision']) {
-                $this->app->helper('revisions')->add($entry['_id'], $entry, "collections/{$collection}", true);
+                $user = $this->app->module('cockpit')->getUser();
+                $this->app->helper('revisions')->add($entry['_id'], $entry, $user['_id'], "collections/{$collection}");
             }
 
             $return[] = $ret ? $entry : false;
@@ -738,7 +741,7 @@ if (COCKPIT_API_REQUEST) {
 
 // ADMIN
 if (COCKPIT_ADMIN_CP) {
-    include_once(__DIR__.'/admin.php');
+   include_once(__DIR__.'/admin.php');
 }
 
 // CLI

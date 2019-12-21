@@ -125,7 +125,8 @@ $this->module('singletons')->extend([
             $this->app->trigger("singleton.saveData.after.{$name}", [$singleton, $data]);
 
             if (isset($options['revision']) && $options['revision']) {
-                $this->app->helper('revisions')->add($singleton['_id'], $data, "singletons/{$singleton['name']}", true);
+                $user = $this->app->module('cockpit')->getUser();
+                $this->app->helper('revisions')->add($singleton['_id'], $data, $user['_id'], "singletons/{$singleton['name']}");
             }
 
             return $data;

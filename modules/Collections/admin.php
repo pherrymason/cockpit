@@ -7,16 +7,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+$container = $app->getContainer();
+/** @var \Cockpit\Helper\Admin $admin */
 
-$app->on('admin.init', function() {
+$app->on('admin.init', function() use ($container) {
+    $admin = $container->get('admin');
 
-    $this->helper('admin')->addAssets('collections:assets/field-collectionlink.tag');
-    $this->helper('admin')->addAssets('collections:assets/link-collectionitem.js');
+    $admin->addAssets('collections:assets/field-collectionlink.tag');
+    $admin->addAssets('collections:assets/link-collectionitem.js');
 
     if (!$this->module('cockpit')->getGroupRights('collections') && !$this->module('collections')->getCollectionsInGroup()) {
 
-        $this->bind('/collections/*', function() {
-            return $this('admin')->denyRequest();
+        $this->bind('/collections/*', function() use($admin) {
+            return $admin->denyRequest();
         });
 
         return;
@@ -26,12 +29,12 @@ $app->on('admin.init', function() {
     $this->bindClass('Collections\\Controller\\Trash', 'collections/trash');
     $this->bindClass('Collections\\Controller\\Import', 'collections/import');
     $this->bindClass('Collections\\Controller\\Utils', 'collections/utils');
-    $this->bindClass('Collections\\Controller\\Admin', 'collections');
+    $this->bindClass(\Cockpit\Collections\Controller\Admin::class, 'collections');
 
     $active = strpos($this['route'], '/collections') === 0;
 
     // add to modules menu
-    $this->helper('admin')->addMenuItem('modules', [
+    $admin->addMenuItem('modules', [
         'label' => 'Collections',
         'icon'  => 'collections:icon.svg',
         'route' => '/collections',
@@ -39,7 +42,7 @@ $app->on('admin.init', function() {
     ]);
 
     if ($active) {
-        $this->helper('admin')->favicon = 'collections:icon.svg';
+        $admin->favicon = 'collections:icon.svg';
     } 
 
     /**

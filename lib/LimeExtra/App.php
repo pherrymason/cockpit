@@ -10,84 +10,29 @@
 
 namespace LimeExtra;
 
+use DI\Definition\Exception\InvalidDefinition;
+use Psr\Container\ContainerInterface;
+
 /**
  * Class App
  * @package LimeExtra
  */
 class App extends \Lime\App {
 
-    /**
-     * @param array $settings
-     */
-    public function __construct ($settings = []) {
-
-        $settings["helpers"]  = \array_merge([
-            'acl'     => 'Lime\\Helper\\SimpleAcl',
-            'assets'  => 'Lime\\Helper\\Assets',
-            'fs'      => 'Lime\\Helper\\Filesystem',
-            'image'   => 'Lime\\Helper\\Image',
-            'i18n'    => 'Lime\\Helper\\I18n',
-            'utils'   => 'Lime\\Helper\\Utils',
-            'coockie' => 'Lime\\Helper\\Cookie',
-            'yaml'    => 'Lime\\Helper\\YAML',
-        ], isset($settings['helpers']) ? $settings['helpers'] : []);
-
-        parent::__construct($settings);
-
-        // renderer service
-        $this->service('renderer', function() {
-
-            $renderer = new \Lexy();
-
-            //register app helper functions
-            $renderer->extend(function($content){
-
-                $replace = [
-                    'extend'   => '<?php $extend(expr); ?>',
-                    'base'     => '<?php $app->base(expr); ?>',
-                    'route'    => '<?php $app->route(expr); ?>',
-                    'trigger'  => '<?php $app->trigger(expr); ?>',
-                    'assets'   => '<?php echo $app->assets(expr); ?>',
-                    'start'    => '<?php $app->start(expr); ?>',
-                    'end'      => '<?php $app->end(expr); ?>',
-                    'block'    => '<?php $app->block(expr); ?>',
-                    'url'      => '<?php echo $app->pathToUrl(expr); ?>',
-                    'view'     => '<?php echo $app->view(expr); ?>',
-                    'render'   => '<?php echo $app->view(expr); ?>',
-                    'include'  => '<?php echo include($app->path(expr)); ?>',
-                    'lang'     => '<?php echo $app("i18n")->get(expr); ?>',
-                ];
-
-
-                $content = \preg_replace_callback('/\B@(\w+)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function($match) use($replace) {
-
-                    if (isset($match[3]) && \trim($match[1]) && isset($replace[$match[1]])) {
-                        return \str_replace('(expr)', $match[3], $replace[$match[1]]);
-                    }
-
-                    return $match[0];
-
-                }, $content);
-
-
-                return $content;
-            });
-
-            return $renderer;
-        });
+    public function __construct (ContainerInterface $container, array $settings = []) {
+        parent::__construct($container, $settings);
 
         if ($this->retrieve('session.init', true)) {
             $this('session')->init();
         }
     }
 
-
     /**
-    * Render view.
-    * @param  String $template Path to view
-    * @param  Array  $slots   Passed variables
-    * @return String               Rendered view
-    */
+     * Render view.
+     * @param string $template Path to view
+     * @param  []  $slots   Passed variables
+     * @return string               Rendered view
+     */
     public function view($template, $slots = []) {
 
         $this->trigger('app.render.view', [&$template, &$slots]);
@@ -96,7 +41,8 @@ class App extends \Lime\App {
             $this->trigger("app.render.view/{$template}", [&$template, &$slots]);
         }
 
-        $renderer     = $this->renderer;
+        /** @var \Lexy $renderer */
+        $renderer     = $this->container->get('renderer');
         $olayout      = $this->layout;
 
         $slots        = \array_merge($this->viewvars, $slots);
@@ -197,5 +143,25 @@ class App extends \Lime\App {
         }
 
         return \implode("\n", $list);
+    }
+
+    public function invoke($class, $action="index", $params=[])
+    {
+        // Check if existing in container
+        if ($this->container->has($class)) {
+            try {
+                $controller = $this->container->get($class);
+            } catch (InvalidDefinition $e) {
+                $controller = null;
+            }
+        }
+
+        if ($controller === null) {
+            $controller = new $class($this);
+        }
+
+        return \method_exists($controller, $action) && \is_callable([$controller, $action])
+            ? \call_user_func_array([$controller,$action], $params)
+            : false;
     }
 }
