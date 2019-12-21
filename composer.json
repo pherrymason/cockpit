@@ -37,7 +37,9 @@
         "maennchen/zipstream-php": "^0.5.2",
         "php-di/php-di": "^6.0",
         "ramsey/uuid": "^3.9",
-        "filp/whoops": "^2.5"
+        "filp/whoops": "^2.5",
+      "ext-fileinfo": "*",
+        "cocur/slugify": "^4.0"
     },
 
     "config": {

@@ -13,8 +13,8 @@ namespace Lime\Helper;
 use claviska\SimpleImage;
 
 
-class Image extends \Lime\Helper {
-
+class Image
+{
     public function take($imgpath) {
 
         $img = new Img($imgpath);
