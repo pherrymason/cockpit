@@ -27,6 +27,10 @@ return [
     },
 
     // Repositories -----------------------------------------------
+    \Cockpit\App\Revisions\RevisionsRepository::class => function(ContainerInterface $c) {
+        return new \Cockpit\App\Revisions\RevisionsRepository($c->get('dbal.mysql'));
+    },
+
     \Cockpit\App\Assets\AssetRepository::class => function (ContainerInterface $c) {
         return new \Cockpit\App\Assets\DBAssetRepository(
             $c->get('dbal.mysql')
@@ -46,6 +50,13 @@ return [
             $c->get(\Cockpit\App\Assets\AssetRepository::class),
             $c->get(\Cockpit\App\Assets\FolderRepository::class),
             $c->get(\Cockpit\App\Assets\Uploader::class)
+        );
+    },
+
+    \Cockpit\App\Controller\Utils::class => function (ContainerInterface $c) {
+        return new \Cockpit\App\Controller\Utils(
+            $c->get('app'),
+            $c->get(\Cockpit\App\Revisions\RevisionsRepository::class)
         );
     }
 ];

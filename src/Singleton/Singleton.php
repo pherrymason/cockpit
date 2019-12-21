@@ -2,11 +2,11 @@
 
 namespace Cockpit\Singleton;
 
+use Cockpit\App\ContentUnit;
 use Cockpit\Collections\Field;
 use DateTimeImmutable;
-use Framework\IDs;
 
-final class Singleton
+final class Singleton implements ContentUnit
 {
     /** @var string */
     private $id;
@@ -24,15 +24,17 @@ final class Singleton
     private $created;
     /** @var DateTimeImmutable|null */
     private $modified;
+    /** @var array */
+    private $data;
 
-    public static function create(string $id, string $name, ?string $label, ?string $description, array $fields, ?string $template)
+    public static function create(string $id, ?string $name, ?string $label, ?string $description, array $fields, ?string $template, array $data)
     {
         $fields = array_map([Field::class, 'fromArray'], $fields);
 
-        return new self($id, $name, $label, $description, $fields, $template, new \DateTimeImmutable(), null);
+        return new self($id, $name, $label, $description, $fields, $template, $data, new \DateTimeImmutable(), null);
     }
 
-    public function __construct(string $id, string $name, ?string $label, ?string $description, array $fields, ?string $template, DateTimeImmutable $created, ?DateTimeImmutable $modified)
+    public function __construct(string $id, string $name, ?string $label, ?string $description, array $fields, ?string $template, array $data, DateTimeImmutable $created, ?DateTimeImmutable $modified)
     {
         $this->id = $id;
         $this->name = $name;
@@ -42,6 +44,7 @@ final class Singleton
         $this->label = $label;
         $this->created = $created;
         $this->modified = $modified;
+        $this->data = $data;
     }
 
     public function id(): string
@@ -74,6 +77,11 @@ final class Singleton
         return $this->template;
     }
 
+    public function data(): array
+    {
+        return $this->data;
+    }
+
     public function created(): DateTimeImmutable
     {
         return $this->created;
@@ -95,7 +103,11 @@ final class Singleton
                 return $field->toArray();
             }, $this->fields),
             'template' => $this->template,
-            'data' => null
+            'data' => $this->data,
+
+            'sortable' => false,
+            'color' => '#FF000',
+            'icon' => ''
         ];
     }
 }

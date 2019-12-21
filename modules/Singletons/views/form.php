@@ -272,10 +272,6 @@
             }
 
             submit(e) {
-                console.log('adsfas');
-                debugger;
-                alert('adasda');
-                var a = 12309;
                 if(e) e.preventDefault();
 
                 var required = [];

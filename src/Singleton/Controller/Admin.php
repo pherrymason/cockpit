@@ -2,6 +2,7 @@
 
 namespace Cockpit\Singleton\Controller;
 
+use Cockpit\App\Revisions;
 use Cockpit\Singleton\Singleton;
 use Cockpit\Singleton\SingletonRepository;
 use Framework\IDs;
@@ -11,10 +12,13 @@ final class Admin extends \Cockpit\AuthController
 {
     /** @var SingletonRepository */
     private $singletons;
+    /** @var Revisions */
+    private $revisions;
 
-    public function __construct(SingletonRepository $singletons, App $app)
+    public function __construct(SingletonRepository $singletons, App $app, \Cockpit\App\Revisions $revisions)
     {
         $this->singletons = $singletons;
+        $this->revisions = $revisions;
         parent::__construct($app);
     }
 
@@ -46,6 +50,44 @@ final class Admin extends \Cockpit\AuthController
         return $this->render('singletons:views/index.php', ['singletons' => $arraySingletons]);
     }
 
+    public function form($name = null)
+    {
+        if (!$name) {
+            return false;
+        }
+
+        $singleton = $this->singletons->byName($name);
+
+        if (!$singleton) {
+            return false;
+        }
+        /*
+        if (!$this->module('singletons')->hasaccess($singleton['name'], 'form')) {
+            return $this->helper('admin')->denyRequest();
+        }*/
+
+        $this->app->helper('admin')->favicon = [
+            'path' => 'singletons:icon.svg',
+            'color' => '#FF000',//$singleton['color']
+        ];
+/*
+        $lockId = "singleton_{$singleton['name']}";
+
+        if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($lockId, $meta)) {
+            return $this->render('singletons:views/locked.php', compact('meta', 'singleton'));
+        }
+        $data = $this->module('singletons')->getData($name);
+
+        $this->app->helper('admin')->lockResourceId($lockId);
+*/
+
+        return $this->render(
+            'singletons:views/form.php', [
+                'singleton' => $singleton->toArray(),
+                'data' => $singleton->data()
+        ]);
+    }
+
     public function singleton($name = null)
     {
         /*
@@ -57,7 +99,7 @@ final class Admin extends \Cockpit\AuthController
             return $this->helper('admin')->denyRequest();
         }*/
 
-        $singleton = Singleton::create('', null, null, [], null);
+        $singleton = Singleton::create('', null, null, '', [], null, []);
 
         if ($name) {
             $singleton = $this->singletons->byName($name);
@@ -96,21 +138,12 @@ final class Admin extends \Cockpit\AuthController
         if (isset($data['_id'])) {
             // Update
             $singleton = Singleton::create(
-                $data['_id'],
-                $data['name'],
-                $data['label'] ?? null,
-                $data['description'] ?? null,
-                $data['fields'],
-                $data['template'] ?? null
-            );
+                $data['_id'], $data['name'], $data['label'] ?? null, $data['description'] ?? null, $data['fields'], $data['template'] ?? null,
+            []);
         } else {
             $singleton = Singleton::create(
-                IDs::new(),
-                $data['name'],
-                $data['label'] ?? null,
-                $data['description'] ?? null,
-                $data['fields'],
-                $data['template'] ?? null);
+                IDs::new(), $data['name'], $data['label'] ?? null, $data['description'] ?? null, $data['fields'], $data['template'] ?? null,
+                []);
         }
 
         // @todo Singletons can't be modified
@@ -127,5 +160,56 @@ final class Admin extends \Cockpit\AuthController
         //return isset($data['_id']) ? $this->updateSingleton($name, $data) : $this->createSingleton($name, $data);
 
         return json_encode(['result' => $singleton->toArray()]);
+    }
+
+    public function update_data($singleton)
+    {
+        $singleton = $this->singletons->byName($singleton);
+        $data = $this->param('data');
+
+        if (!$singleton || !$data) {
+            return false;
+        }
+
+        /*
+        if (!$this->module('singletons')->hasaccess($singleton->name(), 'form')) {
+            return $this->helper('admin')->denyRequest();
+        }*/
+/*
+        $lockId = "singleton_{$singleton['name']}";
+
+        if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($lockId)) {
+            $this->stop(['error' => "Saving failed! Singleton is locked!"], 412);
+        }
+*/
+        $data['_mby'] = $this->module('cockpit')->getUser('_id');
+
+        if (isset($data['_by'])) {
+            $data['_by'] = $data['_mby'];
+            $singleton = $this->singletons->byName($singleton->name());
+            $revision = !(json_encode($singleton->data()) == json_encode($data));
+        } else {
+            $data['_by'] = $data['_mby'];
+            $revision = true;
+        }
+
+        // @todo Events can't modify singleton
+        $this->app->trigger('singleton.saveData.before', [$singleton->toArray(), &$data]);
+        $this->app->trigger("singleton.saveData.before.{$singleton->name()}", [$singleton->toArray(), &$data]);
+
+        unset($data['_d']);
+        $data = $this->singletons->saveData($singleton->name(), $data);
+
+        // @todo Events can't modify singleton
+        $this->app->trigger('singleton.saveData.after', [$singleton->toArray(), $data]);
+        $this->app->trigger("singleton.saveData.after.{$singleton->name()}", [$singleton->toArray(), $data]);
+
+        if ($revision) {
+            $this->revisions->add($singleton, $data['_by'], 'singletons/'.$singleton->name());
+        }
+
+  //      $this->app->helper('admin')->lockResourceId($lockId);
+
+        return ['data' => $data];
     }
 }

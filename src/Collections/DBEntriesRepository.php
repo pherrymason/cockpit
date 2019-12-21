@@ -45,7 +45,6 @@ final class DBEntriesRepository implements EntriesRepository
         return array_map([$this, 'hydrate'], $stmt->fetchAll());
     }
 
-
     public function save(Collection $collection, array $entry, array $options): Entry
     {
         $options = array_merge(['revision' => false], $options);

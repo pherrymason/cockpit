@@ -2,8 +2,19 @@
 
 namespace Cockpit\App\Controller;
 
+use Cockpit\App\Revisions\RevisionsRepository;
+
 final class Utils extends \Cockpit\AuthController
 {
+    /** @var RevisionsRepository */
+    private $revisions;
+
+    public function __construct($app, \Cockpit\App\Revisions\RevisionsRepository $revisions)
+    {
+        parent::__construct($app);
+        $this->revisions = $revisions;
+    }
+
     public function thumb_url()
     {
         \session_write_close(); // improve concurrency loading
@@ -33,5 +44,17 @@ final class Utils extends \Cockpit\AuthController
         }
 
         return $this->module('cockpit')->thumbnail($options);
+    }
+
+    public function revisionsCount()
+    {
+        \session_write_close();
+
+        if ($id = $this->param('id')) {
+            $cnt = $this->revisions->count($id);
+            return (string)$cnt;
+        }
+
+        return 0;
     }
 }

@@ -18,16 +18,21 @@ final class DBSingletonRepository implements SingletonRepository
         $this->db = $db;
     }
 
-    public function byGroup($userGroup): array
+    public function byGroup(string $userGroup): array
     {
         $stmt = $this->db->executeQuery('SELECT * FROM '.self::TABLE . ' ORDER BY `label` ASC');
 
         return array_map([$this, 'hydrate'], $stmt->fetchAll());
     }
 
-    public function byName($name): ?Singleton
+    public function byName(string $name): ?Singleton
     {
-        return null;
+        $stmt = $this->db->executeQuery('SELECT * FROM '.self::TABLE .
+            ' WHERE `name`=:name ' .
+            ' ORDER BY `label` ASC', ['name' => $name], ['name' => ParameterType::STRING]);
+
+
+        return $stmt->rowCount() === 0 ? null : $this->hydrate($stmt->fetch());
     }
 
     public function save(Singleton $singleton)
@@ -56,15 +61,25 @@ final class DBSingletonRepository implements SingletonRepository
         $this->db->executeUpdate($sql, $params, $types);
     }
 
+    public function saveData(string $name, $data)
+    {
+        $sql = 'UPDATE `' . self::TABLE . '` SET `data`=:data WHERE name=:name';
+        $this->db->executeUpdate(
+            $sql,
+            [
+                'data' => json_encode($data),
+                'name' => $name
+            ],
+            [
+                'data' => ParameterType::STRING,
+                'name' => ParameterType::STRING
+            ]);
+    }
+
     private function hydrate(array $data): Singleton
     {
         return Singleton::create(
-            $data['_id'],
-            $data['name'],
-            $data['label'],
-            $data['description'],
-            json_decode($data['fields'], true),
-            $data['template']
+            $data['_id'], $data['name'], $data['label'], $data['description'], json_decode($data['fields'], true), $data['template'], json_decode($data['data'], true)
         );
     }
 }
