@@ -70,21 +70,21 @@ final class Admin extends \Cockpit\AuthController
             'path' => 'singletons:icon.svg',
             'color' => '#FF000',//$singleton['color']
         ];
-/*
-        $lockId = "singleton_{$singleton['name']}";
+        /*
+                $lockId = "singleton_{$singleton['name']}";
 
-        if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($lockId, $meta)) {
-            return $this->render('singletons:views/locked.php', compact('meta', 'singleton'));
-        }
-        $data = $this->module('singletons')->getData($name);
+                if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($lockId, $meta)) {
+                    return $this->render('singletons:views/locked.php', compact('meta', 'singleton'));
+                }
+                $data = $this->module('singletons')->getData($name);
 
-        $this->app->helper('admin')->lockResourceId($lockId);
-*/
+                $this->app->helper('admin')->lockResourceId($lockId);
+        */
 
         return $this->render(
             'singletons:views/form.php', [
-                'singleton' => $singleton->toArray(),
-                'data' => $singleton->data()
+            'singleton' => $singleton->toArray(),
+            'data' => $singleton->data()
         ]);
     }
 
@@ -99,7 +99,6 @@ final class Admin extends \Cockpit\AuthController
             return $this->helper('admin')->denyRequest();
         }*/
 
-        $singleton = Singleton::create('', null, null, '', [], null, []);
 
         if ($name) {
             $singleton = $this->singletons->byName($name);
@@ -109,11 +108,15 @@ final class Admin extends \Cockpit\AuthController
             }
 
             $meta = [];
-            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($singleton['_id'], $meta)) {
+            /*
+            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($singleton->id(), $meta)) {
                 return $this->render('cockpit:views/base/locked.php', compact('meta'));
             }
 
-            $this->app->helper('admin')->lockResourceId($singleton['_id']);
+            $this->app->helper('admin')->lockResourceId($singleton->id());
+            */
+        } else {
+            $singleton = Singleton::create('', '', null, '', [], null, []);
         }
 
         // acl groups
@@ -125,7 +128,10 @@ final class Admin extends \Cockpit\AuthController
             }
         }
 
-        return $this->render('singletons:views/singleton.php', compact('singleton', 'aclgroups'));
+        return $this->render('singletons:views/singleton.php', [
+            'singleton' => $singleton->toArray(),
+            'aclgroups' => $aclgroups
+        ]);
     }
 
     public function save($name)
@@ -139,10 +145,15 @@ final class Admin extends \Cockpit\AuthController
             // Update
             $singleton = Singleton::create(
                 $data['_id'], $data['name'], $data['label'] ?? null, $data['description'] ?? null, $data['fields'], $data['template'] ?? null,
-            []);
+                []);
         } else {
             $singleton = Singleton::create(
-                IDs::new(), $data['name'], $data['label'] ?? null, $data['description'] ?? null, $data['fields'], $data['template'] ?? null,
+                IDs::new(),
+                $data['name'],
+                $data['label'] ?? null,
+                $data['description'] ?? null,
+                $data['fields'] ?? [],
+                $data['template'] ?? null,
                 []);
         }
 
@@ -175,13 +186,13 @@ final class Admin extends \Cockpit\AuthController
         if (!$this->module('singletons')->hasaccess($singleton->name(), 'form')) {
             return $this->helper('admin')->denyRequest();
         }*/
-/*
-        $lockId = "singleton_{$singleton['name']}";
+        /*
+                $lockId = "singleton_{$singleton['name']}";
 
-        if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($lockId)) {
-            $this->stop(['error' => "Saving failed! Singleton is locked!"], 412);
-        }
-*/
+                if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($lockId)) {
+                    $this->stop(['error' => "Saving failed! Singleton is locked!"], 412);
+                }
+        */
         $data['_mby'] = $this->module('cockpit')->getUser('_id');
 
         if (isset($data['_by'])) {
@@ -205,10 +216,10 @@ final class Admin extends \Cockpit\AuthController
         $this->app->trigger("singleton.saveData.after.{$singleton->name()}", [$singleton->toArray(), $data]);
 
         if ($revision) {
-            $this->revisions->add($singleton, $data['_by'], 'singletons/'.$singleton->name());
+            $this->revisions->add($singleton, $data['_by'], 'singletons/' . $singleton->name());
         }
 
-  //      $this->app->helper('admin')->lockResourceId($lockId);
+        //      $this->app->helper('admin')->lockResourceId($lockId);
 
         return ['data' => $data];
     }

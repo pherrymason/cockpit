@@ -21,7 +21,6 @@ $app->on('admin.init', function() {
 
     // bind admin routes /singleton/*
     $this->bindClass(\Cockpit\Singleton\Controller\Admin::class, 'singletons');
-    //$this->bindClass(\Singletons\Controller\Admin::class, 'singletons');
 
     $active = strpos($this['route'], '/singletons') === 0;
 

@@ -78,8 +78,13 @@ final class DBSingletonRepository implements SingletonRepository
 
     private function hydrate(array $data): Singleton
     {
+        $dataContent = !empty($data['data'])
+            ? json_decode($data['data'], true)
+            : [];
+
         return Singleton::create(
-            $data['_id'], $data['name'], $data['label'], $data['description'], json_decode($data['fields'], true), $data['template'], json_decode($data['data'], true)
+            $data['_id'], $data['name'], $data['label'], $data['description'], json_decode($data['fields'], true), $data['template'],
+            $dataContent
         );
     }
 }
