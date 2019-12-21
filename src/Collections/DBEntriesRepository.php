@@ -50,23 +50,28 @@ final class DBEntriesRepository implements EntriesRepository
     {
         $options = array_merge(['revision' => false], $options);
         $params = [];
+        $types = [];
 
-        foreach ($entry as $fieldName => $value) {
-            $params[$fieldName] = $value;
-        }
-
-        $types['id'] = ParameterType::STRING;
-        foreach ($params as $field => $value) {
-            switch ($field) {
-                case '_modified':
-                case '_created':
-                    $types[$field] = ParameterType::STRING;
-                    break;
+        foreach ($collection->fields() as $field) {
+            switch ($field->type()) {
                 default:
-                    $types[$field] = ParameterType::STRING;
+                    $types[$field->name()] = ParameterType::STRING;
+                    $params[$field->name()] = $entry[$field->name()];
+                    break;
+
+                case Field::TYPE_IMAGE:
+                    $types[$field->name()] = ParameterType::STRING;
+                    $params[$field->name()] = json_encode($entry[$field->name()]);
                     break;
             }
         }
+
+        $types['id'] = ParameterType::STRING;
+        $types['_modified'] = ParameterType::STRING;
+        $types['_created'] = ParameterType::STRING;
+        $params['_modified'] = $entry['_modified'];
+        $params['_created'] = $entry['_created'];
+
 
         $tableName = $this->tableManager->tableName($collection->name());
         if (!isset($params['_id'])) {
