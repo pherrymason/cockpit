@@ -63,6 +63,9 @@ class Base extends \Cockpit\AuthController {
         return json_encode($list->getArrayCopy());
     }
 
+    /**
+     * @todo Deprecate this call, it has no sense as modules provide their own controllers
+     */
     public function call($module, $method) {
 
         $args = (array)$this->param('args', []);
