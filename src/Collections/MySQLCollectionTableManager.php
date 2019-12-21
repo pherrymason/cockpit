@@ -71,19 +71,7 @@ final class MySQLCollectionTableManager
 
     private function hydrateField(array $field): Field
     {
-        return new Field(
-            $field['name'],
-            $field['label'],
-            $field['type'],
-            $field['default'],
-            $field['info'],
-            $field['group'],
-            $field['localize'],
-            $field['options'],
-            $field['width'],
-            $field['lst'],
-            $field['acl']
-        );
+        return Field::fromArray($field);
     }
 
     /**

@@ -167,19 +167,19 @@ final class Admin extends \Cockpit\AuthController
 
         $isUpdate = isset($collection['_id']);
         /*
-                // @todo
-                if (!$isUpdate && !$this->module('cockpit')->hasaccess('collections', 'create')) {
-                    return $this->helper('admin')->denyRequest();
-                }
+        // @todo
+        if (!$isUpdate && !$this->module('cockpit')->hasaccess('collections', 'create')) {
+            return $this->helper('admin')->denyRequest();
+        }
 
-                // @todo
-                if ($isUpdate && !$this->module('collections')->hasaccess($collection['name'], 'collection_edit')) {
-                    return $this->helper('admin')->denyRequest();
-                }
-                // @todo
-                if ($isUpdate && !$this->app->helper('admin')->isResourceEditableByCurrentUser($collection['_id'])) {
-                    $this->stop(['error' => "Saving failed! Collection is locked!"], 412);
-                }
+        // @todo
+        if ($isUpdate && !$this->module('collections')->hasaccess($collection['name'], 'collection_edit')) {
+            return $this->helper('admin')->denyRequest();
+        }
+        // @todo
+        if ($isUpdate && !$this->app->helper('admin')->isResourceEditableByCurrentUser($collection['_id'])) {
+            $this->stop(['error' => "Saving failed! Collection is locked!"], 412);
+        }
         */
 
         $this->collections->save($collection);

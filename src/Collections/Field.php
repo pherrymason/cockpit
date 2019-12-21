@@ -58,7 +58,24 @@ final class Field
     /** @var array */
     private $acl;
 
-    public function __construct(string $name, string $label, string $type, string $default, string $info, string $group, bool $localize, array $options, string $width, bool $lst, array $acl)
+    public static function fromArray(array $field)
+    {
+        return new Field(
+            $field['name'],
+            $field['label'],
+            $field['type'],
+            $field['default'] ?? null,
+            $field['info'],
+            $field['group'],
+            $field['localize'],
+            $field['options'],
+            $field['width'],
+            $field['lst'],
+            $field['acl']
+        );
+    }
+
+    public function __construct(string $name, string $label, string $type, ?string $default, string $info, string $group, bool $localize, array $options, string $width, bool $lst, array $acl)
     {
         $this->name = $name;
         $this->label = $label;
@@ -88,7 +105,7 @@ final class Field
         return $this->type;
     }
 
-    public function default(): string
+    public function default(): ?string
     {
         return $this->default;
     }

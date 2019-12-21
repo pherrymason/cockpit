@@ -16,7 +16,7 @@ final class Collection
     private $description;
     /** @var string */
     private $color;
-    /** @var mixed */
+    /** @var Field */
     private $fields;
     /** @var array */
     private $acl;
