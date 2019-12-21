@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cockpit\Framework\Database\MongoLite\MongoLite;
+namespace Framework\Database\MongoLite\MongoLite;
 
 /**
  * Collection object.
@@ -110,16 +110,16 @@ class Collection {
     /**
      * Save document
      *
-     * @param  array $document
+     * @param array $document
      * @return mixed
      */
-    public function save(&$document, $create = false) {
+    public function save(&$document) {
 
         if (isset($document['_id'])) {
             $ret = $this->update(['_id' => $document['_id']], $document);
 
             // insert document if document doesn't exist
-            if (!$ret && $create) {
+            if (!$ret) {
                 $ret = $this->insert($document);
             }
 

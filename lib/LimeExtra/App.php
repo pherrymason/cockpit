@@ -10,6 +10,7 @@
 
 namespace LimeExtra;
 
+use DI\Definition\Exception\InvalidDefinition;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -142,5 +143,25 @@ class App extends \Lime\App {
         }
 
         return \implode("\n", $list);
+    }
+
+    public function invoke($class, $action="index", $params=[])
+    {
+        // Check if existing in container
+        if ($this->container->has($class)) {
+            try {
+                $controller = $this->container->get($class);
+            } catch (InvalidDefinition $e) {
+                $controller = null;
+            }
+        }
+
+        if ($controller === null) {
+            $controller = new $class($this);
+        }
+
+        return \method_exists($controller, $action) && \is_callable([$controller, $action])
+            ? \call_user_func_array([$controller,$action], $params)
+            : false;
     }
 }

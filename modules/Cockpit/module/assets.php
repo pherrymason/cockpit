@@ -8,10 +8,12 @@
  * file that was distributed with this source code.
  */
 
+use Framework\Database\DatabaseConnection;
+
 $this->module('cockpit')->extend([
 
     'listAssets' => function($options = []) {
-
+        /** @var DatabaseConnection $assets */
         $assets = $this->app->storage->find('cockpit/assets', $options)->toArray();
         $total  = (!isset($options['skip']) && !isset($options['limit']))
                    ? count($assets)

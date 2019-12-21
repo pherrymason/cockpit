@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cockpit\Framework\Database\MongoLite\MongoHybrid;
+namespace Framework\Database\MongoLite\MongoHybrid;
 
 
 class ResultSet extends \ArrayObject {

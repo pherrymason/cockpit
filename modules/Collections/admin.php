@@ -29,7 +29,7 @@ $app->on('admin.init', function() use ($container) {
     $this->bindClass('Collections\\Controller\\Trash', 'collections/trash');
     $this->bindClass('Collections\\Controller\\Import', 'collections/import');
     $this->bindClass('Collections\\Controller\\Utils', 'collections/utils');
-    $this->bindClass('Collections\\Controller\\Admin', 'collections');
+    $this->bindClass(\Cockpit\Collections\Controller\Admin::class, 'collections');
 
     $active = strpos($this['route'], '/collections') === 0;
 

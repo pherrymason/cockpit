@@ -112,7 +112,7 @@ function cockpit($module = null) {
         $container = $builder->build();
 
         $app = new LimeExtra\App($container, $configuration);
-
+        $container->set('app', $app);
         $app['config'] = $configuration;
 
         // register paths
@@ -131,7 +131,10 @@ function cockpit($module = null) {
 
         // handle exceptions
         if (COCKPIT_ADMIN) {
-
+            $whoops = new \Whoops\Run;
+            $whoops->prependHandler(new \Whoops\Handler\PrettyPageHandler);
+            $whoops->register();
+            /*
             set_exception_handler(function($exception) use($app) {
 
                 $error = [
@@ -156,7 +159,7 @@ function cockpit($module = null) {
                 if (function_exists('cockpit_error_handler')) {
                     cockpit_error_handler($error);
                 }
-            });
+            });*/
         }
 
         $modulesPaths = array_merge([

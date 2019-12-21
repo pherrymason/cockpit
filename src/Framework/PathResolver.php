@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Cockpit\Framework;
+namespace Framework;
 
 final class PathResolver
 {
@@ -30,6 +30,13 @@ final class PathResolver
         }
 
         return $this->pathMap[$namespace] ?? [];
+    }
+
+    public function relativePath(string $file)
+    {
+        $path = $this->path($file);
+
+        return str_replace($this->docsRoot, '', $path);
     }
 
     /**

@@ -8,7 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Cockpit\Framework\Database\MongoLite\MongoHybrid;
+namespace Framework\Database\MongoLite\MongoHybrid;
+
+use Framework\Database\MongoLite\MongoLite\Cursor;
 
 class MongoLite {
     /** @var Client */
@@ -18,7 +20,7 @@ class MongoLite {
 
     public function __construct($server, $options=[])
     {
-        $this->client = new \Cockpit\Framework\Database\MongoLite\MongoLite\Client(str_replace('mongolite://', '', $server));
+        $this->client = new \Framework\Database\MongoLite\MongoLite\Client(str_replace('mongolite://', '', $server));
         $this->db     = $options['db'];
     }
 
@@ -69,6 +71,7 @@ class MongoLite {
         $sort   = isset($options['sort'])   ? $options['sort'] : null;
         $skip   = isset($options['skip'])   ? $options['skip'] : null;
 
+        /** @var Cursor $cursor */
         $cursor = $this->getCollection($collection)->find($filter, $fields);
 
         if($limit) $cursor->limit($limit);
@@ -85,8 +88,8 @@ class MongoLite {
         return $this->getCollection($collection)->insert($doc);
     }
 
-    public function save($collection, &$data, $create = false) {
-        return $this->getCollection($collection)->save($data, $create);
+    public function save($collection, &$data) {
+        return $this->getCollection($collection)->save($data);
     }
 
     public function update($collection, $criteria, $data) {

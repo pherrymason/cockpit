@@ -25,8 +25,8 @@
 
 namespace Lime;
 
-use Cockpit\Framework\EventSystem;
-use Cockpit\Framework\PathResolver;
+use Framework\EventSystem;
+use Framework\PathResolver;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -37,7 +37,7 @@ class App implements \ArrayAccess {
     protected $eventSystem;
 
     /** @var array */
-    protected $modules  = [];
+    public $modules  = [];
     protected $routes   = [];
     protected $paths    = [];
     protected $events   = [];
@@ -1159,7 +1159,12 @@ class App implements \ArrayAccess {
     }
 
     public function module($name) {
-        return $this->modules->offsetExists($name) && $this->modules[$name] ? $this->modules[$name] : null;
+        $offsetGet = $this->modules->offsetExists($name);
+        if ($offsetGet && $this->modules[$name]) {
+            return $this->modules[$name];
+        }
+
+        throw new \RuntimeException('No module "'.$name.'" exists.');
     }
 
     public function registerModule($name, $dir) {

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cockpit\Framework\Database\MongoLite\MongoLite;
+namespace Framework\Database\MongoLite\MongoLite;
 
 /**
  * Database object.

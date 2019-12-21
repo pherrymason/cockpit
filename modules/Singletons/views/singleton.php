@@ -8,7 +8,7 @@
 
 <div class="uk-margin" riot-view>
 
-    <form class="uk-form" onsubmit="{ submit }">
+    <form class="uk-form" onsubmit="{ submit }" action="@route('/singletons/save')">
 
         <div class="uk-grid">
 
@@ -209,12 +209,14 @@
         }
 
         submit(e) {
-
+            console.log('asdfasdf');
             if(e) e.preventDefault();
 
             var singleton = this.singleton;
 
-            App.callmodule('singletons:saveSingleton', [this.singleton.name, singleton]).then(function(data) {
+            App.request(e.target.action + '/' + this.singleton.name, {args: [this.singleton.name, singleton], acl: 'manage'}).
+            //App.callmodule('singletons:saveSingleton', [this.singleton.name, singleton])
+            then(function(data) {
 
                 if (data.result) {
 

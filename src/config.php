@@ -83,4 +83,7 @@ return [
     ],
 
     'filestorage.config' => [],
+
+    // Directories
+    'path_root' => APP_ROOT
 ];
