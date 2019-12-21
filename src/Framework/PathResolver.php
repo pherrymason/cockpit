@@ -32,6 +32,13 @@ final class PathResolver
         return $this->pathMap[$namespace] ?? [];
     }
 
+    public function relativePath(string $file)
+    {
+        $path = $this->path($file);
+
+        return str_replace($this->docsRoot, '', $path);
+    }
+
     /**
      * @return false|string
      */

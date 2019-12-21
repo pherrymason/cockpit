@@ -10,6 +10,9 @@
 
 namespace Cockpit\Controller;
 
+/**
+ * @deprecated
+ */
 class Assets extends \Cockpit\AuthController {
 
     public function index() {

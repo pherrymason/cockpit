@@ -71,6 +71,14 @@ final class Collection
         return $this->sortable;
     }
 
+    /**
+     * @return Field[]
+     */
+    public function fields(): array
+    {
+        return $this->fields;
+    }
+
     public function hasAccess($role): bool
     {
         return true;

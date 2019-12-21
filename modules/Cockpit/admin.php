@@ -105,13 +105,13 @@ $app->bind('/', function(){
     return $this->invoke('Cockpit\\Controller\\Base', 'dashboard');
 });
 
-$app->bindClass('Cockpit\\Controller\\Utils', 'cockpit/utils');
+$app->bindClass(\Cockpit\App\Controller\Utils::class, 'cockpit/utils');
 $app->bindClass('Cockpit\\Controller\\Base', 'cockpit');
 $app->bindClass('Cockpit\\Controller\\Settings', 'settings');
 $app->bindClass('Cockpit\\Controller\\Accounts', 'accounts');
 $app->bindClass('Cockpit\\Controller\\Auth', 'auth');
 $app->bindClass('Cockpit\\Controller\\Media', 'media');
-$app->bindClass('Cockpit\\Controller\\Assets', 'assetsmanager');
+$app->bindClass(\Cockpit\App\Controller\Assets::class, 'assetsmanager');
 $app->bindClass('Cockpit\\Controller\\RestAdmin', 'restadmin');
 $app->bindClass('Cockpit\\Controller\\Webhooks', 'webhooks');
 
