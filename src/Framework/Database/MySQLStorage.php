@@ -86,7 +86,7 @@ final class MySQLStorage implements DatabaseConnection
     {
         $resultSet = $this->find($collection, ['filter' => $filter]);
 
-        return $resultSet->count() > 0 ? $resultSet[0] : null;
+        return $resultSet->count() > 0 ? $resultSet->toArray()[0] : null;
     }
 
     public function insert(string $collection, &$doc)
