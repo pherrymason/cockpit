@@ -41,8 +41,8 @@ final class MySQLCollectionTableManager
             // Add mandatory columns
             $sql.= '`_by` CHAR(32) DEFAULT NULL, ';
             $sql.= '`_mby` CHAR(32) DEFAULT NULL, ';
-            $sql.= '`_created` DATETIME DEFAULT NULL, ';
-            $sql.= '`_modified` DATETIME DEFAULT NULL ';
+            $sql.= '`_created` DATETIME NULL, ';
+            $sql.= '`_modified` DATETIME NULL, ';
 
             $sql.= 'PRIMARY KEY (`id`)';
             $sql.= ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
