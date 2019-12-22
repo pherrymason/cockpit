@@ -107,8 +107,15 @@ final class DBCollectionRepository implements CollectionRepository
 
     private function hydrate($data)
     {
+        $fieldsArray = json_decode($data['fields'], true);
+        $fields = array_map(function ($data) {
+            return Field::fromArray($data);
+        }, $fieldsArray);
+
+
+
         return new Collection(
-            $data['id'], $data['name'], $data['label'], $data['description'] ?? '', (string)$data['color'], json_decode($data['fields'], true), json_decode($data['acl'], true), (bool)$data['sortable'], (bool)$data['in_menu']
+            $data['id'], $data['name'], $data['label'], $data['description'] ?? '', (string)$data['color'], $fields, json_decode($data['acl'], true), (bool)$data['sortable'], (bool)$data['in_menu']
         );
         //json_decode($data['rules'], true)
     }
