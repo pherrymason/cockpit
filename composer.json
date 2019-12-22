@@ -15,7 +15,7 @@
         "psr-4": {
             "\\": "lib/",
             "Cockpit\\": "src/",
-            "Framework\\": "src/"
+            "Framework\\": "src/Framework"
         }
     },
     "require": {
