@@ -12,6 +12,10 @@
         }
     ],
     "autoload": {
+        "psr-0": {
+            "Lime\\": "lib/Lime/",
+            "LimeExtra\\": "lib/LimeExtra/"
+        },
         "psr-4": {
             "\\": "lib/",
             "Cockpit\\": "src/",

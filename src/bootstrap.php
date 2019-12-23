@@ -21,7 +21,7 @@ if (!defined('COCKPIT_CLI')) {
 
 // Autoload vendor libs
 define('APP_ROOT', dirname(__DIR__));
-include(APP_ROOT.'/vendor/autoload.php');
+
 
 // include core classes for better performance
 if (!class_exists('Lime\\App')) {
