@@ -18,6 +18,7 @@
         },
         "psr-4": {
             "Cockpit\\": "src/Cockpit/",
+            "Cockpit\\App\\": "src/App/",
             "Cockpit\\Collections\\": "src/Collections/",
             "Cockpit\\Singletons\\": "src/Singletons/",
             "Cockpit\\Forms\\": "src/Forms/",
