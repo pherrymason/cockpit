@@ -209,7 +209,6 @@ $services = [
     }
 ];
 
-
 $cockpitServices = require('App/config/services.php');
 $collectionServices = require('Collections/config/services.php');
 $singletonServices = require('Singleton/config/services.php');

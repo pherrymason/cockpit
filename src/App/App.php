@@ -12,11 +12,13 @@ final class App
     private $config;
     /** @var \LimeExtra\App */
     private $cockpit;
+    /** @var \Psr\Container\ContainerInterface */
+    private $container;
 
-    public function __construct(array $config)
+    public function __construct(\Psr\Container\ContainerInterface $container, array $config)
     {
         $this->config = $config;
-        $this->cockpit = null;
+        $this->container = $container;
     }
 
     public function app(): \LimeExtra\App
@@ -91,7 +93,7 @@ final class App
 
 
         $customconfig = [];
-        $defaultConfiguration = require('config.php');
+        $defaultConfiguration = require(APP_ROOT.'/config.php');
 
         // load custom config
         if (file_exists(COCKPIT_CONFIG_PATH)) {
@@ -104,8 +106,8 @@ final class App
             array_splice($configuration['modules.disabled'], array_search('Cockpit', $configuration['modules.disabled']), 1);
         }
 
-        $app = new \LimeExtra\App($container, $configuration);
-        $container->set('app', $app);
+        $app = new \LimeExtra\App($this->container, $configuration);
+        $this->container->set('app', $app);
         $app['config'] = $configuration;
 
         // register paths
