@@ -29,6 +29,10 @@ return [
             );
     },
 
+    \Cockpit\App\Assets\Thumbnail::class => function () {
+        return new \Cockpit\App\Assets\Thumbnail();
+    },
+
     // Repositories -----------------------------------------------
     \Cockpit\App\Revisions\RevisionsRepository::class => function(ContainerInterface $c) {
         return new \Cockpit\App\Revisions\RevisionsRepository($c->get('dbal.mysql'));
@@ -59,7 +63,8 @@ return [
     \Cockpit\App\Controller\Utils::class => function (ContainerInterface $c) {
         return new \Cockpit\App\Controller\Utils(
             $c->get('app'),
-            $c->get(\Cockpit\App\Revisions\RevisionsRepository::class)
+            $c->get(\Cockpit\App\Revisions\RevisionsRepository::class),
+            $c->get(\Cockpit\App\Assets\Thumbnail::class)
         );
     }
 ];

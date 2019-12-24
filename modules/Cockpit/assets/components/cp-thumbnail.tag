@@ -87,7 +87,9 @@
                 if (_src.match(/\.(svg|ico)$/i)) {
                     url = _src;
                 } else {
-                    url = App.route(`/cockpit/utils/thumb_url?src=${_src}&w=${opts.width}&h=${opts.height}&m=${mode}&o=1`);
+                    // url = App.route(`/cockpit/utils/thumb_url?src=${_src}&w=${opts.width}&h=${opts.height}&m=${mode}&o=1`);
+                    // console.log(url, 2);
+                    url = _src;
                 }
                 
                 img.src = url;

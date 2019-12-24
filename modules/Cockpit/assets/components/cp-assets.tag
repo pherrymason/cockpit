@@ -158,8 +158,8 @@
 
                                     <span if="{ asset.mime.match(/^image\//) == null }"><i class="uk-text-muted uk-icon-{ parent.getIconCls(asset.path) }"></i></span>
 
-                                    <a href="{ASSETS_URL+asset.path}" if="{ asset.mime.match(/^image\//) }" data-uk-lightbox="type:'image'" title="{ asset.width && [asset.width, asset.height].join('x') }" aria-label="{ asset.width && [asset.width, asset.height].join('x') }">
-                                        <cp-thumbnail src="{ASSETS_URL+asset.path}" width="20" height="20"></cp-thumbnail>
+                                    <a href="{asset.path}" if="{ asset.mime.match(/^image\//) }" data-uk-lightbox="type:'image'" title="{ asset.width && [asset.width, asset.height].join('x') }" aria-label="{ asset.width && [asset.width, asset.height].join('x') }">
+                                        <cp-thumbnail src="{asset.path}" width="20" height="20"></cp-thumbnail>
                                     </a>
                                 </td>
                                 <td>
@@ -651,11 +651,11 @@
                   <div class="uk-margin-large-top uk-text-center" if="{asset}">
                       <span class="uk-h1" if="{asset.mime.match(/^image\//) == null }"><i class="uk-icon-{ getIconCls(asset.path) }"></i></span>
                       <div class="uk-display-inline-block uk-position-relative asset-fp-image" if="{asset.mime.match(/^image\//) }">
-                          <cp-thumbnail src="{ASSETS_URL+asset.path}" width="800"></cp-thumbnail>
+                          <cp-thumbnail src="{asset.path}" width="800"></cp-thumbnail>
                           <div class="cp-assets-fp" title="Focal Point" data-uk-tooltip></div>
                       </div>
                       <div class="uk-margin-top uk-text-truncate uk-text-small uk-text-muted">
-                          <a href="{ASSETS_URL+asset.path}" target="_blank"  title="{ App.i18n.get('Direct link to asset') }" data-uk-tooltip><i class="uk-icon-button uk-icon-button-outline uk-text-primary uk-icon-link"></i></a>
+                          <a href="{asset.path}" target="_blank"  title="{ App.i18n.get('Direct link to asset') }" data-uk-tooltip><i class="uk-icon-button uk-icon-button-outline uk-text-primary uk-icon-link"></i></a>
                       </div>
                   </div>
               </div>

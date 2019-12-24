@@ -8,11 +8,14 @@ final class Utils extends \Cockpit\AuthController
 {
     /** @var RevisionsRepository */
     private $revisions;
+    /** @var \Cockpit\App\Assets\Thumbnail */
+    private $thumbnail;
 
-    public function __construct($app, \Cockpit\App\Revisions\RevisionsRepository $revisions)
+    public function __construct($app, \Cockpit\App\Revisions\RevisionsRepository $revisions, \Cockpit\App\Assets\Thumbnail $thumbnail)
     {
         parent::__construct($app);
         $this->revisions = $revisions;
+        $this->thumbnail = $thumbnail;
     }
 
     public function thumb_url()
@@ -43,7 +46,7 @@ final class Utils extends \Cockpit\AuthController
             if ($this->param($f)) $options[$f] = $this->param($f);
         }
 
-        return $this->module('cockpit')->thumbnail($options);
+        return $this->thumbnail->thumbnailURL($options);
     }
 
     public function revisionsCount()
