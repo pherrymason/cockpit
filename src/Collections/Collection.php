@@ -16,7 +16,7 @@ final class Collection
     private $description;
     /** @var string */
     private $color;
-    /** @var Field */
+    /** @var Field[] */
     private $fields;
     /** @var array */
     private $acl;
@@ -84,7 +84,7 @@ final class Collection
         return true;
     }
 
-    public function toFrontendArray(): array
+    public function toArray(): array
     {
         $data = [
             '_id' => $this->id,
@@ -92,9 +92,11 @@ final class Collection
             'label' => $this->label,
             'description' => $this->description,
             'color' => $this->color,
-            'fields' => $this->fields,
-            'sortable' => (bool) $this->sortable,
-            'in_menu' => (bool) $this->inMenu,
+            'fields' => array_map(function (Field $field) {
+                return $field->toArray();
+            }, $this->fields),
+            'sortable' => (bool)$this->sortable,
+            'in_menu' => (bool)$this->inMenu,
             '_created' => (new \DateTimeImmutable())->getTimestamp(),
             '_updated' => (new \DateTimeImmutable())->getTimestamp(),
             'acl' => [],

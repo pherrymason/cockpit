@@ -59,7 +59,7 @@ final class Admin extends \Cockpit\AuthController
         //       $collections = $this->collections->byGroup();
         $collections = $this->collections->all();
         $frontendData = array_map(function (Collection $collection) {
-            return $collection->toFrontendArray();
+            return $collection->toArray();
         }, $collections);
 
         return $this->render('collections:views/index.php', ['collections' => $frontendData]);
@@ -148,7 +148,7 @@ final class Admin extends \Cockpit\AuthController
 
         return $this->render('collections:views/collection.php',
             [
-                'collection' => $collection->toFrontendArray(),
+                'collection' => $collection->toArray(),
                 'templates' => $templates,
                 'aclgroups' => $aclgroups,
                 'rules' => $rules
@@ -233,7 +233,7 @@ final class Admin extends \Cockpit\AuthController
         }
 
         return $this->render($view, [
-            'collection' => $collection->toFrontendArray()
+            'collection' => $collection->toArray()
         ]);
     }
 
@@ -340,7 +340,7 @@ final class Admin extends \Cockpit\AuthController
         }
 
         return $this->render($view, [
-            'collection' => $collection->toFrontendArray(),
+            'collection' => $collection->toArray(),
             'entry' => $entry->toFrontendArray(),
             'excludeFields' => $excludeFields
         ]);
@@ -436,7 +436,7 @@ final class Admin extends \Cockpit\AuthController
         $revisions = $this->revisions->getList($id);
 
         return $this->render('collections:views/revisions.php', [
-            'collection' => $collection->toFrontendArray(),
+            'collection' => $collection->toArray(),
             'entry' => $entry->toFrontendArray(),
             'revisions' => $revisions
         ]);
