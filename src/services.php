@@ -57,7 +57,7 @@ $services = [
     },
 
     'path' => function (ContainerInterface $c) {
-        return new \Framework\PathResolver($c->get('paths'), $c->get('docs_root'), $c->get('site_url'));
+        return new \Framework\PathResolver($c->get('paths'), $c->get('docs_root'), $c->get('base_url'), $c->get('site_url'));
     },
 
     'events' => function (ContainerInterface $c) {

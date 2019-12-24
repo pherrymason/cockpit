@@ -10,8 +10,12 @@ final class PathResolver
     private $siteURL;
     /** @var string */
     private $docsRoot;
+    /**
+     * @var string
+     */
+    private $baseURL;
 
-    public function __construct(array $pathMap, string $docsRoot, ?string $siteURL)
+    public function __construct(array $pathMap, string $docsRoot, string $baseURL, ?string $siteURL)
     {
         $this->pathMap = [];
         foreach ($pathMap as $key => $path) {
@@ -21,6 +25,7 @@ final class PathResolver
 
         $this->siteURL = $siteURL;
         $this->docsRoot = $docsRoot;
+        $this->baseURL = $baseURL;
     }
 
     public function paths($namespace = null)
@@ -89,7 +94,8 @@ final class PathResolver
             $file = \str_replace(DIRECTORY_SEPARATOR, '/', $file);
             $root = \str_replace(DIRECTORY_SEPARATOR, '/', $this->docsRoot);
 
-            $url = '/' . \ltrim(\str_replace($root, '', $file), '/');
+            $url = rtrim($this->baseURL, '/') .
+            $url.= '/' . \ltrim(\str_replace($root, '', $file), '/');
             $url = \implode('/', \array_map('rawurlencode', explode('/', $url)));
 
             if ($full) {
