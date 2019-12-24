@@ -127,7 +127,7 @@ final class App
         }
 
         $app = new \LimeExtra\App($this->container, $this->configuration);
-
+        $this->container->set('app', $app);
         $app['config'] = $this->configuration;
 
         // set cache path
