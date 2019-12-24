@@ -249,8 +249,7 @@ final class App
                 'assets' => COCKPIT_DIR . '/assets',
                 'site' => COCKPIT_SITE_DIR
             ],
-
-            'filestorage' => [],
+            'filestorage.config' => []
         ];
     }
 
