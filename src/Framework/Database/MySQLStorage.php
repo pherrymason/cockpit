@@ -2,7 +2,6 @@
 
 namespace Framework\Database;
 
-use Cockpit\Framework\Database\ResultSet;
 use Doctrine\DBAL\Connection;
 
 
