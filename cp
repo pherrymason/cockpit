@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use DI\ContainerBuilder;
+
 if (PHP_SAPI !== 'cli') {
     exit('Script needs to be run from Command Line Interface (cli)');
 }
@@ -8,10 +10,19 @@ if (PHP_SAPI !== 'cli') {
 // Autoload vendor libs
 include(__DIR__ . '/lib/vendor/autoload.php');
 
-$configuration = require('app/config.php');
+$configuration = require(__DIR__ . '/src/Sepia/CMS/config/config.php');
+$services = require(__DIR__ . '/src/services.php');
+
+// Container configuration
+$builder = new ContainerBuilder();
+$builder->useAnnotations(false);
+$builder->addDefinitions($services);
+//        $builder->enableCompilation($configuration['paths']['#tmp']);
+$container = $builder->build();
+
 $appPath = __DIR__;
 $publicPath = __DIR__;
-$app = new \Cockpit\App($appPath, $publicPath, $configuration, \Cockpit\App::MODE_CLI);
+$app = new \Cockpit\App($container, $appPath, $publicPath, $configuration, \Cockpit\App::MODE_CLI);
 $app->boot();
 
 $_REQUEST = CLI::opts(); // make option available via $app->param()
