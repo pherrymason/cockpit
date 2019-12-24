@@ -187,7 +187,7 @@ final class Admin extends \Cockpit\AuthController
         //$collection = $this->module('collections')->saveCollection($collection['name'], $collection, $rules);
 
         if (!$isUpdate) {
-            $this->app->helper('admin')->lockResourceId($collection['_id']);
+//            $this->app->helper('admin')->lockResourceId($collection['_id']);
         }
 
         return $collection;
@@ -265,7 +265,6 @@ final class Admin extends \Cockpit\AuthController
 //        }
 
         $this->app->trigger("collections.admin.find.before.{$collection->name()}", [&$options]);
-//        $entries = $this->app->module('collections')->find($collection['name'], $options);
         $entries = $this->entries->byCollectionFiltered($collection, $options);
 
         $this->app->trigger("collections.admin.find.after.{$collection->name()}", [&$entries, $options]);
@@ -379,9 +378,9 @@ final class Admin extends \Cockpit\AuthController
         $entry['_modified'] = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
         $isUpdate = false;
         if (isset($entry['_id'])) {
-            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($entry['_id'])) {
-                $this->stop(['error' => "Saving failed! Entry is locked!"], 412);
-            }
+//            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($entry['_id'])) {
+//                $this->stop(['error' => "Saving failed! Entry is locked!"], 412);
+//            }
 
             $_entry = $this->entries->byId($collection, $entry['_id']);
 //            $_entry = $this->module('collections')->findOne($collection['name'], ['_id' => $entry['_id']]);
