@@ -33,7 +33,7 @@
 
     <div class="uk-margin uk-text-center uk-text-muted" show="{ (Array.isArray(entries) && entries.length) || filter}">
 
-        <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'collections:icon.svg')" width="50" alt="icon" data-uk-svg>
+        <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="50" alt="icon" data-uk-svg>
         @if($collection['description'])
         <div class="uk-container-center uk-margin-top uk-width-medium-1-2">
             {{ htmlspecialchars($collection['description']) }}
@@ -58,7 +58,7 @@
 
             <div class="uk-animation-scale">
 
-                <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'collections:icon.svg')" width="50" alt="icon" data-uk-svg>
+                <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="50" alt="icon" data-uk-svg>
                 @if($collection['description'])
                 <div class="uk-margin-top uk-text-small uk-text-muted">
                     {{ htmlspecialchars($collection['description']) }}
@@ -145,7 +145,7 @@
                             <cp-thumbnail src="{ parent.isImageField(entry) }" width="400" height="250" if="{ parent.isImageField(entry) }"></cp-thumbnail>
 
                             <div class="uk-svg-adjust uk-text-primary" style="color:{{ @$collection['color'] }} !important;" if="{ !parent.isImageField(entry) }">
-                                <img src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'collections:icon.svg')" width="80" alt="icon" data-uk-svg>
+                                <img src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="80" alt="icon" data-uk-svg>
                             </div>
                         </div>
                         <a class="uk-position-cover" href="@route('/collections/entry/'.$collection['name'])/{ entry._id }"></a>

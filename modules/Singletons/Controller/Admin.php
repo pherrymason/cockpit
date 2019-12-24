@@ -104,7 +104,7 @@ class Admin extends \Cockpit\AuthController {
         ], $singleton);
 
         $this->app->helper('admin')->favicon = [
-            'path' => 'singletons:icon.svg',
+            'path' => 'assets:singletons/icon.svg',
             'color' => $singleton['color']
         ];
 

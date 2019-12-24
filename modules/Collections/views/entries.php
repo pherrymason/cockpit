@@ -25,7 +25,7 @@ function CollectionHasFieldAccess(field) {
 </script>
 
 
-<script type="riot/tag" src="@base('collections:assets/entries-batchedit.tag')"></script>
+<script type="riot/tag" src="@base('assets:collections/entries-batchedit.tag')"></script>
 
 <div>
 

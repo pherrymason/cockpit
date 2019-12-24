@@ -25,7 +25,7 @@
                     <li class="uk-text-truncate">
                         <a class="uk-link-muted" href="@route('/forms/entries/'.$form['name'])">
 
-                            <img class="uk-margin-small-right uk-svg-adjust" src="@url(isset($form['icon']) && $form['icon'] ? 'assets:app/media/icons/'.$form['icon']:'forms:icon.svg')" width="18px" alt="icon" data-uk-svg>
+                            <img class="uk-margin-small-right uk-svg-adjust" src="@url(isset($form['icon']) && $form['icon'] ? 'assets:app/media/icons/'.$form['icon']:'assets:forms/icon.svg')" width="18px" alt="icon" data-uk-svg>
 
                             {{ htmlspecialchars(@$form['label'] ? $form['label'] : $form['name']) }}
                         </a>
@@ -46,7 +46,7 @@
             <div class="uk-margin uk-text-center uk-text-muted">
 
                 <p>
-                    <img src="@url('forms:icon.svg')" width="30" height="30" alt="Forms" data-uk-svg />
+                    <img src="@url('assets:forms/icon.svg')" width="30" height="30" alt="Forms" data-uk-svg />
                 </p>
 
                 @lang('No forms')

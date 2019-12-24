@@ -41,7 +41,7 @@
             <div class="uk-animation-scale">
 
                 <p>
-                    <img class="uk-svg-adjust uk-text-muted" src="@url('collections:icon.svg')" width="80" height="80" alt="Collections" data-uk-svg />
+                    <img class="uk-svg-adjust uk-text-muted" src="@url('assets:collections/icon.svg')" width="80" height="80" alt="Collections" data-uk-svg />
                 </p>
                 <hr>
                 <span class="uk-text-large"><strong>@lang('No Collections').</strong>
@@ -70,7 +70,7 @@
                         <canvas width="600" height="350"></canvas>
                         <a aria-label="{ collection.label }" href="@route('/collections/entries')/{collection.name}" class="uk-position-cover uk-flex uk-flex-middle uk-flex-center">
                             <div class="uk-width-1-4 uk-svg-adjust" style="color:{ (collection.meta.color) }">
-                                <img riot-src="{ collection.meta.icon ? '@url('assets:app/media/icons/')'+collection.meta.icon : '@url('collections:icon.svg')'}" alt="icon" data-uk-svg>
+                                <img riot-src="{ collection.meta.icon ? '@url('assets:app/media/icons/')'+collection.meta.icon : '@url('assets:collections/icon.svg')'}" alt="icon" data-uk-svg>
                             </div>
                         </a>
                     </div>

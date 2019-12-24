@@ -78,8 +78,8 @@ $assets = [
     'assets:app/js/codemirror.js',
     'assets:app/components/cp-actionbar.js',
     'assets:app/components/cp-fieldcontainer.js',
-    'cockpit:assets/components.js',
-    'cockpit:assets/cockpit.js',
+    'assets:cockpit/components.js',
+    'assets:cockpit/cockpit.js',
 
     'assets:app/css/style.css',
 ];

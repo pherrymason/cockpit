@@ -1,5 +1,5 @@
 
-<script type="riot/tag" src="@base('collections:assets/collection-entrypreview.tag')"></script>
+<script type="riot/tag" src="@base('assets:collections/collection-entrypreview.tag')"></script>
 
 <style>
     @if(isset($collection['color']) && $collection['color'])
@@ -42,7 +42,7 @@
 
             <div class="uk-flex uk-flex-middle uk-text-bold uk-h3">
                 <div class="uk-margin-small-right">
-                    <img src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'collections:icon.svg')" width="40" alt="icon">
+                    <img src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="40" alt="icon">
                 </div>
                 <div class="uk-margin-right">{ App.i18n.get(entry._id ? 'Edit Entry':'Add Entry') }</div>
                 <a onclick="{showPreview}" if="{ collection.contentpreview && collection.contentpreview.enabled }" title="@lang('Preview')"><i class="uk-icon-button uk-icon-eye"></i></a>

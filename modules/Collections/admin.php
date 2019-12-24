@@ -13,8 +13,8 @@ $container = $app->getContainer();
 $app->on('admin.init', function() use ($container) {
     $admin = $container->get('admin');
 
-    $admin->addAssets('collections:assets/field-collectionlink.tag');
-    $admin->addAssets('collections:assets/link-collectionitem.js');
+    $admin->addAssets('assets:collections/field-collectionlink.tag');
+    $admin->addAssets('assets:collections/link-collectionitem.js');
 
     if (!$this->module('cockpit')->getGroupRights('collections') && !$this->module('collections')->getCollectionsInGroup()) {
 
@@ -36,13 +36,13 @@ $app->on('admin.init', function() use ($container) {
     // add to modules menu
     $admin->addMenuItem('modules', [
         'label' => 'Collections',
-        'icon'  => 'collections:icon.svg',
+        'icon'  => 'assets:collections/icon.svg',
         'route' => '/collections',
         'active' => $active
     ]);
 
     if ($active) {
-        $admin->favicon = 'collections:icon.svg';
+        $admin->favicon = 'assets:collections/icon.svg';
     } 
 
     /**

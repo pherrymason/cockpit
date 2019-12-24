@@ -27,13 +27,13 @@ $app->on('admin.init', function() {
     // add to modules menu
     $this->helper('admin')->addMenuItem('modules', [
         'label' => 'Forms',
-        'icon'  => 'forms:icon.svg',
+        'icon'  => 'assets:forms/icon.svg',
         'route' => '/forms',
         'active' => $active
     ]);
 
     if ($active) {
-        $this->helper('admin')->favicon = 'forms:icon.svg';
+        $this->helper('admin')->favicon = 'assets:forms/icon.svg';
     } 
 
     /**

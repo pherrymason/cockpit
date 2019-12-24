@@ -10,13 +10,13 @@
 
 </style>
 
-<script type="riot/tag" src="@base('collections:assets/entries-tree.tag')"></script>
+<script type="riot/tag" src="@base('assets:collections/entries-tree.tag')"></script>
 
 <div class="uk-margin-top" riot-view>
 
     <div class="uk-margin uk-text-center uk-text-muted" show="{ (Array.isArray(entries) && entries.length) || filter}">
 
-        <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'collections:icon.svg')" width="50" alt="icon" data-uk-svg>
+        <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="50" alt="icon" data-uk-svg>
         @if($collection['description'])
         <div class="uk-container-center uk-margin-top uk-width-medium-1-2">
             {{ htmlspecialchars($collection['description']) }}
@@ -30,7 +30,7 @@
 
             <div class="uk-animation-scale">
 
-                <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'collections:icon.svg')" width="50" alt="icon" data-uk-svg>
+                <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="50" alt="icon" data-uk-svg>
                 @if($collection['description'])
                 <div class="uk-margin-top uk-text-small uk-text-muted">
                     {{ htmlspecialchars($collection['description']) }}

@@ -1,5 +1,5 @@
 
-{{ $app->assets(['collections:assets/import/parser.js', 'collections:assets/import/filter.js'], $app['cockpit/version']) }}
+{{ $app->assets(['assets:collections/import/parser.js', 'assets:collections/import/filter.js'], $app['cockpit/version']) }}
 
 <div>
     <ul class="uk-breadcrumb">

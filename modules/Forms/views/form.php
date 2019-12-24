@@ -29,11 +29,11 @@
                 <div class="uk-margin">
                    <label class="uk-text-small">@lang('Icon')</label>
                    <div data-uk-dropdown="pos:'right-center', mode:'click'">
-                       <a><img class="uk-display-block uk-margin uk-container-center" riot-src="{ form.icon ? '@url('assets:app/media/icons/')'+form.icon : '@url('forms:icon.svg')'}" alt="icon" width="100"></a>
+                       <a><img class="uk-display-block uk-margin uk-container-center" riot-src="{ form.icon ? '@url('assets:app/media/icons/')'+form.icon : '@url('assets:forms/icon.svg')'}" alt="icon" width="100"></a>
                        <div class="uk-dropdown uk-dropdown-scrollable uk-dropdown-width-2">
                             <div class="uk-grid uk-grid-gutter">
                                 <div>
-                                    <a class="uk-dropdown-close" onclick="{ selectIcon }" icon=""><img src="@url('forms:icon.svg')" width="30" icon=""></a>
+                                    <a class="uk-dropdown-close" onclick="{ selectIcon }" icon=""><img src="@url('assets:forms/icon.svg')" width="30" icon=""></a>
                                 </div>
                                 @foreach($app->helper("fs")->ls('*.svg', 'assets:app/media/icons') as $icon)
                                 <div>

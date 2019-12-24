@@ -30,7 +30,7 @@
 
     <div class="uk-margin uk-text-muted uk-text-center" if="{ready && entries.length}">
 
-        <img class="uk-svg-adjust" src="@url($form['icon'] ? 'assets:app/media/icons/'.$form['icon']:'forms:icon.svg')" width="50" alt="icon" data-uk-svg>
+        <img class="uk-svg-adjust" src="@url($form['icon'] ? 'assets:app/media/icons/'.$form['icon']:'assets:forms/icon.svg')" width="50" alt="icon" data-uk-svg>
         @if($form['description'])
         <div class="uk-container-center uk-margin-top uk-width-medium-1-2">
             {{ htmlspecialchars($form['description']) }}
@@ -54,7 +54,7 @@
 
             <div class="uk-animation-scale uk-width-1-1 uk-text-muted">
 
-                <img class="uk-svg-adjust" src="@url($form['icon'] ? 'assets:app/media/icons/'.$form['icon']:'forms:icon.svg')" width="50" alt="icon" data-uk-svg>
+                <img class="uk-svg-adjust" src="@url($form['icon'] ? 'assets:app/media/icons/'.$form['icon']:'assets:forms/icon.svg')" width="50" alt="icon" data-uk-svg>
                 @if($form['description'])
                 <div class="uk-margin-top uk-text-small">
                     {{ htmlspecialchars($form['description']) }}
@@ -70,7 +70,7 @@
         <div class="uk-clearfix uk-margin-top uk-flex uk-flex-middle" show="{!loading && selected.length}">
 
             <div class="uk-flex-item-1 uk-flex uk-flex-middle uk-h3">
-                <div class="uk-margin-small-right"><img src="@url($form['icon'] ? 'assets:app/media/icons/'.$form['icon']:'forms:icon.svg')" width="40" alt="icon"></div>
+                <div class="uk-margin-small-right"><img src="@url($form['icon'] ? 'assets:app/media/icons/'.$form['icon']:'assets:forms/icon.svg')" width="40" alt="icon"></div>
                 <strong class="uk-margin-small-right">{{ htmlspecialchars(@$form['label'] ? $form['label']:$form['name']) }}</strong> 
                 @lang('Entries')
             </div>

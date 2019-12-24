@@ -34,7 +34,7 @@
             <div class="uk-animation-scale">
 
                 <p>
-                    <img class="uk-svg-adjust uk-text-muted" src="@url('forms:icon.svg')" width="80" height="80" alt="Forms" data-uk-svg />
+                    <img class="uk-svg-adjust uk-text-muted" src="@url('assets:forms/icon.svg')" width="80" height="80" alt="Forms" data-uk-svg />
                 </p>
                 <hr>
                 <span class="uk-text-large"><strong>@lang('No forms').</strong> <a href="@route('/forms/form')">@lang('Create one')</a></span>
@@ -54,7 +54,7 @@
                         <canvas width="600" height="350"></canvas>
                         <a aria-label="{ form.label }" href="@route('/forms/entries')/{form.name}" class="uk-position-cover uk-flex uk-flex-middle uk-flex-center">
                             <div class="uk-width-1-4 uk-svg-adjust" style="color:{ (form.meta.color) }">
-                                <img riot-src="{ form.meta.icon ? '@url('assets:app/media/icons/')'+form.meta.icon : '@url('forms:icon.svg')'}" alt="icon" data-uk-svg>
+                                <img riot-src="{ form.meta.icon ? '@url('assets:app/media/icons/')'+form.meta.icon : '@url('assets:forms/icon.svg')'}" alt="icon" data-uk-svg>
                             </div>
                         </a>
                     </div>

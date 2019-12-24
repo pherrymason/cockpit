@@ -26,7 +26,7 @@
                             <div class="uk-flex-item-1 uk-text-truncate">
                                 <a class="uk-link-muted" href="@route('/collections/entries/'.$col['name'])">
 
-                                    <img class="uk-margin-small-right uk-svg-adjust" src="@url(isset($col['icon']) && $col['icon'] ? 'assets:app/media/icons/'.$col['icon']:'collections:icon.svg')" width="18px" alt="icon" data-uk-svg>
+                                    <img class="uk-margin-small-right uk-svg-adjust" src="@url(isset($col['icon']) && $col['icon'] ? 'assets:app/media/icons/'.$col['icon']:'assets:collections/icon.svg')" width="18px" alt="icon" data-uk-svg>
 
                                     {{ htmlspecialchars(@$col['label'] ? $col['label'] : $col['name']) }}
                                 </a>
@@ -56,7 +56,7 @@
             <div class="uk-margin uk-text-center uk-text-muted">
 
                 <p>
-                    <img src="@url('collections:icon.svg')" width="30" height="30" alt="Collections" data-uk-svg />
+                    <img src="@url('assets:collections/icon.svg')" width="30" height="30" alt="Collections" data-uk-svg />
                 </p>
 
                 @lang('No collections')

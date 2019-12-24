@@ -27,7 +27,7 @@ $app->on('admin.init', function() {
     // add to modules menu
     $this->helper('admin')->addMenuItem('modules', [
         'label' => 'Singletons',
-        'icon'  => 'singletons:icon.svg',
+        'icon'  => 'assets:singletons/icon.svg',
         'route' => '/singletons',
         'active' => $active
     ]);

@@ -39,7 +39,7 @@
                            <div class="uk-dropdown uk-dropdown-scrollable uk-dropdown-width-2">
                                 <div class="uk-grid uk-grid-gutter">
                                     <div>
-                                        <a class="uk-dropdown-close" onclick="{ selectIcon }" icon=""><img src="@url('collections:icon.svg')" width="30" icon=""></a>
+                                        <a class="uk-dropdown-close" onclick="{ selectIcon }" icon=""><img src="@url('assets:collections/icon.svg')" width="30" icon=""></a>
                                     </div>
                                     @foreach($app->helper("fs")->ls('*.svg', 'assets:app/media/icons') as $icon)
                                     <div>

@@ -177,7 +177,7 @@ class Admin extends \Cockpit\AuthController {
         $context = _check_collection_rule($collection, 'read', ['options' => ['filter'=>[]]]);
 
         $this->app->helper('admin')->favicon = [
-            'path' => 'collections:icon.svg',
+            'path' => 'assets:collections/icon.svg',
             'color' => $collection['color']
         ];
 
@@ -224,7 +224,7 @@ class Admin extends \Cockpit\AuthController {
         ], $collection);
 
         $this->app->helper('admin')->favicon = [
-            'path' => 'collections:icon.svg',
+            'path' => 'assets:collections/icon.svg',
             'color' => $collection['color']
         ];
 

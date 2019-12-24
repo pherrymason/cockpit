@@ -68,7 +68,7 @@ class Admin extends \Cockpit\AuthController {
         ], $form);
 
         $this->app->helper('admin')->favicon = [
-            'path' => 'forms:icon.svg',
+            'path' => 'assets:forms/icon.svg',
             'color' => $form['color']
         ];
 
