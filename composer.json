@@ -17,10 +17,10 @@
             "LimeExtra\\": "lib/LimeExtra/"
         },
         "psr-4": {
-            "Cockpit\\": "src/Cockpit/",
             "Cockpit\\Collections\\": "src/Cockpit/Collections/",
             "Cockpit\\Singletons\\": "src/Cockpit/Singletons/",
             "Cockpit\\Forms\\": "src/Cockpit/Forms/",
+            "Cockpit\\": "src/Cockpit/",
 			"Framework\\": "src/Framework"
         }
     },
