@@ -23,7 +23,10 @@ final class DBEntriesRepository implements EntriesRepository
     {
         $sql = 'SELECT *, id as _id FROM '.$this->tableManager->tableName($collection->name()).';';
 
-        return $this->db->query($sql)->fetchAll();
+        $entries = $this->db->query($sql)->fetchAll();
+        $entries = array_map([$this, 'hydrate'], $entries);
+
+        return $entries;
     }
 
     public function byId(Collection $collection, string $id): ?Entry

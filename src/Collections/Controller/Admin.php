@@ -5,6 +5,7 @@ namespace Cockpit\Collections\Controller;
 use Cockpit\Collections\Collection;
 use Cockpit\Collections\CollectionRepository;
 use Cockpit\Collections\EntriesRepository;
+use Cockpit\Collections\Entry;
 use Cockpit\Collections\Role;
 use Cockpit\App\Revisions;
 use Lime\App;
@@ -277,7 +278,13 @@ final class Admin extends \Cockpit\AuthController
             $page = ceil($options['skip'] / $options['limit']) + 1;
         }
 
-        return compact('entries', 'count', 'pages', 'page');
+        return [
+            'entries' => array_map(function (Entry $entry) {
+                return $entry->toArray();
+            }, $entries),
+            'count' => $count,
+            'pages' => $pages,
+            'page' => $page];
     }
 
     public function entry($collectionName, $id = null)

@@ -44,7 +44,15 @@ final class Entry implements ContentUnit
             '_id' => $this->id
         ];
 
-        return array_merge($data, $this->data);
+        $data = array_merge($data, $this->data);
+
+        $created = new \DateTimeImmutable($data['_created']);
+        $data['_created'] = $created->getTimestamp();
+
+        $modified = new \DateTimeImmutable($data['_modified']);
+        $data['_modified'] = $modified->getTimestamp();
+
+        return $data;
     }
 
     public function toArray(): array
