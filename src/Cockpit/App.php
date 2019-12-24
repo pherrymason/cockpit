@@ -9,6 +9,8 @@ final class App
     const MODE_CLI = 1;
     const MODE_HTTP = 2;
 
+    /** @var \Psr\Container\ContainerInterface */
+    private $container;
     /** @var string */
     private $appPath;
     /** @var string */
@@ -21,17 +23,19 @@ final class App
     private $cockpit;
 
     /**
+     * @param \Psr\Container\ContainerInterface $container
      * @param string $appPath The path to the root your application.
      * @param string $publicPath The path from where the Server serves its document. Usually the path where index.php is located.
      * @param array $configuration Configuration parameters.
      * @param int $mode Request mode
      */
-    public function __construct(string $appPath, string $publicPath, array $configuration, int $mode)
+    public function __construct(\Psr\Container\ContainerInterface $container, string $appPath, string $publicPath, array $configuration, int $mode)
     {
         $this->appPath = $appPath;
         $this->publicPath = $publicPath;
         $this->configuration = $configuration;
         $this->mode = $mode;
+        $this->container = $container;
     }
 
     public function boot(): self
@@ -111,95 +115,19 @@ final class App
         // load config
         $config = array_replace_recursive($this->defaultConfiguration(), $this->configuration);
         $this->configuration = $config;
+        // Must overwrite final configuration parameters into container
+        foreach ($config as $key => $value) {
+            $this->container->set($key, $value);
+        }
 
         // make sure Cockpit module is not disabled
         if (isset($this->configuration['modules.disabled']) && in_array('Cockpit', $this->configuration['modules.disabled'])) {
             array_splice($this->configuration['modules.disabled'], array_search('Cockpit', $this->configuration['modules.disabled']), 1);
         }
 
-        $app = new \LimeExtra\App($this->configuration);
+        $app = new \LimeExtra\App($this->container, $this->configuration);
 
         $app['config'] = $this->configuration;
-
-        // register paths
-        foreach ($this->configuration['paths'] as $key => $path) {
-            $app->path($key, $path);
-        }
-
-        // nosql storage
-        $app->service('storage', function () use ($config) {
-            $client = new \MongoHybrid\Client($config['database']['server'], $config['database']['options'], $config['database']['driverOptions']);
-            return $client;
-        });
-
-        // file storage
-        $app->service('filestorage', function () use ($config, $app) {
-
-            $storages = array_replace_recursive([
-
-                'root' => [
-                    'adapter' => 'League\Flysystem\Adapter\Local',
-                    'args' => [$app->path('#root:')],
-                    'mount' => true,
-                    'url' => $app->pathToUrl('#root:', true)
-                ],
-
-                'site' => [
-                    'adapter' => 'League\Flysystem\Adapter\Local',
-                    'args' => [$app->path('site:')],
-                    'mount' => true,
-                    'url' => $app->pathToUrl('site:', true)
-                ],
-
-                'tmp' => [
-                    'adapter' => 'League\Flysystem\Adapter\Local',
-                    'args' => [$app->path('#tmp:')],
-                    'mount' => true,
-                    'url' => $app->pathToUrl('#tmp:', true)
-                ],
-
-                'thumbs' => [
-                    'adapter' => 'League\Flysystem\Adapter\Local',
-                    'args' => [$app->path('#thumbs:')],
-                    'mount' => true,
-                    'url' => $app->pathToUrl('#thumbs:', true)
-                ],
-
-                'uploads' => [
-                    'adapter' => 'League\Flysystem\Adapter\Local',
-                    'args' => [$app->path('#uploads:')],
-                    'mount' => true,
-                    'url' => $app->pathToUrl('#uploads:', true)
-                ],
-
-                'assets' => [
-                    'adapter' => 'League\Flysystem\Adapter\Local',
-                    'args' => [$app->path('#uploads:')],
-                    'mount' => true,
-                    'url' => $app->pathToUrl('#uploads:', true)
-                ]
-
-            ], $config['filestorage']);
-
-            $app->trigger('cockpit.filestorages.init', [&$storages]);
-
-            $filestorage = new \FileStorage($storages);
-
-            return $filestorage;
-        });
-
-        // key-value storage
-        $app->service('memory', function () use ($config) {
-            $client = new \SimpleStorage\Client($config['memory']['server'], $config['memory']['options']);
-            return $client;
-        });
-
-        // mailer service
-        $app->service('mailer', function () use ($app, $config) {
-            $options = isset($config['mailer']) ? $config['mailer'] : [];
-            $mailer = new \Mailer($options['transport'] ?? 'mail', $options);
-            return $mailer;
-        });
 
         // set cache path
         $tmppath = $app->path('#tmp:');
@@ -273,10 +201,37 @@ final class App
             'docs_root' => COCKPIT_DOCS_ROOT,
             'session.name' => md5(COCKPIT_ENV_ROOT),
             'session.init' => ($this->isHTTP() && !COCKPIT_API_REQUEST),
-            'sec-key' => 'c3b40c4c-db44-s5h7-a814-b4931a15e5e1',
-            'i18n' => 'en',
-            'database' => ['server' => 'mongolite://' . (COCKPIT_STORAGE_FOLDER . '/data'), 'options' => ['db' => 'cockpitdb'], 'driverOptions' => []],
-            'memory' => ['server' => 'redislite://' . (COCKPIT_STORAGE_FOLDER . '/data/cockpit.memory.sqlite'), 'options' => []],
+            'sec-key' => 'xxxxx-SiteSecKeyPleaseChangeMe-xxxxx',
+            'ui.i18n' => 'en',
+            // Content languages
+            'languages' => [
+                //'default' => 'English',       #setting a default language is optional
+                'fr' => 'French',
+                'de' => 'German'
+            ],
+            'modules.disabled' => [],
+            'database.config'     => [
+                'driver' => 'mongolite',
+                'server' => 'mongolite://'.(COCKPIT_STORAGE_FOLDER.'/data'),
+                'options' => ['db' => 'cockpitdb'],
+                'driverOptions' => []
+            ],
+            'memory.config'       => [
+                'server' => 'redislite://'.(COCKPIT_STORAGE_FOLDER.'/data/cockpit.memory.sqlite'),
+                'options' => []
+            ],
+            'mailer.config' => [
+                'from'       => 'info@mydomain.tld',
+                'transport'  => 'mail',   //mail|smtp
+                'host'       => 'smtp.myhost.tld',
+                'user'       => 'username',
+                'password'   => 'xxpasswordxx',
+                'port'       => 25,
+                'auth'       => true,
+                'encryption' => ''
+            ],
+            'groups' => [],
+            'cors' => [],
 
             'paths' => [
                 '#root' => COCKPIT_DIR,
@@ -300,29 +255,9 @@ final class App
 
     protected function configureDashboard(\LimeExtra\App $app): void
     {
-        set_exception_handler(function ($exception) use ($app) {
-            /** @var \Exception $exception */
-            $error = [
-                'message' => $exception->getMessage(),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-            ];
-
-            if ($app['debug']) {
-                $body = $app->req_is('ajax') || COCKPIT_API_REQUEST ? json_encode(['error' => $error['message'], 'file' => $error['file'], 'line' => $error['line']]) : $app->render('cockpit:views/errors/500-debug.php', ['error' => $error]);
-            } else {
-                $body = $app->req_is('ajax') || COCKPIT_API_REQUEST ? '{"error": "500", "message": "system error"}' : $app->view('cockpit:views/errors/500.php');
-            }
-
-            $app->trigger('error', [$error, $exception]);
-
-            header('HTTP/1.0 500 Internal Server Error');
-            echo $body;
-
-            if (function_exists('cockpit_error_handler')) {
-                cockpit_error_handler($error);
-            }
-        });
+        $whoops = new \Whoops\Run;
+        $whoops->prependHandler(new \Whoops\Handler\PrettyPageHandler);
+        $whoops->register();
 
         # admin route
         if (!defined('COCKPIT_ADMIN_ROUTE')) {
