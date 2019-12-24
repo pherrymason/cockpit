@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Cockpit\Framework;
+namespace Framework;
 
 use DI\DependencyException;
 use DI\NotFoundException;
