@@ -318,11 +318,11 @@ final class Admin extends \Cockpit\AuthController
                 return cockpit()->helper('admin')->denyRequest();
             }
 
-            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($id, $meta)) {
-                return $this->render('collections:views/locked.php', compact('meta', 'collection', 'entry'));
-            }
-
-            $this->app->helper('admin')->lockResourceId($id);
+//            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($id, $meta)) {
+//                return $this->render('collections:views/locked.php', compact('meta', 'collection', 'entry'));
+//            }
+//
+//            $this->app->helper('admin')->lockResourceId($id);
         }
 
 //        $context = _check_collection_rule($collection, 'read', ['options' => ['filter'=>[]]]);
