@@ -11,7 +11,7 @@ final class PathResolver
     /** @var string */
     private $docsRoot;
 
-    public function __construct(array $pathMap, ?string $siteURL, string $docsRoot)
+    public function __construct(array $pathMap, string $docsRoot, ?string $siteURL)
     {
         $this->pathMap = [];
         foreach ($pathMap as $key => $path) {

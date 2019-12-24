@@ -65,8 +65,6 @@ final class App
          * Collect needed paths
          */
 
-        $baseURL = trim(str_replace($this->publicPath, '', $this->appPath), "/");
-        $baseURL = strlen($baseURL) ? "/{$baseURL}" : $baseURL;
 
         /*
          * SYSTEM DEFINES
@@ -103,6 +101,9 @@ final class App
             define('COCKPIT_CONFIG_PATH', $_configpath);
         }
 
+
+        $baseURL = trim($this->configuration['base_url'], '/'); //trim($this->baseURL, "/");
+        $baseURL = strlen($baseURL) ? "/{$baseURL}" : $baseURL;
         define('COCKPIT_BASE_URL', $baseURL);
         define('COCKPIT_BASE_ROUTE', $baseURL);
 
