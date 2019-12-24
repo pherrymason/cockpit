@@ -10,7 +10,7 @@ return [
     },
 
     \League\Flysystem\AdapterInterface::class => function (ContainerInterface $c) {
-        return new \League\Flysystem\Adapter\Local($c->get('path_root'));
+        return new \League\Flysystem\Adapter\Local($c->get('root_path'));
     },
 
     \League\Flysystem\Filesystem::class => function (ContainerInterface $c) {
@@ -21,8 +21,11 @@ return [
 
     \Cockpit\App\Assets\Uploader::class => function (ContainerInterface $c) {
         return new \Cockpit\App\Assets\Uploader(
-            $c->get(\League\Flysystem\Filesystem::class), $c->get('path'),
-            $c->get(\Cockpit\App\Assets\AssetRepository::class), $c->get(\Framework\EventSystem::class), new \Cocur\Slugify\Slugify(), ['*'], 100000
+            $c->get(\League\Flysystem\Filesystem::class),
+            $c->get('path'),
+            $c->get(\Cockpit\App\Assets\AssetRepository::class),
+            $c->get(\Framework\EventSystem::class),
+            new \Cocur\Slugify\Slugify(), ['*'], 100000
             );
     },
 

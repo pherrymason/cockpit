@@ -2,7 +2,7 @@
 
 namespace Cockpit\App\Assets;
 
-use Cockpit\Framework\Database\Constraint;
+use Framework\Database\Constraint;
 
 interface FolderRepository
 {

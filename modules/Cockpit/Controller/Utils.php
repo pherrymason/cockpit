@@ -37,7 +37,9 @@ class Utils extends \Cockpit\AuthController {
             'edge detect', 'emboss',
             'flip', 'invert', 'opacity', 'pixelate', 'sepia', 'sharpen', 'sketch'
         ] as $f) {
-            if ($this->param($f)) $options[$f] = $this->param($f);
+            if ($this->param($f)) {
+                $options[$f] = $this->param($f);
+            }
         }
 
         return $this->module('cockpit')->thumbnail($options);

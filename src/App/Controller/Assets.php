@@ -3,7 +3,7 @@
 namespace Cockpit\App\Controller;
 
 use Cockpit\App\Assets\AssetRepository;
-use Cockpit\Framework\Database\Constraint;
+use Framework\Database\Constraint;
 use Lime\App;
 use function Cockpit\Controller\parent_sort;
 

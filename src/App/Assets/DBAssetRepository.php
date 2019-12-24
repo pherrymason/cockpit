@@ -2,8 +2,8 @@
 
 namespace Cockpit\App\Assets;
 
-use Cockpit\Framework\Database\Constraint;
-use Cockpit\Framework\Database\MysqlConstraintQueryBuilder;
+use Framework\Database\Constraint;
+use Framework\Database\MysqlConstraintQueryBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use function Framework\Database\MongoLite\MongoLite\array_key_intersect;

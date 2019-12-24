@@ -65,15 +65,19 @@ $services = [
     },
 
     'filestorage' => function (ContainerInterface $c) {
+        /** @var \Framework\PathResolver $pathResolver */
         $pathResolver = $c->get('path');
         $customConfig = $c->get('filestorage.config');
+        $root = [
+            'adapter' => 'League\Flysystem\Adapter\Local',
+            'args' => [$pathResolver->path('#root:')],
+            'mount' => true,
+            'url' => $pathResolver->pathToUrl('#root:', true)
+        ];
+
+
         $storages = array_replace_recursive([
-            'root' => [
-                'adapter' => 'League\Flysystem\Adapter\Local',
-                'args' => [$pathResolver->path('#root:')],
-                'mount' => true,
-                'url' => $pathResolver->pathToUrl('#root:', true)
-            ],
+            'root' => $root,
 
             'site' => [
                 'adapter' => 'League\Flysystem\Adapter\Local',

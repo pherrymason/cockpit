@@ -2,8 +2,8 @@
 
 namespace Cockpit\App\Assets;
 
-use Cockpit\Framework\Database\Constraint;
-use Cockpit\Framework\Database\MysqlConstraintQueryBuilder;
+use Framework\Database\Constraint;
+use Framework\Database\MysqlConstraintQueryBuilder;
 use Doctrine\DBAL\Connection;
 
 final class DBFolderRepository implements FolderRepository

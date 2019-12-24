@@ -5,11 +5,15 @@ namespace Cockpit\App\Assets;
 final class Asset
 {
     /** @var string */
+    private $id;
+    /** @var string */
     private $path;
     /** @var string */
     private $title;
     /** @var string */
     private $description;
+    /** @var string */
+    private $mime;
     /** @var string[] */
     private $tags;
     /** @var string */
@@ -20,14 +24,6 @@ final class Asset
     private $modified;
     /** @var string */
     private $userID;
-    /**
-     * @var string
-     */
-    private $id;
-    /**
-     * @var string
-     */
-    private $mime;
 
     public function __construct(string $id, string $path, string $title, string $description, array $tags, string $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID)
     {

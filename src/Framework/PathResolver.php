@@ -85,6 +85,9 @@ final class PathResolver
             || (3 < \strlen($path) && \ctype_alpha($path[0]) && $path[1] === ':' && ('\\' === $path[2] || '/' === $path[2]));
     }
 
+    /**
+     * @bug: cannot convert to URL a path that goes below $root.
+     */
     public function pathToUrl($path, $full = false)
     {
         $url = false;
@@ -94,9 +97,12 @@ final class PathResolver
             $file = \str_replace(DIRECTORY_SEPARATOR, '/', $file);
             $root = \str_replace(DIRECTORY_SEPARATOR, '/', $this->docsRoot);
 
-            $url = rtrim($this->baseURL, '/') .
-            $url.= '/' . \ltrim(\str_replace($root, '', $file), '/');
-            $url = \implode('/', \array_map('rawurlencode', explode('/', $url)));
+            $url = rtrim($this->baseURL, '/') . '/';
+
+            if (!$this->isNotParentPath($root, $file)) {
+                $url.= '/' . \ltrim(\str_replace($root, '', $file), '/');
+                $url = \implode('/', \array_map('rawurlencode', explode('/', $url)));
+            }
 
             if ($full) {
                 $url = \rtrim($this->siteURL, '/') . $url;
@@ -104,5 +110,23 @@ final class PathResolver
         }
 
         return $url;
+    }
+
+    private function isNotParentPath(string $parentPath, string $childPath): bool
+    {
+        $parentSeparators = count(explode(DIRECTORY_SEPARATOR, $parentPath));
+        $childSeparators = count(explode(DIRECTORY_SEPARATOR, $childPath));
+
+        // Parent should have more / than child
+        if ($parentSeparators < $childSeparators) {
+            return false;
+        }
+
+        // Check if childPath is below parentPath
+        if (strpos($parentPath, $childPath) === 0) {
+            return true;
+        }
+
+        return false;
     }
 }
