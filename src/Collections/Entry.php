@@ -46,12 +46,12 @@ final class Entry implements ContentUnit
 
         $data = array_merge($data, $this->data);
 
-        if (is_numeric($data['_created'])) {
+        if (!is_numeric($data['_created'])) {
             $created = new \DateTimeImmutable($data['_created']);
             $data['_created'] = $created->getTimestamp();
         }
 
-        if (is_numeric($data['_modified'])) {
+        if (!is_numeric($data['_modified'])) {
             $modified = new \DateTimeImmutable($data['_modified']);
             $data['_modified'] = $modified->getTimestamp();
         }

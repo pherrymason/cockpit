@@ -4,10 +4,14 @@ namespace Cockpit\Collections;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Framework\Database\Constraint;
+use Framework\Database\MysqlConstraintQueryBuilder;
 use Framework\IDs;
 
 final class DBEntriesRepository implements EntriesRepository
 {
+    use MysqlConstraintQueryBuilder;
+
     /** @var Connection */
     private $db;
     /** @var MySQLCollectionTableManager */
@@ -21,7 +25,13 @@ final class DBEntriesRepository implements EntriesRepository
 
     public function byCollectionFiltered(Collection $collection, $options)
     {
-        $sql = 'SELECT *, id as _id FROM '.$this->tableManager->tableName($collection->name()).';';
+        $sql = 'SELECT *, id as _id FROM '.$this->tableManager->tableName($collection->name());
+
+        $limit = $options['limit'] ?? null;
+        $skip = $options['skip'] ?? null;
+        $sort = $options['sort'] ?? null;
+        $constraint = new Constraint(null, $limit, $sort, $skip);
+        $sql = $this->applyConstraints($constraint, $sql);
 
         $entries = $this->db->query($sql)->fetchAll();
         $entries = array_map([$this, 'hydrate'], $entries);
