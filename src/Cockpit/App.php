@@ -208,8 +208,8 @@ final class App
             // Content languages
             'languages' => [
                 //'default' => 'English',       #setting a default language is optional
-                'fr' => 'French',
-                'de' => 'German'
+                //'fr' => 'French',
+                //'de' => 'German'
             ],
             'modules.disabled' => [],
             'database.config'     => [

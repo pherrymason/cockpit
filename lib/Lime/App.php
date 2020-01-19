@@ -398,6 +398,11 @@ class App implements \ArrayAccess {
     */
     public function retrieve($key, $default=null) {
         try {
+            if (strpos($key, 'config/') === 0) {
+                $key = str_replace('config/', '', $key);
+            }
+
+
             $value = $this->container->get($key);
         } catch (NotFoundExceptionInterface $e) {
             $value = $default;
