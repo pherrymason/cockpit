@@ -8,6 +8,9 @@ interface EntriesRepository
 
     public function byId(Collection $collection, string $id): ?Entry;
 
-    public function save(Collection $collection, array $entry, array $options): Entry;
+    public function revisionsById(Collection $collection, string $id);
 
+    public function count(Collection $collection, array $filter = []) : int;
+
+    public function save(Collection $collection, array $entry, array $options): Entry;
 }

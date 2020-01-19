@@ -12,6 +12,15 @@ return [
             $c->get('app')
         );
     },
+    \Cockpit\Collections\Controller\RestAPI::class => function (ContainerInterface $c) {
+        return new \Cockpit\Collections\Controller\RestAPI(
+            $c->get(\Cockpit\Collections\DBCollectionRepository::class),
+            $c->get(\Cockpit\Collections\DBEntriesRepository::class),
+            $c->get(\Cockpit\App\Revisions::class),
+            $c->get('app')
+        );
+    },
+
 
     // Utils
     \Cockpit\Collections\MySQLCollectionTableManager::class => function (ContainerInterface $c) {

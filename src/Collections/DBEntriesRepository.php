@@ -58,6 +58,15 @@ final class DBEntriesRepository implements EntriesRepository
         return array_map([$this, 'hydrate'], $stmt->fetchAll());
     }
 
+    public function count(Collection $collection, array $filter = []): int
+    {
+        $sql = 'SELECT * FROM '.$this->tableManager->tableName($collection->name());
+
+        $stmt = $this->db->executeQuery($sql);
+
+        return count($stmt->fetchAll());
+    }
+
     public function save(Collection $collection, array $entry, array $options): Entry
     {
         $options = array_merge(['revision' => false], $options);

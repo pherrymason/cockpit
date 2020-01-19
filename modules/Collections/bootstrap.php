@@ -718,7 +718,7 @@ $this->module("collections")->extend([
 if (COCKPIT_API_REQUEST) {
 
     $app->on('cockpit.rest.init', function($routes) {
-        $routes['collections'] = 'Collections\\Controller\\RestApi';
+        $routes['collections'] = \Cockpit\Collections\Controller\RestAPI::class;//'Collections\\Controller\\RestApi';
     });
 
     // allow access to public collections
