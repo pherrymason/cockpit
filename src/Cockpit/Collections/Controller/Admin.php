@@ -35,11 +35,11 @@ final class Admin extends \Cockpit\Framework\Controller
             return $collection->toArray();
         }, $collections);
 
-        return $this->renderTemplate(
+/*        return $this->renderTemplate(
             'collections::index.react.php',
             ['collections' => $frontendData]
         );
-//        return $this->render('collections:views/index.php', ['collections' => $frontendData]);
+  */      return $this->render('collections:views/index.php', ['collections' => $frontendData]);
     }
 
     public function collection($name = null)

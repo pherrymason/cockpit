@@ -4,9 +4,9 @@ namespace Cockpit\Collections;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
-use Framework\Database\Constraint;
-use Framework\Database\MysqlConstraintQueryBuilder;
-use Framework\IDs;
+use Cockpit\Framework\Database\Constraint;
+use Cockpit\Framework\Database\MysqlConstraintQueryBuilder;
+use Cockpit\Framework\IDs;
 
 final class DBEntriesRepository implements EntriesRepository
 {

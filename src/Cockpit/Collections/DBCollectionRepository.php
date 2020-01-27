@@ -3,7 +3,7 @@
 namespace Cockpit\Collections;
 
 use Doctrine\DBAL\Connection;
-use Framework\IDs;
+use Cockpit\Framework\IDs;
 
 final class DBCollectionRepository implements CollectionRepository
 {

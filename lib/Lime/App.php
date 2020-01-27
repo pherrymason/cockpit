@@ -25,8 +25,8 @@
 
 namespace Lime;
 
-use Framework\EventSystem;
-use Framework\PathResolver;
+use Cockpit\Framework\EventSystem;
+use Cockpit\Framework\PathResolver;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 

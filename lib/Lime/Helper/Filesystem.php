@@ -10,7 +10,7 @@
 
 namespace Lime\Helper;
 
-use Framework\PathResolver;
+use Cockpit\Framework\PathResolver;
 
 class Filesystem {
     /** @var PathResolver */

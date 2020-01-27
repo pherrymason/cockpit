@@ -2,142 +2,162 @@
 
 namespace Cockpit\App;
 
-use DI\ContainerBuilder;
-use Dotenv\Dotenv;
-use Spyc;
+use CLI;
 
 final class App
 {
-    /** @var array */
-    private $config;
-    /** @var \LimeExtra\App */
-    private $cockpit;
+    const MODE_CLI = 1;
+    const MODE_HTTP = 2;
+
     /** @var \Psr\Container\ContainerInterface */
     private $container;
+    /** @var string */
+    private $appPath;
+    /** @var string */
+    private $publicPath;
+    /** @var array */
+    private $configuration;
+    /** @var bool */
+    private $mode;
+    /** @var \LimeExtra\App */
+    private $cockpit;
 
-    public function __construct(\Psr\Container\ContainerInterface $container, array $config)
+    /**
+     * @param \Psr\Container\ContainerInterface $container
+     * @param string $appPath The path to the root your application.
+     * @param string $publicPath The path from where the Server serves its document. Usually the path where index.php is located.
+     * @param array $configuration Configuration parameters.
+     * @param int $mode Request mode
+     */
+    public function __construct(\Psr\Container\ContainerInterface $container, string $appPath, string $publicPath, array $configuration, int $mode)
     {
-        $this->config = $config;
+        $this->appPath = $appPath;
+        $this->publicPath = $publicPath;
+        $this->configuration = $configuration;
+        $this->mode = $mode;
         $this->container = $container;
     }
 
-    public function app(): \LimeExtra\App
+    public function boot(): self
     {
-        return $this->cockpit;
-    }
-
-    public function boot(): \LimeExtra\App
-    {
-        define('COCKPIT_ADMIN', 1);
-        date_default_timezone_set('UTC');
-
         define('COCKPIT_START_TIME', microtime(true));
 
-        if (!defined('COCKPIT_CLI')) {
-            define('COCKPIT_CLI', PHP_SAPI === 'cli');
-        }
+        // set default timezone
+        date_default_timezone_set('UTC');
 
-        define('APP_ROOT', dirname(__DIR__));
+        $cockpitRootPath = dirname(__DIR__, 3);
 
-        spl_autoload_register(function($class){
-            $class_path = APP_ROOT.'/lib/'.str_replace('\\', '/', $class).'.php';
-            if(file_exists($class_path)) {
+        /*
+         * Autoload from lib folder (PSR-0)
+         */
+
+        spl_autoload_register(function ($class) use ($cockpitRootPath) {
+            $class_path = $cockpitRootPath . '/lib/' . str_replace('\\', '/', $class) . '.php';
+            if (file_exists($class_path)) {
                 include_once($class_path);
             }
         });
 
         // load .env file if exists
-        DotEnv::createImmutable(APP_ROOT);
-
-        // check for custom defines
-        if (file_exists(APP_ROOT.'/defines.php')) {
-            include(APP_ROOT.'/defines.php');
-        }
+        //\DotEnv::load($this->appPath);
+        $dotenv = \Dotenv\Dotenv::createImmutable($this->appPath);
+        $dotenv->load();
 
         /*
          * Collect needed paths
          */
 
-        $COCKPIT_DIR         = str_replace(DIRECTORY_SEPARATOR, '/', APP_ROOT);
-        $COCKPIT_DOCS_ROOT   = str_replace(DIRECTORY_SEPARATOR, '/', isset($_SERVER['DOCUMENT_ROOT']) ? realpath($_SERVER['DOCUMENT_ROOT']) : dirname(APP_ROOT));
-
-# make sure that $_SERVER['DOCUMENT_ROOT'] is set correctly
-        if (strpos($COCKPIT_DIR, $COCKPIT_DOCS_ROOT)!==0 && isset($_SERVER['SCRIPT_NAME'])) {
-            $COCKPIT_DOCS_ROOT = str_replace(dirname(str_replace(DIRECTORY_SEPARATOR, '/', $_SERVER['SCRIPT_NAME'])), '', $COCKPIT_DIR);
-        }
-
-        $COCKPIT_BASE        = trim(str_replace($COCKPIT_DOCS_ROOT, '', $COCKPIT_DIR), "/");
-        $COCKPIT_BASE_URL    = strlen($COCKPIT_BASE) ? "/{$COCKPIT_BASE}": $COCKPIT_BASE;
-        $COCKPIT_BASE_ROUTE  = $COCKPIT_BASE_URL;
 
         /*
          * SYSTEM DEFINES
+         *
+         * Definitions
+         * COCKPIT_DIR:         Root directory of cockpit src
+         * COCKPIT_ENV_ROOT:    Application path. Not necessarily the same path where cockpit is located.
+         *                      This is where customization will be stored.
+         *                      For example:
+         *                        - /addons
+         *                        - /config
+         *                        - /storage.
+         * COCKPIT_DOCS_ROOT:   The path to the public folder.
+         * COCKPIT_SITE_DIR:    ????
+         *
+         * Behavioural constants
+         * COCKPIT_ADMIN          Are we handling a request to the Dashboard?
+         * COCKPIT_API_REQUEST    Are we handling an API request?
          */
-        if (!defined('COCKPIT_DIR'))                    define('COCKPIT_DIR'            , $COCKPIT_DIR);
-        if (!defined('COCKPIT_ADMIN'))                  define('COCKPIT_ADMIN'          , 0);
-        if (!defined('COCKPIT_DOCS_ROOT'))              define('COCKPIT_DOCS_ROOT'      , $COCKPIT_DOCS_ROOT);
-        if (!defined('COCKPIT_ENV_ROOT'))               define('COCKPIT_ENV_ROOT'       , COCKPIT_DIR);
-        if (!defined('COCKPIT_BASE_URL'))               define('COCKPIT_BASE_URL'       , $COCKPIT_BASE_URL);
-        if (!defined('COCKPIT_API_REQUEST'))            define('COCKPIT_API_REQUEST'    , COCKPIT_ADMIN && strpos($_SERVER['REQUEST_URI'], COCKPIT_BASE_URL.'/api/')!==false ? 1:0);
-        if (!defined('COCKPIT_SITE_DIR'))               define('COCKPIT_SITE_DIR'       , COCKPIT_ENV_ROOT == COCKPIT_DIR ?  ($COCKPIT_DIR === COCKPIT_DOCS_ROOT ? COCKPIT_DIR : dirname(COCKPIT_DIR)) :  COCKPIT_ENV_ROOT);
-        if (!defined('COCKPIT_CONFIG_DIR'))             define('COCKPIT_CONFIG_DIR'     , COCKPIT_ENV_ROOT.'/config');
-        if (!defined('COCKPIT_BASE_ROUTE'))             define('COCKPIT_BASE_ROUTE'     , $COCKPIT_BASE_ROUTE);
-        if (!defined('COCKPIT_STORAGE_FOLDER'))         define('COCKPIT_STORAGE_FOLDER' , COCKPIT_ENV_ROOT.'/storage');
-        if (!defined('COCKPIT_ADMIN_CP'))               define('COCKPIT_ADMIN_CP'       , COCKPIT_ADMIN && !COCKPIT_API_REQUEST ? 1 : 0);
-        if (!defined('COCKPIT_PUBLIC_STORAGE_FOLDER'))  define('COCKPIT_PUBLIC_STORAGE_FOLDER' , COCKPIT_ENV_ROOT.'/storage');
+        define('COCKPIT_DIR', $cockpitRootPath);
+        define('COCKPIT_ENV_ROOT', $this->appPath);
+        define('COCKPIT_DOCS_ROOT', $this->publicPath);
+        define('COCKPIT_CONFIG_DIR', COCKPIT_ENV_ROOT . '/config');
+        define('COCKPIT_STORAGE_FOLDER', COCKPIT_ENV_ROOT . '/storage');
+        define('COCKPIT_PUBLIC_STORAGE_FOLDER', COCKPIT_ENV_ROOT . '/storage');
+        if (COCKPIT_ENV_ROOT === COCKPIT_DIR) {
+            define('COCKPIT_SITE_DIR', $cockpitRootPath === COCKPIT_DOCS_ROOT ? COCKPIT_DIR : dirname(COCKPIT_DIR));
+        } else {
+            define('COCKPIT_SITE_DIR', COCKPIT_ENV_ROOT);
+        }
 
         if (!defined('COCKPIT_CONFIG_PATH')) {
-            $_configpath = COCKPIT_CONFIG_DIR.'/config.'.(file_exists(COCKPIT_CONFIG_DIR.'/config.php') ? 'php':'yaml');
+            $_configpath = COCKPIT_CONFIG_DIR . '/config.' . (file_exists(COCKPIT_CONFIG_DIR . '/config.php') ? 'php' : 'yaml');
             define('COCKPIT_CONFIG_PATH', $_configpath);
         }
 
 
-        $customconfig = [];
-        $defaultConfiguration = require(APP_ROOT.'/config.php');
+        $baseURL = trim($this->configuration['base_url'], '/'); //trim($this->baseURL, "/");
+        $baseURL = strlen($baseURL) ? "/{$baseURL}" : $baseURL;
+        define('COCKPIT_BASE_URL', $baseURL);
+        define('COCKPIT_BASE_ROUTE', $baseURL);
 
-        // load custom config
-        if (file_exists(COCKPIT_CONFIG_PATH)) {
-            $customconfig = preg_match('/\.yaml$/', COCKPIT_CONFIG_PATH) ? Spyc::YAMLLoad(COCKPIT_CONFIG_PATH) : include(COCKPIT_CONFIG_PATH);
+        define('COCKPIT_ADMIN', $this->isHTTP());
+        define('COCKPIT_CLI', $this->isCLI());
+        define('COCKPIT_API_REQUEST', $this->isHTTP() && strpos($_SERVER['REQUEST_URI'], COCKPIT_BASE_URL . '/api/') !== false ? 1 : 0);
+        define('COCKPIT_ADMIN_CP', $this->isHTTP() && !COCKPIT_API_REQUEST ? 1 : 0);
+
+
+        // load config
+        $config = array_replace_recursive($this->defaultConfiguration(), $this->configuration);
+        $this->configuration = $config;
+        // Must overwrite final configuration parameters into container
+        foreach ($config as $key => $value) {
+            $this->container->set($key, $value);
         }
-        $configuration = array_merge($defaultConfiguration, $customconfig);
 
         // make sure Cockpit module is not disabled
-        if (isset($configuration['modules.disabled']) && in_array('Cockpit', $configuration['modules.disabled'])) {
-            array_splice($configuration['modules.disabled'], array_search('Cockpit', $configuration['modules.disabled']), 1);
+        if (isset($this->configuration['modules.disabled']) && in_array('Cockpit', $this->configuration['modules.disabled'])) {
+            array_splice($this->configuration['modules.disabled'], array_search('Cockpit', $this->configuration['modules.disabled']), 1);
         }
 
-        $app = new \LimeExtra\App($this->container, $configuration);
+        $app = new \LimeExtra\App($this->container, $this->configuration);
         $this->container->set('app', $app);
-        $app['config'] = $configuration;
-
-        // register paths
-//        foreach ($configuration['paths'] as $key => $path) {
-//            $app->path($key, $path);
-//        }
+        $this->container->set('root_path', $this->appPath);
+        $app['config'] = $this->configuration;
 
         // set cache path
         $tmppath = $app->path('#tmp:');
 
-        $app->get('cache')->setCachePath($tmppath);
-        $app->get('renderer')->setCachePath($tmppath);
+        $app('cache')->setCachePath($tmppath);
+        $app->renderer->setCachePath($tmppath);
 
         // i18n
-        $app->get('i18n')->locale = $config['i18n'] ?? 'en';
+        $app('i18n')->locale = $config['i18n'] ?? 'en';
 
-        // handle exceptions
-        if (COCKPIT_ADMIN) {
-            $whoops = new \Whoops\Run;
-            $whoops->prependHandler(new \Whoops\Handler\PrettyPageHandler);
-            $whoops->register();
+        switch ($this->mode) {
+            case self::MODE_HTTP:
+                $this->configureDashboard($app);
+                break;
+            case self::MODE_CLI:
+                $this->configureCLI($app);
+                break;
         }
 
         $modulesPaths = array_merge([
-            COCKPIT_DIR.'/modules',  # core
-            COCKPIT_DIR.'/addons' # addons
+            COCKPIT_DIR . '/modules',  # core
+            COCKPIT_DIR . '/addons' # addons
         ], $config['loadmodules'] ?? []);
 
         if (COCKPIT_ENV_ROOT !== COCKPIT_DIR) {
-            $modulesPaths[] = COCKPIT_ENV_ROOT.'/addons';
+            $modulesPaths[] = COCKPIT_ENV_ROOT . '/addons';
         }
 
         // load modules
@@ -150,6 +170,7 @@ final class App
 
         $app->trigger('cockpit.bootstrap');
 
+        // shorthand modules method call e.g. cockpit('regions:render', 'test');
         if (func_num_args() > 1) {
 
             $arguments = func_get_args();
@@ -159,36 +180,144 @@ final class App
             return call_user_func_array([$app->module($module), $method], $arguments);
         }
 
-        # admin route
-        if (COCKPIT_ADMIN && !defined('COCKPIT_ADMIN_ROUTE')) {
-            $route = preg_replace('#'.preg_quote(COCKPIT_BASE_URL, '#').'#', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), 1);
-            define('COCKPIT_ADMIN_ROUTE', $route == '' ? '/' : $route);
-        }
-
-        if (COCKPIT_API_REQUEST) {
-
-            $_cors = $app->retrieve('config/cors', []);
-
-            header('Access-Control-Allow-Origin: '      .($_cors['allowedOrigins'] ?? '*'));
-            header('Access-Control-Allow-Credentials: ' .($_cors['allowCredentials'] ?? 'true'));
-            header('Access-Control-Max-Age: '           .($_cors['maxAge'] ?? '1000'));
-            header('Access-Control-Allow-Headers: '     .($_cors['allowedHeaders'] ?? 'X-Requested-With, Content-Type, Origin, Cache-Control, Pragma, Authorization, Accept, Accept-Encoding, Cockpit-Token'));
-            header('Access-Control-Allow-Methods: '     .($_cors['allowedMethods'] ?? 'PUT, POST, GET, OPTIONS, DELETE'));
-            header('Access-Control-Expose-Headers: '    .($_cors['exposedHeaders'] ?? 'true'));
-
-            if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-                exit(0);
-            }
-        }
-
         $this->cockpit = $app;
 
+        return $this;
+    }
+
+    public function run()
+    {
+        $this->cockpit->set('route', COCKPIT_ADMIN_ROUTE)->trigger('admin.init')->run();
+    }
+
+    public function cockpit(): \LimeExtra\App
+    {
         return $this->cockpit;
     }
 
-    public function run(): void
+    protected function defaultConfiguration(): array
     {
-        $this->cockpit = $this->boot();
-        $this->cockpit->set('route', COCKPIT_ADMIN_ROUTE)->trigger('admin.init')->run();
+        return [
+            'debug' => preg_match('/(localhost|::1|\.local)$/', @$_SERVER['SERVER_NAME']),
+            'app.name' => 'Cockpit',
+            'base_url' => COCKPIT_BASE_URL,
+            'base_route' => COCKPIT_BASE_ROUTE,
+            'docs_root' => COCKPIT_DOCS_ROOT,
+            'session.name' => md5(COCKPIT_ENV_ROOT),
+            'session.init' => ($this->isHTTP() && !COCKPIT_API_REQUEST),
+            'sec-key' => 'xxxxx-SiteSecKeyPleaseChangeMe-xxxxx',
+            'ui.i18n' => 'en',
+            // Content languages
+            'languages' => [
+                //'default' => 'English',       #setting a default language is optional
+                //'fr' => 'French',
+                //'de' => 'German'
+            ],
+            'modules.disabled' => [],
+            'database.config'     => [
+                'driver' => 'mongolite',
+                'server' => 'mongolite://'.(COCKPIT_STORAGE_FOLDER.'/data'),
+                'options' => ['db' => 'cockpitdb'],
+                'driverOptions' => []
+            ],
+            'memory.config'       => [
+                'server' => 'redislite://'.(COCKPIT_STORAGE_FOLDER.'/data/cockpit.memory.sqlite'),
+                'options' => []
+            ],
+            'mailer.config' => [
+                'from'       => 'info@mydomain.tld',
+                'transport'  => 'mail',   //mail|smtp
+                'host'       => 'smtp.myhost.tld',
+                'user'       => 'username',
+                'password'   => 'xxpasswordxx',
+                'port'       => 25,
+                'auth'       => true,
+                'encryption' => ''
+            ],
+            'groups' => [],
+            'cors' => [],
+
+            'paths' => [
+                '#root' => COCKPIT_DIR,
+                '#storage' => COCKPIT_STORAGE_FOLDER,
+                '#pstorage' => COCKPIT_PUBLIC_STORAGE_FOLDER,
+                '#data' => COCKPIT_STORAGE_FOLDER . '/data',
+                '#cache' => COCKPIT_STORAGE_FOLDER . '/cache',
+                '#tmp' => COCKPIT_STORAGE_FOLDER . '/tmp',
+                '#thumbs' => COCKPIT_PUBLIC_STORAGE_FOLDER . '/thumbs',
+                '#uploads' => COCKPIT_PUBLIC_STORAGE_FOLDER . '/uploads',
+                '#modules' => COCKPIT_DIR . '/modules',
+                '#addons' => COCKPIT_ENV_ROOT . '/addons',
+                '#config' => COCKPIT_CONFIG_DIR,
+                'assets' => COCKPIT_DIR . '/assets',
+                'site' => COCKPIT_SITE_DIR
+            ],
+            'filestorage.config' => []
+        ];
+    }
+
+    protected function configureDashboard(\LimeExtra\App $app): void
+    {
+        $whoops = new \Whoops\Run;
+        $whoops->prependHandler(new \Whoops\Handler\PrettyPageHandler);
+        $whoops->register();
+
+        # admin route
+        if (!defined('COCKPIT_ADMIN_ROUTE')) {
+            $route = preg_replace('#' . preg_quote(COCKPIT_BASE_URL, '#') . '#', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), 1);
+            define('COCKPIT_ADMIN_ROUTE', $route === '' ? '/' : $route);
+        }
+    }
+
+    private function configureAPI(\LimeExtra\App $app): void
+    {
+        $_cors = $app->retrieve('config/cors', []);
+
+        header('Access-Control-Allow-Origin: ' . ($_cors['allowedOrigins'] ?? '*'));
+        header('Access-Control-Allow-Credentials: ' . ($_cors['allowCredentials'] ?? 'true'));
+        header('Access-Control-Max-Age: ' . ($_cors['maxAge'] ?? '1000'));
+        header('Access-Control-Allow-Headers: ' . ($_cors['allowedHeaders'] ?? 'X-Requested-With, Content-Type, Origin, Cache-Control, Pragma, Authorization, Accept, Accept-Encoding, Cockpit-Token'));
+        header('Access-Control-Allow-Methods: ' . ($_cors['allowedMethods'] ?? 'PUT, POST, GET, OPTIONS, DELETE'));
+        header('Access-Control-Expose-Headers: ' . ($_cors['exposedHeaders'] ?? 'true'));
+
+        if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit(0);
+        }
+    }
+
+    private function configureCLI(\LimeExtra\App $app): void
+    {
+        set_exception_handler(function ($exception) use ($app) {
+            /** @var \Exception $exception */
+            $error = [
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+            ];
+
+            $app->trigger('error', [$error, $exception]);
+
+            if (function_exists('cockpit_error_handler')) {
+                cockpit_error_handler($error);
+            }
+
+            CLI::writeln('COCKPIT CLI ERROR:', false);
+            CLI::writeln('-> in ' . $error['file'] . ':' . $error['line'] . "\n");
+            CLI::writeln($error['message'] . "\n");
+        });
+
+        register_shutdown_function(function () use ($app) {
+            $app->trigger('shutdown');
+        });
+    }
+
+    private function isHTTP(): bool
+    {
+        return $this->mode === self::MODE_HTTP;
+    }
+
+    private function isCLI(): bool
+    {
+        return $this->mode === self::MODE_CLI;
     }
 }

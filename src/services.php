@@ -175,10 +175,10 @@ $services = [
 
     \League\Plates\Engine::class => function (ContainerInterface $c) {
         $engine = new \League\Plates\Engine(
-            dirname(__DIR__, 2) . '/Resources/views'
+           // dirname(__DIR__, 2) . '/Resources/views'
         );
 
-        $engine->addFolder('collections', dirname(__DIR__).'/Collections/views');
+        $engine->addFolder('collections', __DIR__ . '/Cockpit/Collections/views');
 
         /*
         $engine->registerFunction('route', function ($routeName, array $data = [], array $queryParams = []) use ($c) {
