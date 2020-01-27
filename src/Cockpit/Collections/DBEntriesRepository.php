@@ -41,43 +41,7 @@ final class DBEntriesRepository implements EntriesRepository
 
         $entries = $this->db->query($sql)->fetchAll();
 
-        $fields = $collection->fields();
-        /** @var Field[] $baseFields */
-        $baseFields = array_filter($collection->fields(), function (Field $field) {
-            return !$field->localize();
-        });
-        /** @var Field[] $localizedFields */
-        $localizedFields = array_filter($collection->fields(), function (Field $field) {
-            return $field->localize();
-        });
-
-        $harmonized = [];
-        foreach ($entries as $entry) {
-            $id = $entry['_id'];
-            if  (!isset($harmonized[$id])) {
-                // Copy fields
-                $harmonized[$id] = [
-                    'id' => $id,
-                    '_created' => $entry['_created'],
-                    '_modified' => $entry['_modified'],
-                    '_by' => $entry['_by'],
-                    '_mby' => $entry['_mby']
-                ];
-                foreach ($baseFields as $field) {
-                    $harmonized[$id][$field->name()] = $entry[$field->name()] ?? null;
-                }
-            }
-
-            // localized Fields
-            $harmonized[$id]['localized'][$entry['language']] = [];
-            foreach ($localizedFields as $field) {
-                $language = $entry['language'];
-                if (!isset($harmonized[$id]['localized'][$language])) {
-                    $harmonized[$id]['localized'][$language] = ['language' => $language];
-                }
-                $harmonized[$id]['localized'][$language][$field->name()] = $entry[$field->name()] ?? null;
-            }
-        }
+        $harmonized = $this->mergeResults($collection, $entries);
 
         $entries = array_map([$this, 'hydrate'], $harmonized);
 
@@ -86,12 +50,16 @@ final class DBEntriesRepository implements EntriesRepository
 
     public function byId(Collection $collection, string $id): ?Entry
     {
-        $sql = 'SELECT * FROM '.$this->tableManager->tableName($collection->name()).' WHERE id=:id ';
-        $sql.= 'ORDER BY _modified DESC LIMIT 1';
+        $tableName = $this->tableManager->tableName($collection->name());
+        $sql = 'SELECT *, entry.id as _id FROM '. $tableName . ' as entry '.
+            'LEFT JOIN ' . $tableName . '_content as content ON content.entry_id=entry.id ' .
+            'WHERE entry.id=:id ' .
+            'ORDER BY _modified DESC LIMIT 1';
 
         $stmt = $this->db->executeQuery($sql, ['id' => $id]);
+        $harmonized = $this->mergeResults($collection, $stmt->fetchAll());
 
-        return $this->hydrate($stmt->fetch());
+        return $this->hydrate(array_values($harmonized)[0]);
     }
 
     public function revisionsById(Collection $collection, string $id)
@@ -224,5 +192,46 @@ final class DBEntriesRepository implements EntriesRepository
         $previousRevisionID = $data['prev_rev_id'] ?? null;
 
         return new Entry($data['id'], $data);
+    }
+
+    protected function mergeResults(Collection $collection, array $entries): array
+    {
+        /** @var Field[] $baseFields */
+        $baseFields = array_filter($collection->fields(), function (Field $field) {
+            return !$field->localize();
+        });
+        /** @var Field[] $localizedFields */
+        $localizedFields = array_filter($collection->fields(), function (Field $field) {
+            return $field->localize();
+        });
+
+        $harmonized = [];
+        foreach ($entries as $entry) {
+            $id = $entry['_id'];
+            if (!isset($harmonized[$id])) {
+                // Copy fields
+                $harmonized[$id] = [
+                    'id' => $id,
+                    '_created' => $entry['_created'],
+                    '_modified' => $entry['_modified'],
+                    '_by' => $entry['_by'],
+                    '_mby' => $entry['_mby']
+                ];
+                foreach ($baseFields as $field) {
+                    $harmonized[$id][$field->name()] = $entry[$field->name()] ?? null;
+                }
+            }
+
+            // localized Fields
+            $harmonized[$id]['localized'][$entry['language']] = [];
+            foreach ($localizedFields as $field) {
+                $language = $entry['language'];
+                if (!isset($harmonized[$id]['localized'][$language])) {
+                    $harmonized[$id]['localized'][$language] = ['language' => $language];
+                }
+                $harmonized[$id]['localized'][$language][$field->name()] = $entry[$field->name()] ?? null;
+            }
+        }
+        return $harmonized;
     }
 }
