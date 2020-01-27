@@ -321,6 +321,7 @@
         var $this = this, $root = App.$(this.root);
 
         this.collection = {{ json_encode($collection) }};
+        this.originalFields = [...this.collection.fields];
         this.loading    = true;
         this.count      = 0;
         this.page       = 1;
@@ -333,37 +334,49 @@
         if (this.languages.length) {
             this.lang = App.session.get('collections.entry.'+this.collection._id+'.lang', '');
         }
+        function getLanguage() {
+            return $this.lang;
+        }
 
-        this.fields = this.collection.fields.filter(function(field){
+        function getFields() {
+            var fields = $this.originalFields
+                .filter(function(field){
+                    if (!CollectionHasFieldAccess(field)) {
+                        return false;
+                    }
 
-            if (!CollectionHasFieldAccess(field)) {
-                return false;
-            }
+                    var fieldName = field.localize ? field.name + '_' + getLanguage() : field.name
+                    $this.fieldsidx[fieldName] = field;
 
-            var fieldName = field.localize ? field.name + '_' + App.$data.appLanguages[0]['code'] : field.name
+                    if (!$this.imageField && (field.type=='image' || field.type=='asset')) {
+                        $this.imageField = field;
+                    }
 
-            field.name = fieldName;
-            $this.fieldsidx[fieldName] = field;
+                    return field.lst;
+                })
+                .map(function(field){
+                    var fieldCopy = Object.assign({}, field);
+                    fieldCopy.name = field.localize ? field.name + '_' + getLanguage() : field.name
 
-            if (!$this.imageField && (field.type=='image' || field.type=='asset')) {
-                $this.imageField = field;
-            }
+                    return fieldCopy;
+                });
 
-            return field.lst;
-        });
+            $this.fieldsidx['_created'] = {name:'_created', 'label':'@lang('Created')', type: 'text'};
+            $this.fieldsidx['_modified'] = {name:'_modified', 'label':'@lang('Modified')', type: 'text'};
 
-        this.fieldsidx['_created'] = {name:'_created', 'label':'@lang('Created')', type: 'text'};
-        this.fieldsidx['_modified'] = {name:'_modified', 'label':'@lang('Modified')', type: 'text'};
+            fields.push($this.fieldsidx['_created']);
+            fields.push($this.fieldsidx['_modified']);
 
-        this.fields.push(this.fieldsidx['_created']);
-        this.fields.push(this.fieldsidx['_modified']);
+            return fields;
+        }
+
+        this.fields = getFields();
 
         this.sort     = {'_created': -1};
         this.selected = [];
         this.listmode = App.session.get('collections.entries.'+this.collection.name+'.listmode', 'list');
 
         this.on('mount', function(){
-
             $root.on('click', '[data-check]', function() {
 
                 if (this.getAttribute('data-check') == 'all') {
@@ -381,8 +394,9 @@
             $this.initState();
         });
 
-        initState() {
 
+
+        initState() {
             var searchParams = new URLSearchParams(location.search);
 
             if (searchParams.has('q')) {
@@ -478,7 +492,6 @@
         }
 
         load(initial) {
-
             var options = { sort:this.sort };
 
             if (this.lang) {
@@ -519,6 +532,8 @@
                 this.page    = data.page;
                 this.count   = data.count;
 
+                this.fields = getFields();
+
                 this.checkselected();
                 this.loading = false;
                 this.update();
@@ -532,7 +547,6 @@
         }
 
         updatesort(e, field) {
-
             e.preventDefault();
 
             field = e.target.getAttribute('data-sort');
@@ -599,7 +613,6 @@
         }
 
         updatefilter() {
-
             var load = this.filter ? true:false;
 
             this.filter = this.refs.txtfilter.value || null;
