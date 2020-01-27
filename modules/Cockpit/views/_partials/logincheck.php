@@ -58,11 +58,12 @@
                 });
             }
 
-            setInterval(check, 60000);
+            /*setInterval(check, 60000);
 
             document.addEventListener('visibilitychange', function() {
                 if (!document.hidden) check();
             }, false);
+            */
         });
 
         submit(e) {

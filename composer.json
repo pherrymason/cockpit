@@ -18,11 +18,11 @@
         },
         "psr-4": {
             "Cockpit\\": "src/Cockpit/",
-            "Cockpit\\App\\": "src/App/",
-            "Cockpit\\Collections\\": "src/Collections/",
-            "Cockpit\\Singletons\\": "src/Singletons/",
-            "Cockpit\\Forms\\": "src/Forms/",
-			"Framework\\": "src/Framework"
+            "Cockpit\\App\\": "src/Cockpit/App/",
+            "Cockpit\\Collections\\": "src/Cockpit/Collections/",
+            "Cockpit\\Singletons\\": "src/Cockpit/Singletons/",
+            "Cockpit\\Forms\\": "src/Cockpit/Forms/",
+			"Cockpit\\Framework\\": "src/Cockpit/Framework"
         }
     },
 
@@ -33,6 +33,7 @@
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-pdo": "*",
+        "ext-fileinfo": "*",
 
         "phpmailer/phpmailer": "^6.0",
         "claviska/simpleimage": "^3.3",
@@ -46,8 +47,8 @@
         "php-di/php-di": "^6.0",
         "ramsey/uuid": "^3.9",
         "filp/whoops": "^2.5",
-      "ext-fileinfo": "*",
-        "cocur/slugify": "^4.0"
+        "cocur/slugify": "^4.0",
+        "league/plates": "^3.3"
     },
 
     "config": {

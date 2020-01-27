@@ -87,6 +87,7 @@ class Admin extends \Lime\Helper {
                 'user'      => $this->user,
                 'locale'    => $this->app->helper('i18n')->locale,
                 'site_url'  => $this->app->pathToUrl('site:'),
+                'appLanguages' => array_merge([['code'=>'default', 'label'=>$langDefaultLabel]], $languages),
                 'languages' => $languages,
                 'languageDefaultLabel' => $langDefaultLabel,
                 'groups' => $this->app->helper('acl')->getGroups(),

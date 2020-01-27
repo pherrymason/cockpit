@@ -88,7 +88,7 @@
                     { lang ? _.find(languages,{'code':lang}).label : App.$data.languageDefaultLabel }
                 </span>
                 <select onchange="{changelanguage}">
-                    <option value="" selected="{lang === ''}">{App.$data.languageDefaultLabel}</option>
+                    <!--<option value="" selected="{lang === ''}">{App.$data.languageDefaultLabel}</option>-->
                     <option each="{language,idx in languages}" value="{language.code}" selected="{lang === language.code}">{language.label}</option>
                 </select>
             </div>
@@ -227,7 +227,7 @@
                         <td class="uk-text-truncate" each="{field,idy in parent.fields}" if="{ field.name != '_modified' && field.name != '_created' }">
                             <a class="uk-link-muted" href="@route('/collections/entry/'.$collection['name'])/{ parent.entry._id }">
                                 <raw content="{ App.Utils.renderValue(field.type, parent.entry[field.name], field) }" if="{parent.entry[field.name] !== undefined}"></raw>
-                                <span class="uk-icon-eye-slash uk-text-muted" if="{parent.entry[field.name] === undefined}"></span>
+                                <span class="uk-icon-eye-slash uk-text-muted" if="{parent.entry[field.name] === undefined}">{field.name}</span>
                             </a>
                         </td>
                         <td><span class="uk-badge uk-badge-outline uk-text-muted">{ App.Utils.dateformat( new Date( 1000 * entry._created )) }</span></td>
@@ -328,17 +328,22 @@
         this.entries    = [];
         this.fieldsidx  = {};
         this.imageField = null;
-        this.languages  = App.$data.languages;
+        this.languages  = App.$data.appLanguages;
 
         if (this.languages.length) {
             this.lang = App.session.get('collections.entry.'+this.collection._id+'.lang', '');
         }
 
-        this.fields     = this.collection.fields.filter(function(field){
+        this.fields = this.collection.fields.filter(function(field){
 
-            if (!CollectionHasFieldAccess(field)) return false;
+            if (!CollectionHasFieldAccess(field)) {
+                return false;
+            }
 
-            $this.fieldsidx[field.name] = field;
+            var fieldName = field.localize ? field.name + '_' + App.$data.appLanguages[0]['code'] : field.name
+
+            field.name = fieldName;
+            $this.fieldsidx[fieldName] = field;
 
             if (!$this.imageField && (field.type=='image' || field.type=='asset')) {
                 $this.imageField = field;

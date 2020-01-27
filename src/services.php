@@ -23,7 +23,7 @@ $services = [
 
     'sql' => function (ContainerInterface $c) {
         $config = $c->get('database.config');
-        return new \Framework\Database\MySQLStorage(
+        return new \Cockpit\Framework\Database\MySQLStorage(
             $config['server'],
             $config['options']['db'] ?? null,
             $config['options']['user'] ?? null,
@@ -34,14 +34,14 @@ $services = [
     'mongolite' => function (ContainerInterface $c) {
         $config = $c->get('database.config');
 
-        return new \Framework\Database\MongoLite\MongoLite($config['server'], $config['options']);
+        return new \Cockpit\Framework\Database\MongoLite\MongoLite($config['server'], $config['options']);
     },
 
 
     'mongo' => function (ContainerInterface $c) {
         $config = $c->get('database.config');
 
-        return new \Framework\Database\MongoDB\Mongo($config['server'], $config['options'], $config['driverOptions']);
+        return new \Cockpit\Framework\Database\MongoDB\Mongo($config['server'], $config['options'], $config['driverOptions']);
     },
 
     // nosql storage
@@ -49,7 +49,7 @@ $services = [
         $config = $c->get('database.config');
         $service = $c->get($config['driver']);
 
-        if (!$service instanceof \Framework\Database\DatabaseConnection) {
+        if (!$service instanceof \Cockpit\Framework\Database\DatabaseConnection) {
             throw new \RuntimeException('Invalid database driver selected.');
         }
 
@@ -57,15 +57,15 @@ $services = [
     },
 
     'path' => function (ContainerInterface $c) {
-        return new \Framework\PathResolver($c->get('paths'), $c->get('docs_root'), $c->get('base_url'), $c->get('site_url'));
+        return new \Cockpit\Framework\PathResolver($c->get('paths'), $c->get('docs_root'), $c->get('base_url'), $c->get('site_url'));
     },
 
     'events' => function (ContainerInterface $c) {
-        return new \Framework\EventSystem();
+        return new \Cockpit\Framework\EventSystem();
     },
 
     'filestorage' => function (ContainerInterface $c) {
-        /** @var \Framework\PathResolver $pathResolver */
+        /** @var \Cockpit\Framework\PathResolver $pathResolver */
         $pathResolver = $c->get('path');
         $customConfig = $c->get('filestorage.config');
         $root = [
@@ -173,6 +173,27 @@ $services = [
         return new \Lime\Cache($c->get('path'), $c->get('app.name'));
     },
 
+    \League\Plates\Engine::class => function (ContainerInterface $c) {
+        $engine = new \League\Plates\Engine(
+            dirname(__DIR__, 2) . '/Resources/views'
+        );
+
+        $engine->addFolder('collections', dirname(__DIR__).'/Collections/views');
+
+        /*
+        $engine->registerFunction('route', function ($routeName, array $data = [], array $queryParams = []) use ($c) {
+            $routeParser = $c->get('router');
+
+            return $routeParser->urlFor($routeName, $data, $queryParams);
+        });
+        */
+        $engine->registerFunction('asset', function ($resource) {
+            return $resource;
+        });
+
+        return $engine;
+    },
+
     'renderer' => function (ContainerInterface $c) {
         $renderer = new \Lexy();
 
@@ -213,8 +234,8 @@ $services = [
     }
 ];
 
-$cockpitServices = require('App/config/services.php');
-$collectionServices = require('Collections/config/services.php');
-$singletonServices = require('Singleton/config/services.php');
+$cockpitServices = require('Cockpit/App/config/services.php');
+$collectionServices = require('Cockpit/Collections/config/services.php');
+$singletonServices = require('Cockpit/Singleton/config/services.php');
 
 return array_merge($configuration, $services, $cockpitServices, $collectionServices, $singletonServices);

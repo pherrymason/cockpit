@@ -54,7 +54,8 @@
         this.modal     = null;
         this.collection= opts.collection || {};
         this.fields    = opts.fields || {};
-        this.languages = App.$data.languages;
+        this.languages    = App.$data.appLanguages;
+        //this.languages = App.$data.languages;
         this.entries   = [];
         this.selected  = [];
 

@@ -8,7 +8,7 @@
 </style>
 
 <script>
-    window.__collectionEntry = {{ json_encode($entry) }};
+    window.__collectionEntry = {{ json_encode($entry, JSON_FORCE_OBJECT) }};
 </script>
 
 <div riot-view>
@@ -147,7 +147,7 @@
                     <div class="uk-margin-small-top"><span class="uk-badge uk-badge-outline {lang ? 'uk-text-primary' : 'uk-text-muted'}">{ lang ? _.find(languages,{code:lang}).label:App.$data.languageDefaultLabel }</span></div>
 
                     <select bind="lang" onchange="{persistLanguage}">
-                        <option value="">{App.$data.languageDefaultLabel}</option>
+                        <!--<option value="">{App.$data.languageDefaultLabel}</option>-->
                         <option each="{language,idx in languages}" value="{language.code}">{language.label}</option>
                     </select>
                 </div>
@@ -201,7 +201,7 @@
 
         this.entry        = window.__collectionEntry;
 
-        this.languages    = App.$data.languages;
+        this.languages    = App.$data.appLanguages;
         this.groups       = {Main:[]};
         this.group        = '';
 
@@ -210,8 +210,9 @@
         }
 
         // fill with default values
-        this.fields.forEach(function(field) {
+        console.log($this.languages);
 
+        this.fields.forEach(function(field) {
             $this.fieldsidx[field.name] = field;
 
             if ($this.entry[field.name] === undefined) {
@@ -219,6 +220,8 @@
             }
 
             if (field.localize && $this.languages.length) {
+                delete $this.fieldsidx[field.name];
+                delete $this.entry[field.name];
 
                 $this.languages.forEach(function(lang) {
 
@@ -295,7 +298,7 @@
         }
 
         submit(e) {
-
+            console.log('HOALAAAAA');
             if (e) {
                 e.preventDefault();
             }
@@ -321,7 +324,7 @@
             }
 
             App.request('/collections/save_entry/'+this.collection.name, {entry:this.entry}).then(function(entry) {
-
+                console.log('posted');
                 if (entry) {
 
                     App.ui.notify("Saving successful", "success");
