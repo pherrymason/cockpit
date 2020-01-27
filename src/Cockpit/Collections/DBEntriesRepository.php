@@ -54,7 +54,7 @@ final class DBEntriesRepository implements EntriesRepository
         $sql = 'SELECT *, entry.id as _id FROM '. $tableName . ' as entry '.
             'LEFT JOIN ' . $tableName . '_content as content ON content.entry_id=entry.id ' .
             'WHERE entry.id=:id ' .
-            'ORDER BY _modified DESC LIMIT 1';
+            'ORDER BY _modified DESC';
 
         $stmt = $this->db->executeQuery($sql, ['id' => $id]);
         $harmonized = $this->mergeResults($collection, $stmt->fetchAll());
