@@ -104,7 +104,6 @@
 
             <div class="uk-float-right">
 
-                @if($app->module('collections')->hasaccess($collection['name'], 'entries_edit'))
                 <div class="uk-display-inline-block uk-margin-small-right" data-uk-dropdown="mode:'click'" if="{ selected.length }">
                     <button class="uk-button uk-button-large uk-animation-fade">@lang('Batch Action') <span class="uk-badge uk-badge-contrast uk-margin-small-left">{ selected.length }</span></button>
                     <div class="uk-dropdown">
@@ -117,11 +116,10 @@
                         </ul>
                     </div>
                 </div>
-                @endif
 
-                @if($app->module('collections')->hasaccess($collection['name'], 'entries_create'))
+
+
                 <a class="uk-button uk-button-large uk-button-primary" href="@route('/collections/entry/'.$collection['name'])">@lang('Add Entry')</a>
-                @endif
             </div>
         </div>
 

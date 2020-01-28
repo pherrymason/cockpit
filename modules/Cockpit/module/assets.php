@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-use Framework\Database\DatabaseConnection;
+use Cockpit\Framework\Database\DatabaseConnection;
 
 $this->module('cockpit')->extend([
 

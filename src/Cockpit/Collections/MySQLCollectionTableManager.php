@@ -58,22 +58,26 @@ final class MySQLCollectionTableManager
         $fields = array_filter($masterFields, function(Field $field) {
             return $field->localize();
         });
-        if ($this->tableExists($localizedTableName)) {
-            $this->updateTableStructure($localizedTableName, $fields);
-        } else {
-            $sql = 'CREATE TABLE `' . $localizedTableName . '` (';
-            $sql.= '`id` CHAR(36) NOT NULL, ';
-            $sql.= '`entry_id` CHAR(36) NOT NULL, ';
-            $sql.= '`language` CHAR(4) NOT NULL, ';
-            foreach ($fields as $field) {
-                $columnType = $this->columnTypeFromField($field);
-                $default = 'DEFAULT NULL';
-                $sql.= '`'.$field->name().'` '.$columnType . ' ' . $default.', ';
-            }
-            $sql.= 'PRIMARY KEY (`id`)';
-            $sql.= ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
-            $this->db->query($sql);
+        if (count($fields) >0 ) {
+            if ($this->tableExists($localizedTableName)) {
+                $fields[] = new Field('entry_id', 'entry_id', 'string', null, '', '', false, [], '0', false, []);
+                $this->updateTableStructure($localizedTableName, $fields);
+            } else {
+                $sql = 'CREATE TABLE `' . $localizedTableName . '` (';
+                $sql.= '`id` CHAR(36) NOT NULL, ';
+                $sql.= '`entry_id` CHAR(36) NOT NULL, ';
+                $sql.= '`language` CHAR(4) NOT NULL, ';
+                foreach ($fields as $field) {
+                    $columnType = $this->columnTypeFromField($field);
+                    $default = 'DEFAULT NULL';
+                    $sql.= '`'.$field->name().'` '.$columnType . ' ' . $default.', ';
+                }
+                $sql.= 'PRIMARY KEY (`id`)';
+                $sql.= ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+
+                $this->db->query($sql);
+            }
         }
     }
 

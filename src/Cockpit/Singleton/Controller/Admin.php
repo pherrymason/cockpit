@@ -5,7 +5,7 @@ namespace Cockpit\Singleton\Controller;
 use Cockpit\App\Revisions;
 use Cockpit\Singleton\Singleton;
 use Cockpit\Singleton\SingletonRepository;
-use Framework\IDs;
+use Cockpit\Framework\IDs;
 use Lime\App;
 
 final class Admin extends \Cockpit\AuthController

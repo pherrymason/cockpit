@@ -20,8 +20,8 @@ final class DBCollectionRepository implements CollectionRepository
 
     public function byId(string $id): ?Collection
     {
-        $sql = 'SELECT * FROM cockpit_collections WHERE id='.$id;
-        $stmt = $this->db->query($sql);
+        $sql = 'SELECT * FROM cockpit_collections WHERE id=:id';
+        $stmt = $this->db->executeQuery($sql, ['id' => $id]);
 
         if ($stmt->rowCount() === 0) {
             return null;
@@ -40,8 +40,8 @@ final class DBCollectionRepository implements CollectionRepository
 
     public function byName(string $name): ?Collection
     {
-        $sql = 'SELECT * FROM cockpit_collections ORDER BY name ASC';
-        $stmt = $this->db->query($sql);
+        $sql = 'SELECT * FROM cockpit_collections WHERE `name`=:name ORDER BY name ASC';
+        $stmt = $this->db->executeQuery($sql, ['name' => $name]);
 
         if ($stmt->rowCount() === 0) {
             return null;
@@ -111,7 +111,6 @@ final class DBCollectionRepository implements CollectionRepository
         $fields = array_map(function ($data) {
             return Field::fromArray($data);
         }, $fieldsArray);
-
 
 
         return new Collection(

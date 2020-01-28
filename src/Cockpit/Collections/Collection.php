@@ -2,7 +2,7 @@
 
 namespace Cockpit\Collections;
 
-use Framework\IDs;
+use Cockpit\Framework\IDs;
 
 final class Collection
 {
@@ -77,6 +77,15 @@ final class Collection
     public function fields(): array
     {
         return $this->fields;
+    }
+
+    public function hasLocalizedFields(): bool
+    {
+        $localized = array_filter($this->fields, function (Field $field) {
+            return $field->localize();
+        });
+
+        return count($localized) > 0;
     }
 
     public function hasAccess($role): bool

@@ -2,9 +2,9 @@
 
 namespace Cockpit\App\Assets;
 
-use Framework\EventSystem;
-use Framework\IDs;
-use Framework\PathResolver;
+use Cockpit\Framework\EventSystem;
+use Cockpit\Framework\IDs;
+use Cockpit\Framework\PathResolver;
 use League\Flysystem\Filesystem;
 
 final class Uploader
@@ -26,7 +26,7 @@ final class Uploader
      */
     private $assets;
 
-    public function __construct(Filesystem $fileSystem, PathResolver $pathResolver, \Cockpit\App\Assets\AssetRepository $assets, \Framework\EventSystem $events, \Cocur\Slugify\Slugify $slugify, array $allowedUploads, $maxUploadSize)
+    public function __construct(Filesystem $fileSystem, PathResolver $pathResolver, \Cockpit\App\Assets\AssetRepository $assets, \Cockpit\Framework\EventSystem $events, \Cocur\Slugify\Slugify $slugify, array $allowedUploads, $maxUploadSize)
     {
         $this->fileSystem = $fileSystem;
         $this->pathResolver = $pathResolver;

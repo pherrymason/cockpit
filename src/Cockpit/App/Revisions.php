@@ -12,7 +12,7 @@ namespace Cockpit\App;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
-use Framework\IDs;
+use Cockpit\Framework\IDs;
 
 class Revisions
 {

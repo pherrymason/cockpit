@@ -3,7 +3,7 @@
 namespace Cockpit\Collections;
 
 use Cockpit\App\ContentUnit;
-use Framework\IDs;
+use Cockpit\Framework\IDs;
 
 final class Entry implements ContentUnit
 {

@@ -29,10 +29,12 @@ final class DBEntriesRepository implements EntriesRepository
     public function byCollectionFiltered(Collection $collection, $options)
     {
         $tableName = $this->tableManager->tableName($collection->name());
-        $sql = 'SELECT *, entry.id as _id FROM ' . $tableName . ' as entry '.
-            'LEFT JOIN ' . $tableName . '_content as content ON content.entry_id=entry.id';
-// SELECT *, post.id as _id, content.id as content_id FROM cockpit_collection_post as post
-//LEFT JOIN cockpit_collection_post_content as content ON content.entry_id=post.id
+        $sql = 'SELECT *, entry.id as _id FROM ' . $tableName . ' as entry ';
+
+        if ($collection->hasLocalizedFields()) {
+            $sql .= 'LEFT JOIN ' . $tableName . '_content as content ON content.entry_id=entry.id';
+        }
+
         $limit = $options['limit'] ?? null;
         $skip = $options['skip'] ?? null;
         $sort = $options['sort'] ?? null;
@@ -51,9 +53,13 @@ final class DBEntriesRepository implements EntriesRepository
     public function byId(Collection $collection, string $id): ?Entry
     {
         $tableName = $this->tableManager->tableName($collection->name());
-        $sql = 'SELECT *, entry.id as _id FROM '. $tableName . ' as entry '.
-            'LEFT JOIN ' . $tableName . '_content as content ON content.entry_id=entry.id ' .
-            'WHERE entry.id=:id ' .
+        $sql = 'SELECT *, entry.id as _id FROM '. $tableName . ' as entry ';
+
+        if ($collection->hasLocalizedFields()) {
+            $sql.= 'LEFT JOIN ' . $tableName . '_content as content ON content.entry_id=entry.id ';
+        }
+
+        $sql.= 'WHERE entry.id=:id ' .
             'ORDER BY _modified DESC';
 
         $stmt = $this->db->executeQuery($sql, ['id' => $id]);
@@ -88,6 +94,7 @@ final class DBEntriesRepository implements EntriesRepository
         $localizedFields = [];
         $types = [];
 
+        $toHydrateEntry = [];
         foreach ($collection->fields() as $field) {
             switch ($field->type()) {
                 default:
@@ -95,6 +102,9 @@ final class DBEntriesRepository implements EntriesRepository
                     if ($field->localize()) {
                         $localizedFields[] = $field;
                         foreach ($this->languages as $langCode => $lang) {
+                            if (!isset($entry[$field->name().'_'.$langCode])) {
+                                continue;
+                            }
                             $localizedValues[$field->name().'_'.$langCode] = $entry[$field->name().'_'.$langCode];
                         }
                     } else {
@@ -150,22 +160,25 @@ final class DBEntriesRepository implements EntriesRepository
         }
 
         $stmt = $this->db->executeUpdate($sql, $params, $types);
+        $toHydrateEntry = $params;
 
         // Localizable data
         $tableName = $this->tableManager->tableName($collection->name().'_content');
         $lParams = [];
         foreach ($this->languages as $langCode => $langName) {
-            $lParams['id'] = IDs::new();
-            $lParams['entry_id'] = $params['id'];
-            $fieldNames = $fieldPlaceholders = [];
-            /*
-            $fields = [];
-            foreach ($localizedParams as $key => $value) {
-                $fields[] = ':' . $key;
-            }*/
+            $lParams = [
+                'id' => IDs::new(),
+                'entry_id' => $params['id'],
+                'language' => $langCode
+            ];
+            $fieldPlaceholders = [];
+
             foreach ($localizedFields as $field) {
                 $name = $field->name();
-                $lParams[$name] = $localizedValues[$name.'_'.$langCode];
+                $index = $name.'_'.$langCode;
+                if (isset($localizedValues[$index])) {
+                    $lParams[$name] = $localizedValues[$index];
+                }
             }
 
             $fieldNames = array_map(function (string $name) {
@@ -179,9 +192,10 @@ final class DBEntriesRepository implements EntriesRepository
             $sql = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $fieldNames) . ')' .
                 'VALUES (' . implode(', ', $fieldPlaceholders) . ');';
             $stmt = $this->db->executeUpdate($sql, $lParams, $types);
+            $toHydrateEntry['localized'][$langCode] = $lParams;
         }
 
-        $entry = $this->hydrate(array_merge($params, $localizedValues));
+        $entry = $this->hydrate($toHydrateEntry);
 
         return $entry;
     }
