@@ -61,7 +61,7 @@ final class DBAssetRepository implements AssetRepository
             '_id' => $asset->id(),
             'path' => $asset->path(),
             'title' => $asset->title(),
-            'mime' => mime_content_type($asset->path()),
+            'mime' => $asset->mime(),
             'description' => $asset->description(),
             'tags' => json_encode($asset->tags()),
             'size' => $asset->size(),
