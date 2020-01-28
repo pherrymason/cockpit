@@ -17,8 +17,12 @@ final class Folder
     {
         $this->id = $id;
         $this->name = $name;
-        $this->parentFolder = $parentFolder;
         $this->childrenFolders = [];
+
+        if ($parentFolder !== null) {
+            $parentFolder->addChildren($this);
+            $this->parentFolder = $parentFolder;
+        }
     }
 
     public function id(): string
@@ -49,7 +53,12 @@ final class Folder
 
     public function path(): string
     {
-        $path = [];
+        if ($this->parentFolder !== null) {
+            $path = explode('/', $this->parentFolder->path());
+        } else {
+            $path = [];
+        }
+
         $path[]= $this->name();
 
         return implode('/', $path);
