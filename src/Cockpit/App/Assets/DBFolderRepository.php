@@ -5,6 +5,7 @@ namespace Cockpit\App\Assets;
 use Cockpit\Framework\Database\Constraint;
 use Cockpit\Framework\Database\MysqlConstraintQueryBuilder;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 
 final class DBFolderRepository implements FolderRepository
 {
@@ -19,11 +20,34 @@ final class DBFolderRepository implements FolderRepository
         $this->db = $db;
     }
 
-    public function all(Constraint $constraint)
+    public function children(Constraint $constraint, ?string $parentID = null)
     {
         $sql = 'SELECT * FROM '.self::TABLE . ' ';
-        $sql = $this->applyConstraints($constraint, $sql);
 
-        return $this->db->query($sql)->fetchAll();
+        $constraint->addFilter('_p', empty($parentID) ? null : $parentID);
+
+        list($sql, $params) = $this->applyConstraints($constraint, $sql);
+
+        return $this->db->executeQuery($sql, $params)->fetchAll();
+    }
+
+    public function save(Folder $folder): void
+    {
+        $params = [
+            '_id' => $folder->id(),
+            'name' => $folder->name(),
+            '_p' => ($folder->parentFolder() !== null) ? $folder->parentFolder()->id() : null
+        ];
+
+        $types = array_map(function ($key) {
+            return ParameterType::STRING;
+        }, array_keys($params));
+
+        $placeholders = array_map(function ($key) {
+            return ':'.$key;
+        }, array_keys($params));
+
+        $sql = 'INSERT INTO `' . self::TABLE . '` (`_id`, `name`, `_p`) VALUES (' . implode(', ', $placeholders) . ')';
+        $this->db->executeUpdate($sql, $params, $types);
     }
 }

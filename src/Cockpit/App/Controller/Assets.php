@@ -44,10 +44,10 @@ final class Assets extends \Cockpit\AuthController
         // virtual folders
         $folderFilter = $this->param('folder', null);
         $filters = [];
-        if ($folderFilter) {
+        /*if ($folderFilter) {
             $filters = ['_p' => $folderFilter];
-        }
-        $folders = $this->folders->all(new Constraint($filters, null, ['name' => 1]));
+        }*/
+        $folders = $this->folders->children(new Constraint($filters, null, ['name' => 1]), $folderFilter);
 
         return ['assets' => $assets['assets'], 'folders' => $folders];
     }
