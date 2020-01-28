@@ -33,9 +33,9 @@ final class DBAssetRepository implements AssetRepository
     public function byConstraint(Constraint $constraints)
     {
         $sql = 'SELECT * FROM '.self::TABLE.' ';
-        $sql = $this->applyConstraints($constraints, $sql);
+        list($sql, $params) = $this->applyConstraints($constraints, $sql);
 
-        $stmt = $this->db->query($sql);
+        $stmt = $this->db->executeQuery($sql, $params);
         $total = (!$constraints->skip() && !$constraints->limit())
             ? $stmt->rowCount()
             : $this->countAll();

@@ -4,14 +4,19 @@ namespace Cockpit\Framework\Database;
 
 trait MysqlConstraintQueryBuilder
 {
-    protected function applyConstraints(Constraint $constraint, string $sql): string
+    protected function applyConstraints(Constraint $constraint, string $sql): array
     {
+        $params = [];
         if ($constraint->filter() && count($constraint->filter())) {
             $conditions = [];
             $i = 0;
             foreach ($constraint->filter() as $field => $value) {
-                $conditions[] = '`' . $field . '`= :value' . $i;
-                $params['value' . $i] = $value;
+                if ($value === null) {
+                    $conditions[] = '`' . $field .'` IS NULL';
+                } else {
+                    $conditions[] = '`' . $field . '`= :value' . $i;
+                    $params['value' . $i] = $value;
+                }
                 $i++;
             }
 
@@ -35,6 +40,6 @@ trait MysqlConstraintQueryBuilder
             }
         }
 
-        return $sql;
+        return [$sql, $params];
     }
 }

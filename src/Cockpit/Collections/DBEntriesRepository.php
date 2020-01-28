@@ -39,7 +39,7 @@ final class DBEntriesRepository implements EntriesRepository
         $skip = $options['skip'] ?? null;
         $sort = $options['sort'] ?? null;
         $constraint = new Constraint(null, $limit, $sort, $skip);
-        $sql = $this->applyConstraints($constraint, $sql);
+        list($sql, $params) = $this->applyConstraints($constraint, $sql);
 
         $entries = $this->db->query($sql)->fetchAll();
 

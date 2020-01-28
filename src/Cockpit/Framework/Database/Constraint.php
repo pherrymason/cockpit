@@ -40,4 +40,9 @@ final class Constraint
     {
         return $this->filter;
     }
+
+    public function addFilter(string $key, ?string $value): void
+    {
+        $this->filter[$key] = $value;
+    }
 }
