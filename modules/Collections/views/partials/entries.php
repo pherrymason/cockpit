@@ -331,6 +331,9 @@
 
         if (this.languages.length) {
             this.lang = App.session.get('collections.entry.'+this.collection._id+'.lang', '');
+            if (this.lang.length === 0) {
+                this.lang = App.$data.defaultLanguage;
+            }
         }
         function getLanguage() {
             return $this.lang;
