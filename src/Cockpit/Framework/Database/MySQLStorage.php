@@ -18,7 +18,8 @@ final class MySQLStorage implements DatabaseConnection
             'host' => $host,
             'dbname' => $dbName,
             'user' => $user,
-            'password' => $password
+            'password' => $password,
+            'charset' => 'UTF8'
         ];
 
         $this->connection = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);

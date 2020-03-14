@@ -15,7 +15,8 @@ $services = [
             'host' => $params['server'],
             'dbname' => $params['options']['db'],
             'user' => $params['options']['user'],
-            'password' => $params['options']['password']
+            'password' => $params['options']['password'],
+            'charset' => 'UTF8'
         ];
 
         return \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
