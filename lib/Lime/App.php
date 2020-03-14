@@ -1291,6 +1291,9 @@ class Response {
 
             if (\is_array($this->body) || \is_object($this->body)) {
                 $body = \json_encode($this->body);
+                if (\json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \RuntimeException(\json_last_error_msg());
+                }
                 $this->mime = 'json';
             }
 
