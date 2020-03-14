@@ -39,17 +39,20 @@ class Admin extends \Lime\Helper {
         });
 
         $languages = [];
-        $langDefaultLabel = 'Default';
+        $rawLanguages = $this->app->retrieve('config/languages', []);
+        $defaultLanguage = $this->app->retrieve('config/defaultLanguage', []);
+        $langDefaultLabel = $rawLanguages[$defaultLanguage] ?? 'Default';
 
-        foreach ($this->app->retrieve('config/languages', []) as $key => $val) {
-
-            if (is_numeric($key)) $key = $val;
-
-            if ($key == 'default') {
-                $langDefaultLabel = $val;
-            } else {
-                $languages[] = ['code'=>$key, 'label'=>$val];
+        foreach ($rawLanguages as $key => $val) {
+            if (is_numeric($key)) {
+                $key = $val;
             }
+
+//            if ($key == 'default') {
+//                $langDefaultLabel = $val;
+//            } else {
+                $languages[] = ['code'=>$key, 'label'=>$val];
+//            }
         }
 
         $this->data->extend([
@@ -87,8 +90,10 @@ class Admin extends \Lime\Helper {
                 'user'      => $this->user,
                 'locale'    => $this->app->helper('i18n')->locale,
                 'site_url'  => $this->app->pathToUrl('site:'),
-                'appLanguages' => array_merge([['code'=>'default', 'label'=>$langDefaultLabel]], $languages),
+                //'appLanguages' => array_merge([['code'=>'default', 'label'=>$langDefaultLabel]], $languages),
+                'appLanguages' => $languages,
                 'languages' => $languages,
+                'defaultLanguage' => $defaultLanguage,
                 'languageDefaultLabel' => $langDefaultLabel,
                 'groups' => $this->app->helper('acl')->getGroups(),
 
