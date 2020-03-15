@@ -73,7 +73,8 @@ final class MySQLCollectionTableManager
                     $default = 'DEFAULT NULL';
                     $sql.= '`'.$field->name().'` '.$columnType . ' ' . $default.', ';
                 }
-                $sql.= 'PRIMARY KEY (`id`)';
+                $sql.= 'PRIMARY KEY (`id`),';
+                $sql.= 'UNIQUE KEY `entry_language` (`entry_id`, `language`)';
                 $sql.= ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
 
                 $this->db->query($sql);
