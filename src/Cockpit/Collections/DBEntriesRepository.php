@@ -94,7 +94,6 @@ final class DBEntriesRepository implements EntriesRepository
         $localizedFields = [];
         $types = [];
 
-        $toHydrateEntry = [];
         foreach ($collection->fields() as $field) {
             switch ($field->type()) {
                 default:
@@ -123,48 +122,37 @@ final class DBEntriesRepository implements EntriesRepository
             }
         }
 
-        $types['id'] = ParameterType::STRING;
-        $types['_modified'] = ParameterType::STRING;
-        $types['_created'] = ParameterType::STRING;
         $params['_modified'] = $entry['_modified'];
         $params['_created'] = $entry['_created'];
 
         // Main Entry table
         $tableName = $this->tableManager->tableName($collection->name());
-        if (!isset($params['_id'])) {
+        if (!isset($entry['_id'])) {
             $params['id'] = IDs::new();
-            $fieldNames = array_map(function (string $name) {
-                return '`' . $name . '`';
-            }, array_keys($params));
-            $fields = [];
-            foreach ($params as $key => $value) {
-                $fields[]= ':'.$key;
-            }
-
-            $sql = 'INSERT INTO '.$tableName.' (' . implode(', ', $fieldNames) . ') '.
-                'VALUES (' . implode(', ', $fields) . ')';
         } else {
-            $params['id'] = $params['_id'];
-            unset($params['_id']);
-
-            $fields = [];
-            foreach ($params as $key => $value) {
-                if ($key === 'id') {
-                    continue;
-                }
-                $fields[]= '`'.$key.'`=:'.$key;
-            }
-
-            $sql = 'UPDATE '.$tableName.' SET ' . implode(', ', $fields) . ' ';
-            $sql.= 'WHERE id=:id';
+            $params['id'] = $entry['_id'];
         }
+
+        $fieldNames = array_map(function (string $name) {
+            return '`' . $name . '`';
+        }, array_keys($params));
+        $fields = [];
+        $updateFields = [];
+        foreach ($params as $key => $value) {
+            $fields[] = ':' . $key;
+            $types[$key] = ParameterType::STRING;
+            $updateFields[] = '`' . $key . '`=:' . $key;
+        }
+
+        $sql = 'INSERT INTO '.$tableName.' (' . implode(', ', $fieldNames) . ') '.
+                'VALUES (' . implode(', ', $fields) . ') ' .
+            'ON DUPLICATE KEY UPDATE ' . implode(', ', $updateFields);
 
         $stmt = $this->db->executeUpdate($sql, $params, $types);
         $toHydrateEntry = $params;
 
         // Localizable data
         $tableName = $this->tableManager->tableName($collection->name().'_content');
-        $lParams = [];
         foreach ($this->languages as $langCode => $langName) {
             $lParams = [
                 'id' => IDs::new(),
@@ -185,12 +173,16 @@ final class DBEntriesRepository implements EntriesRepository
                 return '`' . $name . '`';
             }, array_keys($lParams));
 
+            $updateFields = [];
             foreach ($lParams as $key => $value) {
                 $fieldPlaceholders[] = ':' . $key;
+                $updateFields[] = '`' . $key . '`=:' . $key;
             }
 
             $sql = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $fieldNames) . ')' .
-                'VALUES (' . implode(', ', $fieldPlaceholders) . ');';
+                'VALUES (' . implode(', ', $fieldPlaceholders) . ') ' .
+                'ON DUPLICATE KEY UPDATE ' . implode (', ', $updateFields);
+
             $stmt = $this->db->executeUpdate($sql, $lParams, $types);
             $toHydrateEntry['localized'][$langCode] = $lParams;
         }
