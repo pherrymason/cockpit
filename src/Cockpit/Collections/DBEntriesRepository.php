@@ -112,11 +112,13 @@ final class DBEntriesRepository implements EntriesRepository
                     break;
 
                 case Field::TYPE_IMAGE:
+                case Field::TYPE_ASSET:
                     $types[$field->name()] = ParameterType::STRING;
+                    $value = empty($entry[$field->name()]) ? null : json_encode($entry[$field->name()]);
                     if ($field->localize()) {
-                        $localizedValues[$field->name()] = json_encode($entry[$field->name()]);
+                        $localizedValues[$field->name()] = $value;
                     } else {
-                        $params[$field->name()] = json_encode($entry[$field->name()]);
+                        $params[$field->name()] = $value;
                     }
                     break;
             }

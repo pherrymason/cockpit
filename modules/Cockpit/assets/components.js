@@ -1814,7 +1814,7 @@ riot.tag2('field-account-link', '<div class="uk-text-center uk-panel uk-panel-fr
 
 });
 
-riot.tag2('field-asset', '<div ref="uploadprogress" class="uk-margin uk-hidden"> <div class="uk-progress"> <div ref="progressbar" class="uk-progress-bar" style="width: 0%;">&nbsp;</div> </div> </div> <div class="uk-placeholder uk-text-center uk-text-muted" if="{!asset}"> <img class="uk-svg-adjust" riot-src="{App.base(\'/assets/app/media/icons/assets.svg\')}" width="100" data-uk-svg> <p>{App.i18n.get(\'No asset selected\')}. <a onclick="{selectAsset}">{App.i18n.get(\'Select one\')}</a></p> </div> <div class="uk-panel uk-panel-box uk-padding-remove uk-panel-card" if="{asset}"> <div class="uk-overlay uk-display-block uk-position-relative {asset.mime.match(/^image\\//) && \'uk-bg-transparent-pattern\'}"> <canvas class="uk-responsive-width" width="200" height="150"></canvas> <div class="uk-position-absolute uk-position-cover uk-flex uk-flex-middle"> <div class="uk-width-1-1 uk-text-center"> <span if="{asset.mime.match(/^image\\//) == null}"><i class="uk-h1 uk-text-muted uk-icon-{getIconCls(asset.path)}"></i></span> <a href="{ASSETS_URL+asset.path}" if="{asset.mime.match(/^image\\//)}" data-uk-lightbox="type:\'image\'" title="{asset.width && [asset.width, asset.height].join(\'x\')}"> <cp-thumbnail riot-src="{asset && ASSETS_URL+asset.path}" height="160"></cp-thumbnail> </a> </div> </div> </div> <div class="uk-panel-body"> <div class="uk-margin-small-top uk-text-truncate"> <a href="{ASSETS_URL+asset.path}" target="_blank">{asset.title}</a> </div> <div class="uk-text-small uk-text-muted"> <strong>{asset.mime}</strong> {App.Utils.formatSize(asset.size)} </div> <div class="uk-margin-top"> <a class="uk-button uk-button-small uk-margin-small-right" onclick="{selectAsset}">{App.i18n.get(\'Replace\')}</a> <span class="uk-button-group"> <a class="uk-button uk-button-small" onclick="{edit}"><i class="uk-icon-pencil"></i></a> <a class="uk-button uk-button-small uk-text-danger" onclick="{reset}"><i class="uk-icon-trash-o"></i></a> </span> </div> </div> </div>', '', '', function(opts) {
+riot.tag2('field-asset', '<div ref="uploadprogress" class="uk-margin uk-hidden"> <div class="uk-progress"> <div ref="progressbar" class="uk-progress-bar" style="width: 0%;">&nbsp;</div> </div> </div> <div class="uk-placeholder uk-text-center uk-text-muted" if="{!asset}"> <img class="uk-svg-adjust" riot-src="{App.base(\'/assets/app/media/icons/assets.svg\')}" width="100" data-uk-svg> <p>{App.i18n.get(\'No asset selected\')}. <a onclick="{selectAsset}">{App.i18n.get(\'Select one\')}</a></p> </div> <div class="uk-panel uk-panel-box uk-padding-remove uk-panel-card" if="{asset}"> <div class="uk-overlay uk-display-block uk-position-relative {asset.mime.match(/^image\\//) && \'uk-bg-transparent-pattern\'}"> <canvas class="uk-responsive-width" width="200" height="150"></canvas> <div class="uk-position-absolute uk-position-cover uk-flex uk-flex-middle"> <div class="uk-width-1-1 uk-text-center"> <span if="{asset.mime.match(/^image\\//) == null}"><i class="uk-h1 uk-text-muted uk-icon-{getIconCls(asset.path)}"></i></span> <a href="{asset.path}" if="{asset.mime.match(/^image\\//)}" data-uk-lightbox="type:\'image\'" title="{asset.width && [asset.width, asset.height].join(\'x\')}"> <cp-thumbnail riot-src="{asset && asset.path}" height="160"></cp-thumbnail> </a> </div> </div> </div> <div class="uk-panel-body"> <div class="uk-margin-small-top uk-text-truncate"> <a href="{asset.path}" target="_blank">{asset.title}</a> </div> <div class="uk-text-small uk-text-muted"> <strong>{asset.mime}</strong> {App.Utils.formatSize(asset.size)} </div> <div class="uk-margin-top"> <a class="uk-button uk-button-small uk-margin-small-right" onclick="{selectAsset}">{App.i18n.get(\'Replace\')}</a> <span class="uk-button-group"> <a class="uk-button uk-button-small" onclick="{edit}"><i class="uk-icon-pencil"></i></a> <a class="uk-button uk-button-small uk-text-danger" onclick="{reset}"><i class="uk-icon-trash-o"></i></a> </span> </div> </div> </div>', '', '', function(opts) {
 
         var $this = this, typefilters = {
             'image'    : /\.(jpg|jpeg|png|gif|svg)$/i,
@@ -1828,13 +1828,15 @@ riot.tag2('field-asset', '<div ref="uploadprogress" class="uk-margin uk-hidden">
         this.asset = opts.default || false;
 
         this.$updateValue = function(value, field, force) {
-
             if (force || (JSON.stringify(this.asset) != JSON.stringify(value))) {
 
                 if (value && !value._id) {
                     value = false;
                 }
 
+                if (typeof value.path !== 'undefined') {
+                    value.path = ASSETS_URL + value.path.replace(/^\/+/, '');
+                }
                 this.asset = value;
                 this.update();
             }
