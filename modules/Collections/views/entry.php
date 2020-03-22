@@ -8,7 +8,7 @@
 </style>
 
 <script>
-    window.__collectionEntry = {{ json_encode($entry, JSON_FORCE_OBJECT) }};
+    window.__collectionEntry = {{ json_encode($entry) }};
 </script>
 
 <div riot-view>
@@ -280,7 +280,7 @@
             App.$(this.root).on('submit', function(e, component) {
                 if (component) $this.submit(e);
             });
-
+/*
             // lock resource
             var idle = setInterval(function() {
 
@@ -293,7 +293,7 @@
                 clearInterval(idle);
 
             }, 60000);
-
+*/
         });
 
         toggleGroup(e) {
@@ -327,7 +327,6 @@
             }
 
             App.request('/collections/save_entry/'+this.collection.name, {entry:this.entry}).then(function(entry) {
-                console.log('posted');
                 if (entry) {
 
                     App.ui.notify("Saving successful", "success");

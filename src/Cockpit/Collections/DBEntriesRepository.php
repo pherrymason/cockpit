@@ -45,7 +45,9 @@ final class DBEntriesRepository implements EntriesRepository
 
         $harmonized = $this->mergeResults($collection, $entries);
 
-        $entries = array_map([$this, 'hydrate'], $harmonized);
+        $entries = array_map(function ($item) use ($collection) {
+            return $this->hydrate($item, $collection);
+        }, $harmonized);
 
         return array_values($entries);
     }
@@ -65,7 +67,11 @@ final class DBEntriesRepository implements EntriesRepository
         $stmt = $this->db->executeQuery($sql, ['id' => $id]);
         $harmonized = $this->mergeResults($collection, $stmt->fetchAll());
 
-        return $this->hydrate(array_values($harmonized)[0]);
+        if (count($harmonized)===0) {
+            return null;
+        }
+
+        return $this->hydrate(array_values($harmonized)[0], $collection);
     }
 
     public function revisionsById(Collection $collection, string $id)
@@ -74,7 +80,9 @@ final class DBEntriesRepository implements EntriesRepository
 
         $stmt = $this->db->executeQuery($sql, ['id' => $id]);
 
-        return array_map([$this, 'hydrate'], $stmt->fetchAll());
+        return array_map(function ($item) use ($collection) {
+            return $this->hydrate($item, $collection);
+        }, $stmt->fetchAll());
     }
 
     public function count(Collection $collection, array $filter = []): int
@@ -113,6 +121,7 @@ final class DBEntriesRepository implements EntriesRepository
 
                 case Field::TYPE_IMAGE:
                 case Field::TYPE_ASSET:
+                case Field::TYPE_GALLERY:
                     $types[$field->name()] = ParameterType::STRING;
                     $value = empty($entry[$field->name()]) ? null : json_encode($entry[$field->name()]);
                     if ($field->localize()) {
@@ -189,15 +198,27 @@ final class DBEntriesRepository implements EntriesRepository
             $toHydrateEntry['localized'][$langCode] = $lParams;
         }
 
-        $entry = $this->hydrate($toHydrateEntry);
+        $entry = $this->hydrate($toHydrateEntry, $collection);
 
         return $entry;
     }
 
-    private function hydrate(array $data): Entry
+    private function hydrate(array $data, Collection $collection): Entry
     {
         $revisionID = $data['rev_id'] ?? null;
         $previousRevisionID = $data['prev_rev_id'] ?? null;
+
+        foreach ($collection->fields() as $field) {
+            if ($field->localize() === false) {
+                switch ($field->type()) {
+                    case Field::TYPE_GALLERY:
+                        $fieldName = $field->name();
+                        $value = $data[$fieldName];
+                        $data[$fieldName] = $value === null ? [] : json_decode($data[$fieldName], true);
+                        break;
+                }
+            }
+        }
 
         return new Entry($data['id'], $data);
     }
