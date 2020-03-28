@@ -245,7 +245,8 @@ final class Admin extends \Cockpit\Framework\Controller
 
         $this->app->trigger("collections.admin.find.after.{$collection->name()}", [&$entries, $options]);
 
-        $count = $this->app->module('collections')->count($collection->name(), isset($options['filter']) ? $options['filter'] : []);
+        $count = $this->entries->count($collection, $options['filter'] ?? []);
+
         $pages = isset($options['limit']) ? ceil($count / $options['limit']) : 1;
         $page = 1;
 

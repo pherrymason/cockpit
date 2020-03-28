@@ -10,7 +10,11 @@
 
 namespace Collections\Controller;
 
-
+/**
+ * Class Admin
+ * @package Collections\Controller
+ * @deprecated
+ */
 class Admin extends \Cockpit\AuthController {
 
     public function index() {

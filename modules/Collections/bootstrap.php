@@ -417,6 +417,7 @@ $this->module('collections')->extend([
         return $result;
     },
 
+    // TODO replace this with EntriesRepository->count()
     'count' => function($collection, $criteria = []) {
 
         $_collection = $this->collection($collection);

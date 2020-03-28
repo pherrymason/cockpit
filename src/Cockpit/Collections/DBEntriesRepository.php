@@ -31,17 +31,20 @@ final class DBEntriesRepository implements EntriesRepository
         $tableName = $this->tableManager->tableName($collection->name());
         $sql = 'SELECT *, entry.id as _id FROM ' . $tableName . ' as entry ';
 
+        $params = [];
         if ($collection->hasLocalizedFields()) {
-            $sql .= 'LEFT JOIN ' . $tableName . '_content as content ON content.entry_id=entry.id';
+            $sql .= 'LEFT JOIN ' . $tableName . '_content as content ON content.entry_id=entry.id AND content.language=:lang';
+            $params['lang'] = $options['lang'];
         }
 
         $limit = $options['limit'] ?? null;
         $skip = $options['skip'] ?? null;
         $sort = $options['sort'] ?? null;
         $constraint = new Constraint(null, $limit, $sort, $skip);
-        list($sql, $params) = $this->applyConstraints($constraint, $sql);
+        list($sql, $constraintParams) = $this->applyConstraints($constraint, $sql);
+        $params = array_merge($params, $constraintParams);
 
-        $entries = $this->db->query($sql)->fetchAll();
+        $entries = $this->db->executeQuery($sql, $params)->fetchAll();
 
         $harmonized = $this->mergeResults($collection, $entries);
 
