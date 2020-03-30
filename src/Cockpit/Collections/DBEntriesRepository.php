@@ -26,7 +26,7 @@ final class DBEntriesRepository implements EntriesRepository
         $this->languages = $languages;
     }
 
-    public function byCollectionFiltered(Collection $collection, $options)
+    public function byCollectionFiltered(Collection $collection, array $fieldsFilter, $options)
     {
         $tableName = $this->tableManager->tableName($collection->name());
         $sql = 'SELECT *, entry.id as _id FROM ' . $tableName . ' as entry ';
@@ -40,7 +40,7 @@ final class DBEntriesRepository implements EntriesRepository
         $limit = $options['limit'] ?? null;
         $skip = $options['skip'] ?? null;
         $sort = $options['sort'] ?? null;
-        $constraint = new Constraint(null, $limit, $sort, $skip);
+        $constraint = new Constraint($fieldsFilter, $limit, $sort, $skip);
         list($sql, $constraintParams) = $this->applyConstraints($constraint, $sql);
         $params = array_merge($params, $constraintParams);
 

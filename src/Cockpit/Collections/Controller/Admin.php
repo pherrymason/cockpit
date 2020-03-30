@@ -241,7 +241,7 @@ final class Admin extends \Cockpit\Framework\Controller
 //        }
 
         $this->app->trigger("collections.admin.find.before.{$collection->name()}", [&$options]);
-        $entries = $this->entries->byCollectionFiltered($collection, $options);
+        $entries = $this->entries->byCollectionFiltered($collection, [], $options);
 
         $this->app->trigger("collections.admin.find.after.{$collection->name()}", [&$entries, $options]);
 

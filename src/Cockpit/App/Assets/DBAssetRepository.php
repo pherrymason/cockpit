@@ -55,7 +55,7 @@ final class DBAssetRepository implements AssetRepository
         return $this->db->query($sql)->rowCount();
     }
 
-    public function save(Asset $asset)
+    public function save(Asset $asset, string $folderID = null)
     {
         $params = [
             '_id' => $asset->id(),

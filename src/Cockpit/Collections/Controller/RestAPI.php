@@ -50,9 +50,17 @@ final class RestAPI extends \LimeExtra\Controller
         if ($fields && isset($_GET['fields'])) $options['fields'] = $this->app->helper('utils')->fixStringNumericValues($fields);
 
         // fields filter
-        if ($fieldsFilter = $this->param('fieldsFilter', [])) $options['fieldsFilter'] = $fieldsFilter;
-        if ($lang = $this->param('lang', false)) $fieldsFilter['lang'] = $lang;
-        if ($ignoreDefaultFallback = $this->param('ignoreDefaultFallback', false)) $fieldsFilter['ignoreDefaultFallback'] = \in_array($ignoreDefaultFallback, ['1', '0']) ? \boolval($ignoreDefaultFallback) : $ignoreDefaultFallback;
+        if ($fieldsFilter = $this->param('fieldsFilter', [])) {
+            $options['fieldsFilter'] = $fieldsFilter;
+        }
+
+        if ($lang = $this->param('lang', false)) {
+            $options['lang'] = $lang;
+        }
+
+        if ($ignoreDefaultFallback = $this->param('ignoreDefaultFallback', false)) {
+            $fieldsFilter['ignoreDefaultFallback'] = \in_array($ignoreDefaultFallback, ['1', '0']) ? \boolval($ignoreDefaultFallback) : $ignoreDefaultFallback;
+        }
         //if ($user) $fieldsFilter['user'] = $user;
 
         if (\is_array($fieldsFilter) && \count($fieldsFilter)) {
@@ -65,7 +73,7 @@ final class RestAPI extends \LimeExtra\Controller
             }
         }
 
-        $entries = $this->entries->byCollectionFiltered($collection, $options);
+        $entries = $this->entries->byCollectionFiltered($collection, [], $options);
         if (!$skip && !$limit) {
             $count = \count($entries);
         } else {
