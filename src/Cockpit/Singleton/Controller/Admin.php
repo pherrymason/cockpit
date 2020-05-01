@@ -210,7 +210,7 @@ final class Admin extends \Cockpit\AuthController
         $this->app->trigger("singleton.saveData.before.{$singleton->name()}", [$singleton->toArray(), &$data]);
 
         unset($data['_d']);
-        $data = $this->singletons->saveData($singleton->name(), $data);
+        $this->singletons->saveData($singleton->name(), $data);
 
         // @todo Events can't modify singleton
         $this->app->trigger('singleton.saveData.after', [$singleton->toArray(), $data]);
