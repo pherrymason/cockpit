@@ -7,7 +7,7 @@ final class Asset
     /** @var string */
     private $id;
     /** @var string */
-    private $path;
+    private $filename;
     /** @var string */
     private $title;
     /** @var string */
@@ -24,10 +24,13 @@ final class Asset
     private $modified;
     /** @var string */
     private $userID;
+    /** @var Folder */
+    private $folder;
 
-    public function __construct(string $id, string $path, string $title, string $description, array $tags, string $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID)
+    public function __construct(string $id, Folder $folder, string $filename, string $title, string $description, array $tags, string $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID)
     {
-        $this->path = $path;
+        $this->folder = $folder;
+        $this->filename = $filename;
         $this->title = $title;
         $this->description = $description;
         $this->tags = $tags;
@@ -44,9 +47,14 @@ final class Asset
         return $this->id;
     }
 
-    public function path(): string
+    public function folder(): Folder
     {
-        return $this->path;
+        return $this->folder;
+    }
+
+    public function filename(): string
+    {
+        return $this->filename;
     }
 
     public function title(): string
@@ -91,38 +99,38 @@ final class Asset
 
     public function isImage(): bool
     {
-        return preg_match('/\.(jpg|jpeg|png|gif|svg)$/i', $this->path) ? true:false;
+        return preg_match('/\.(jpg|jpeg|png|gif|svg)$/i', $this->filename) ? true:false;
     }
 
     public function isVideo(): bool
     {
-        return preg_match('/\.(mp4|mov|ogv|webv|wmv|flv|avi)$/i', $this->path) ? true:false;
+        return preg_match('/\.(mp4|mov|ogv|webv|wmv|flv|avi)$/i', $this->filename) ? true:false;
     }
 
     public function isAudio(): bool
     {
-        return preg_match('/\.(mp3|weba|ogg|wav|flac)$/i', $this->path) ? true:false;
+        return preg_match('/\.(mp3|weba|ogg|wav|flac)$/i', $this->filename) ? true:false;
     }
 
     public function isArchive(): bool
     {
-        return preg_match('/\.(zip|rar|7zip|gz|tar)$/i', $this->path) ? true:false;
+        return preg_match('/\.(zip|rar|7zip|gz|tar)$/i', $this->filename) ? true:false;
     }
 
     public function isDocument(): bool
     {
-        return preg_match('/\.(txt|htm|html|pdf|md)$/i', $this->path) ? true:false;
+        return preg_match('/\.(txt|htm|html|pdf|md)$/i', $this->filename) ? true:false;
     }
 
     public function isCode(): bool
     {
-        return preg_match('/\.(htm|html|php|css|less|js|json|md|markdown|yaml|xml|htaccess)$/i', $this->path) ? true:false;
+        return preg_match('/\.(htm|html|php|css|less|js|json|md|markdown|yaml|xml|htaccess)$/i', $this->filename) ? true:false;
     }
 
     public function toArray(): array
     {
         return [
-            'path' => $this->path,
+            'path' => $this->filename,
             'title' => $this->title,
             'mime' => $this->mime(),
             'description' => '',

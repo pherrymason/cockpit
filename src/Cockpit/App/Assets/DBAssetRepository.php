@@ -59,7 +59,8 @@ final class DBAssetRepository implements AssetRepository
     {
         $params = [
             '_id' => $asset->id(),
-            'path' => $asset->path(),
+            'folder' => $asset->folder()->id(),
+            'path' => $asset->folder()->path().'/'.$asset->filename(),
             'title' => $asset->title(),
             'mime' => $asset->mime(),
             'description' => $asset->description(),

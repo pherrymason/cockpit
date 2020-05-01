@@ -59,8 +59,8 @@ final class Folder
             $path = [];
         }
 
-        $path[]= $this->name();
+        $path[] = $this->name();
 
-        return implode('/', $path);
+        return '/' . ltrim(implode('/', $path), '/');
     }
 }

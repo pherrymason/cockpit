@@ -35,8 +35,9 @@ final class DBFolderRepository implements FolderRepository
     {
         $params = [
             '_id' => $folder->id(),
+            '_p' => ($folder->parentFolder() !== null) ? $folder->parentFolder()->id() : null,
             'name' => $folder->name(),
-            '_p' => ($folder->parentFolder() !== null) ? $folder->parentFolder()->id() : null
+            'path' => $folder->path()
         ];
 
         $types = array_map(function ($key) {
@@ -47,7 +48,7 @@ final class DBFolderRepository implements FolderRepository
             return ':'.$key;
         }, array_keys($params));
 
-        $sql = 'INSERT INTO `' . self::TABLE . '` (`_id`, `name`, `_p`) VALUES (' . implode(', ', $placeholders) . ')';
+        $sql = 'INSERT INTO `' . self::TABLE . '` (`_id`, `_p`, `name`, `path`) VALUES (' . implode(', ', $placeholders) . ')';
         $this->db->executeUpdate($sql, $params, $types);
     }
 }
