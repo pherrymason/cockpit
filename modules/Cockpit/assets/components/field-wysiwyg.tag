@@ -167,11 +167,12 @@
                             if (Array.isArray(assets) && assets[0]) {
 
                                 var asset = assets[0], content;
+                                var assetPath = asset.path.replace(/^\/+/,'');
 
                                 if (asset.mime.match(/^image\//)) {
-                                    content = '<img src="' + ASSETS_URL+asset.path + '" alt="">';
+                                    content = '<img src="' + ASSETS_URL+assetPath + '" alt="">';
                                 } else {
-                                    content = '<a href="' + ASSETS_URL+asset.path + '">'+asset.title+'<a>';
+                                    content = '<a href="' + ASSETS_URL+assetPath + '">'+asset.title+'<a>';
                                 }
 
                                 editor.insertContent(content);

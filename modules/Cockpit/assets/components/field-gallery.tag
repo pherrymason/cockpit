@@ -187,7 +187,7 @@
                                 if (asset.mime.match(/^image\//)) {
                                     _uploads.push({
                                         meta:{title:'', asset: asset._id},
-                                        path: ASSETS_URL.replace(SITE_URL, '')+asset.path
+                                        path: ASSETS_URL.replace(SITE_URL, '')+asset.path.replace(/^\/+/, '')
                                     });
                                 }
                             });
@@ -251,7 +251,8 @@
                 var images = [];
 
                 selected.forEach(function(path){
-                    images.push({meta:{title:''}, path:path});
+                    path = path.replace(/^\/+/, '');
+					images.push({meta:{title:''}, path: path});
                 });
 
                 $this.$setValue($this.images.concat(images));
@@ -273,7 +274,7 @@
                         if (asset.mime.match(/^image\//)) {
                             images.push({
                                 meta:{title:'', asset: asset._id},
-                                path: ASSETS_URL.replace(SITE_URL, '')+asset.path
+                                path: ASSETS_URL + asset.path.replace(/^\/+/, '')
                             });
                         }
                     });

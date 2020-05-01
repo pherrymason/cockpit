@@ -132,7 +132,7 @@
                                     <div class="uk-text-muted uk-margin-small-top uk-flex">
                                         <strong>{ asset.mime }</strong>
                                         <span class="uk-flex-item-1 uk-margin-small-left uk-margin-small-right">{ App.Utils.formatSize(asset.size) }</span>
-                                        <a href="{ASSETS_URL+asset.path}" if="{ asset.mime.match(/^image\//) }" data-uk-lightbox="type:'image'" title="{ asset.width && [asset.width, asset.height].join('x') }" aria-label="{ asset.width && [asset.width, asset.height].join('x') }">
+                                        <a href="{asset.path}" if="{ asset.mime.match(/^image\//) }" data-uk-lightbox="type:'image'" title="{ asset.width && [asset.width, asset.height].join('x') }" aria-label="{ asset.width && [asset.width, asset.height].join('x') }">
                                             <i class="uk-icon-search"></i>
                                         </a>
                                     </div>

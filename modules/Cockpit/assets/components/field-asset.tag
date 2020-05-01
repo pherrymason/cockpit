@@ -23,8 +23,8 @@
 
                     <span if="{ asset.mime.match(/^image\//) == null }"><i class="uk-h1 uk-text-muted uk-icon-{ getIconCls(asset.path) }"></i></span>
 
-                    <a href="{ASSETS_URL+asset.path}" if="{ asset.mime.match(/^image\//) }" data-uk-lightbox="type:'image'" title="{ asset.width && [asset.width, asset.height].join('x') }">
-                        <cp-thumbnail src="{asset && ASSETS_URL+asset.path}" height="160"></cp-thumbnail>
+                    <a href="{asset.path}" if="{ asset.mime.match(/^image\//) }" data-uk-lightbox="type:'image'" title="{ asset.width && [asset.width, asset.height].join('x') }">
+                        <cp-thumbnail src="{asset && asset.path}" height="160"></cp-thumbnail>
                     </a>
                 </div>
             </div>
@@ -32,7 +32,7 @@
         
         <div class="uk-panel-body">
             <div class="uk-margin-small-top uk-text-truncate">
-              <a href="{ASSETS_URL+asset.path}" target="_blank">{ asset.title }</a>
+              <a href="{asset.path}" target="_blank">{ asset.title }</a>
             </div>
             <div class="uk-text-small uk-text-muted">
                 <strong>{ asset.mime }</strong>
@@ -71,6 +71,10 @@
                 if (value && !value._id) {
                     value = false;
                 }
+
+                if (value!==null && typeof value.path !== 'undefined') {
+					value.path = ASSETS_URL + value.path.replace(/^\/+/, '');
+				}
 
                 this.asset = value;
                 this.update();
