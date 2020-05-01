@@ -32,7 +32,7 @@ final class Assets extends \Cockpit\AuthController
     public function listAssets()
     {
         $contraint = new Constraint(
-            $this->param('filter', null),
+            $this->param('filter', $_REQUEST['filter'] ?? null),
             $this->param('limit', null),
             $this->param('sort', ['created' => -1]),
             $this->param('skip', null)
@@ -49,7 +49,7 @@ final class Assets extends \Cockpit\AuthController
         }*/
         $folders = $this->folders->children(new Constraint($filters, null, ['name' => 1]), $folderFilter);
 
-        return ['assets' => $assets['assets'], 'folders' => $folders];
+        return ['assets' => $assets['assets'], 'folders' => $folders, 'total' => $assets['total']];
     }
 
     public function asset($id)

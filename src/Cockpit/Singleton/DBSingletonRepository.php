@@ -83,7 +83,7 @@ final class DBSingletonRepository implements SingletonRepository
             : [];
 
         return Singleton::create(
-            $data['_id'], $data['name'], $data['label'], $data['description'], json_decode($data['fields'], true), $data['template'],
+            $data['_id'], $data['name'], $data['label'], $data['description'], json_decode($data['fields'] ?? [], true), $data['template'],
             $dataContent
         );
     }

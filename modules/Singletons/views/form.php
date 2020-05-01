@@ -7,6 +7,7 @@
 
 <script>
     window.__singletonData = {{ json_encode($data) }} || {};
+    window.__singleton = {{ json_encode($singleton) }} || {};
 </script>
 
 <div riot-view>
@@ -184,7 +185,7 @@
 
             this.mixin(RiotBindMixin);
 
-            this.singleton = {{ json_encode($singleton) }};
+            this.singleton = window.__singleton;
             this.fields    = this.singleton.fields;
             this.fieldsidx = {};
 
@@ -258,7 +259,7 @@
 
                 // lock resource
                 Cockpit.lockResource('singleton_'+$this.singleton.name, function(e){
-                    window.location.reload();
+                    //window.location.reload();
                 });
             });
 

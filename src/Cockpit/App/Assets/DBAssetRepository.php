@@ -36,9 +36,11 @@ final class DBAssetRepository implements AssetRepository
         list($sql, $params) = $this->applyConstraints($constraints, $sql);
 
         $stmt = $this->db->executeQuery($sql, $params);
-        $total = (!$constraints->skip() && !$constraints->limit())
-            ? $stmt->rowCount()
-            : $this->countAll();
+        if ($constraints->limit() || $constraints->skip()) {
+            $total = $this->countAllByConstraint($constraints);
+        } else {
+            $total = $stmt->rowCount();
+        }
 
         $assets = $stmt->fetchAll();
 
@@ -52,7 +54,21 @@ final class DBAssetRepository implements AssetRepository
     {
         $sql = 'SELECT COUNT(_id) as id FROM '.self::TABLE;
 
-        return $this->db->query($sql)->rowCount();
+        $data = $this->db->query($sql)->fetch();
+
+        return (int)$data['id'];
+    }
+
+    public function countAllByConstraint(Constraint $constraints): int
+    {
+        $sql = 'SELECT COUNT(_id) as id FROM '.self::TABLE;
+        $newConstraint = new Constraint($constraints->filter());
+        list($sql, $params) = $this->applyConstraints($newConstraint, $sql);
+
+        $stmt = $this->db->executeQuery($sql, $params);
+        $data = $stmt->fetch();
+
+        return (int)$data['id'];
     }
 
     public function save(Asset $asset, string $folderID = null)

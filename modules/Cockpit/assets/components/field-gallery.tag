@@ -16,7 +16,7 @@
                             <canvas class="uk-responsive-width" width="200" height="150"></canvas>
                             <div class="uk-position-absolute uk-position-cover uk-flex uk-flex-middle">
                                 <div class="uk-width-1-1 uk-text-center">
-                                    <cp-thumbnail src="{ img.path.match(/^(http\:|https\:|\/\/)/) ? img.path : img.path.replace(/^\//, '') }" height="120"></cp-thumbnail>
+                                    <cp-thumbnail src="{ img.path }" height="120"></cp-thumbnail>
                                 </div>
                             </div>
                         </div>
