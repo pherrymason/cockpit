@@ -149,7 +149,7 @@
         },
 
         lockResource: function(resourceId, catchCallback) {
-            
+            /*
             catchCallback = catchCallback || function() {
                 App.ui.notify('This resource is locked!', 'danger');
             };
@@ -169,6 +169,7 @@
                     App.request('/cockpit/utils/unlockResourceIdByCurrentUser/'+resourceId, {});
                 }
             });
+             */
         }
     };
 

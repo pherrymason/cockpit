@@ -81,10 +81,11 @@ final class Admin extends \Cockpit\AuthController
                 $this->app->helper('admin')->lockResourceId($lockId);
         */
 
+        $singletonArray = $singleton->data();
         return $this->render(
             'singletons:views/form.php', [
             'singleton' => $singleton->toArray(),
-            'data' => $singleton->data()
+            'data' => empty($singletonArray) ? null : $singletonArray
         ]);
     }
 
