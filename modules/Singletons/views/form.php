@@ -140,7 +140,7 @@
                         <div class="uk-margin-small-top"><span class="uk-badge uk-badge-outline {lang ? 'uk-text-primary' : 'uk-text-muted'}">{ lang ? _.find(languages,{code:lang}).label:App.$data.languageDefaultLabel }</span></div>
 
                         <select bind="lang">
-                            <option value="">{App.$data.languageDefaultLabel}</option>
+<!--                            <option value="">{App.$data.languageDefaultLabel}</option>-->
                             <option each="{language in languages}" value="{language.code}">{language.label}</option>
                         </select>
                     </div>
@@ -191,12 +191,20 @@
 
             this.data      = window.__singletonData;
 
-            this.languages = App.$data.languages;
+            this.languages = App.$data.appLanguages;
             this.groups    = {main:[]};
             this._groups   = [];
             this.group     = 'main';
 
+            if (this.languages.length) {
+                this.lang = '';
+                if (this.lang.length === 0) {
+                    this.lang = App.$data.defaultLanguage;
+                }
+            }
+
             // fill with default values
+
             this.fields.forEach(function(field){
 
                 $this.fieldsidx[field.name] = field;
@@ -206,12 +214,18 @@
                 }
 
                 if (field.localize && $this.languages.length) {
+                    delete $this.fieldsidx[field.name];
+                    delete $this.data[field.name];
 
                     $this.languages.forEach(function(lang) {
 
                         var key = field.name+'_'+lang.code;
 
                         if ($this.data[key] === undefined) {
+                            if (field.options && field.options['default_'+lang.code] === null) {
+                                return;
+                            }
+
                             $this.data[key] = field.options && field.options.default || null;
                             $this.data[key] = field.options && field.options['default_'+lang.code] || $this.data[key];
                         }
