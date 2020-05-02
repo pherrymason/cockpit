@@ -10,7 +10,7 @@
 
         <div class="uk-flex uk-flex-middle uk-flex-center uk-text-muted">
             <div class="uk-width-1-1 uk-text-center uk-bg-transparent-pattern" if="{ image.path }">
-                <cp-thumbnail src="{ image.path.match(/^(http\:|https\:|\/\/)/) ? image.path : (SITE_URL+'/'+image.path.replace(/^\//, '')) }" height="160"></cp-thumbnail>
+                <cp-thumbnail src="{ image.path }" height="160"></cp-thumbnail>
             </div>
             <div class="uk-text-center uk-margin-top uk-margin-bottom" show="{ !image.path }">
                 <img class="uk-svg-adjust uk-text-muted" riot-src="{App.base('/assets/app/media/icons/photo.svg')}" width="60" height="60" data-uk-svg>
@@ -171,8 +171,9 @@
             App.assets.select(function(assets){
 
                 if (Array.isArray(assets) && assets[0]) {
-
-                    $this.image.path = ASSETS_URL.replace(SITE_URL, '')+assets[0].path;
+                    $this.image.path = assets[0].path;
+console.log(assets[0].path);
+console.log($this.image.path);
                     $this.$setValue($this.image);
                     $this.update();
                 }
