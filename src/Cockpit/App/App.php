@@ -60,8 +60,8 @@ final class App
 
         // load .env file if exists
         //\DotEnv::load($this->appPath);
-        $dotenv = \Dotenv\Dotenv::createImmutable($this->appPath);
-        $dotenv->load();
+        //$dotenv = \Dotenv\Dotenv::createImmutable($this->appPath);
+        //$dotenv->load();
 
         /*
          * Collect needed paths
