@@ -1,6 +1,6 @@
 {
 
-    "name": "agentejo/cockpit",
+    "name": "raulferras/cockpit",
     "type": "project",
     "description": "Cockpit Headless CMS",
     "keywords": ["cms", "headles", "api", "cockpit"],
