@@ -137,7 +137,7 @@ final class DBEntriesRepository implements EntriesRepository
         }
 
         $params['_modified'] = $entry['_modified'];
-        $params['_created'] = $entry['_created'];
+        $params['_created'] = is_numeric($entry['_created']) ? date('Y-m-d H:i:s', $entry['_created']): $entry['_created'];
 
         // Main Entry table
         $tableName = $this->tableManager->tableName($collection->name());

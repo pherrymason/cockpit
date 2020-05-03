@@ -148,8 +148,17 @@ final class Uploader
         $name = basename($finalFilePath);
 
         return new Asset(
-            IDs::new(), $finalFilePath, $name, '', [], (string)$filesize,
-            $mime, new \DateTimeImmutable(), new \DateTimeImmutable(), $userID
+            IDs::new(),
+            new Folder('1','/', null),
+            $finalFilePath,
+            $name,
+            '',
+            [],
+            (string)$filesize,
+            $mime,
+            new \DateTimeImmutable(),
+            new \DateTimeImmutable(),
+            $userID
         );
     }
 }
