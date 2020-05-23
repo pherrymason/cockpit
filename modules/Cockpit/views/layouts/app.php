@@ -14,6 +14,12 @@
         return mb_strtolower($a['label']) <=> mb_strtolower($b['label']);
     });
 
+    $appConfig = $app->getContainer()->get('app');
+    $cmsConfig = $app->getContainer()->get('cms');
+
+    $siteURL = $cmsConfig['host'] . '/' . trim($cmsConfig['base_path'], '/') . '/';
+    $publicStorageURL = $cmsConfig['storage_path'];
+
 ?><!doctype html>
 <html lang="{{ $app('i18n')->locale }}" data-base="@base('/')" data-route="@route('/')" data-version="{{ $app['cockpit/version'] }}" data-locale="{{ $app('i18n')->locale }}">
 <head>
@@ -25,9 +31,9 @@
 
     <script>
         // App constants
-        var SITE_URL   = '{{ rtrim($app->filestorage->getUrl('site://'), '/') }}';
-        var ASSETS_URL = '/';//{{ rtrim($app->filestorage->getUrl('assets://'), '/') }}';
-        var PUBLIC_STORAGE_URL = '{{ rtrim($app->pathToUrl('#pstorage:'), '/') }}';
+        var SITE_URL   = '{{ $siteURL }}';
+        var ASSETS_URL = '/';
+        var PUBLIC_STORAGE_URL = '{{ $publicStorageURL }}';
     </script>
 
     {{ $app->assets($app('admin')->data->get('assets'), $app['debug'] ? time() : $app['cockpit/version']) }}
