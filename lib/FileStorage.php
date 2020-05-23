@@ -25,7 +25,7 @@ class FileStorage {
             try {
                 $this->addStorage($name, $_config);
             } catch (\Exception $e) {
-                die('Failed to init storage '.$name.'. '.print_r($_config, true));
+                throw new \Exception('Failed to init storage '.$name.'. '.print_r($_config, true));
             }
         }
     }
