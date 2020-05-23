@@ -114,20 +114,20 @@ class App extends \Lime\App {
 
             if (@\substr($src, -3) == '.js') {
 
-                $ispath = \strpos($src, ':') !== false && !\preg_match('#^(|http\:|https\:)//#', $src);
-
+//                $ispath = \strpos($src, ':') !== false && !\preg_match('#^(|http\:|https\:)//#', $src);
+/*
                 if (!$debug && $ispath && $path = $this->path($src)) {
                     $js[] = $path;
                     $jshash = md5($jshash.md5_file($path));
-                } else {
+                } else {*/
                     $list[] = $this->script($asset, $version);
-                }
+//                }
 
             } elseif (@\substr($src, -4) == '.css') {
                 $list[] = $this->style($asset, $version);
             }
         }
-
+/*
         if (count($js)) {
             
             $path = '#pstorage:tmp/'.$jshash.'.js';
@@ -141,7 +141,7 @@ class App extends \Lime\App {
             $url = $this->pathToUrl($path);
             $list[] = '<script src="'.($url.($version ? "?ver={$version}":'')).'" type="text/javascript"></script>';
         }
-
+*/
         return \implode("\n", $list);
     }
 
