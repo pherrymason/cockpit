@@ -22,7 +22,11 @@ class FileStorage {
         $this->manager = new MountManager();
 
         foreach ($config as $name => $_config) {
-            $this->addStorage($name, $_config);
+            try {
+                $this->addStorage($name, $_config);
+            } catch (\Exception $e) {
+                die('Failed to init storage '.$name.'. '.print_r($_config, true));
+            }
         }
     }
 
