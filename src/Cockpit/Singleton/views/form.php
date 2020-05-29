@@ -5,8 +5,8 @@
 </style>
 
 <script>
-    window.__singletonData = <?= json_encode($data) ?> || {};
-    window.__singleton = <?= json_encode($singleton) ?> || {};
+  window.__singletonData = <?= json_encode($data) ?> || {};
+  window.__singleton = <?= json_encode($singleton) ?> || {};
 </script>
 
 <div riot-view>
@@ -15,19 +15,19 @@
 
         <div class="uk-container uk-container-center">
             <ul class="uk-breadcrumb">
-                <li><a href="<?= $this->route('/singletons')?>"><?= $this->lang('Singletons') ?></a></li>
+                <li><a href="<?= $this->route('singletons')?>"><?= $this->lang('Singletons') ?></a></li>
                 <li class="uk-active" data-uk-dropdown>
 
-                    <a><i class="uk-icon-bars"></i> <?= $this->(@$singleton['label'] ? $singleton['label']:$singleton['name']) ?></a>
+                    <a><i class="uk-icon-bars"></i> <?= $this->e($singleton['label'] ?? $singleton['name']) ?></a>
 
-                    <?php if($app->module('singletons')->hasaccess($singleton['name'], 'edit')) ?>
+                    <?php if($this->hasAccess($singleton['name'], 'edit')): ?>
                     <div class="uk-dropdown">
                         <ul class="uk-nav uk-nav-dropdown">
                             <li class="uk-nav-header"><?= $this->lang('Actions') ?></li>
-                            <li><a href="@route('/singletons/singleton/'.$singleton['name'])"><?= $this->lang('Edit') ?></a></li>
+                            <li><a href="<?= $this->route('singleton', ['name' => $singleton['name']])?>"><?= $this->lang('Edit') ?></a></li>
                         </ul>
                     </div>
-                    <?php endif ?>
+                    <?php endif; ?>
                 </li>
             </ul>
 
@@ -36,9 +36,9 @@
                     <img src="@url($singleton['icon'] ? 'assets:app/media/icons/'.$singleton['icon']:'singletons:icon.svg')" width="40" alt="icon">
                 </div>
                 <div class="uk-flex-item-1">{ singleton.label || singleton.name }</div>
-                @if($app->module('cockpit')->isSuperAdmin())
+                <?php if($this->isSuperAdmin()): ?>
                 <a class="uk-button uk-button-outline uk-text-warning" onclick="{showDataObject}"><?= $this->lang('Show json') ?></a>
-                @endif
+                <?php endif ?>
             </div>
         </div>
 
@@ -52,10 +52,10 @@
                 <a>{ App.i18n.get(group || 'All') } <i class="uk-margin-small-left uk-icon-angle-down"></i></a>
                 <div class="uk-dropdown uk-dropdown-scrollable uk-dropdown-close">
                     <ul class="uk-nav uk-nav-dropdown">
-                    <li class="uk-nav-header"><?= $this->lang('Groups') ?></li>
-                    <li class="{ !group && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleGroup }">{ App.i18n.get('All') }</a></li>
-                    <li class="uk-nav-divider"></li>
-                    <li class="{ group==parent.group && 'uk-active'}" each="{group in _groups}" show="{ parent.groups[group].length }"><a class="uk-text-capitalize" onclick="{ toggleGroup }">{ App.i18n.get(group) }</a></li>
+                        <li class="uk-nav-header"><?= $this->lang('Groups') ?></li>
+                        <li class="{ !group && 'uk-active'}"><a class="uk-text-capitalize" onclick="{ toggleGroup }">{ App.i18n.get('All') }</a></li>
+                        <li class="uk-nav-divider"></li>
+                        <li class="{ group==parent.group && 'uk-active'}" each="{group in _groups}" show="{ parent.groups[group].length }"><a class="uk-text-capitalize" onclick="{ toggleGroup }">{ App.i18n.get(group) }</a></li>
                     </ul>
                 </div>
             </li>
@@ -66,14 +66,14 @@
     <div class="uk-margin-top">
 
         <div class="uk-alert" if="{ !fields.length }">
-            <?= $this->lang('No fields defined') ?>. <a href="@route('/singletons/singleton')/{ singleton.name }"><?= $this->lang('Define singleton fields') ?>.</a>
+            <?= $this->lang('No fields defined') ?>. <a href="<?= $this->route('singleton', ['name' => $singleton['name']])?>"><?= $this->lang('Define singleton fields') ?>.</a>
         </div>
 
-        @if($singleton['description'])
+        <?php if($singleton['description']): ?>
         <div class="uk-margin uk-text-muted">
             {{ htmlspecialchars($singleton['description']) }}
         </div>
-        @endif
+        <?php endif ?>
 
         <div class="uk-grid">
 
@@ -121,7 +121,7 @@
                     <cp-actionbar>
                         <div class="uk-container uk-container-center">
                             <button class="uk-button uk-button-large uk-button-primary"><?= $this->lang('Save') ?></button>
-                            <a class="uk-button uk-button-link" href="@route('/singletons')"><?= $this->lang('Close') ?></a>
+                            <a class="uk-button uk-button-link" href="<?= $this->route('singletons')?>"><?= $this->lang('Close') ?></a>
                         </div>
                     </cp-actionbar>
 
@@ -138,7 +138,7 @@
                         <div class="uk-margin-small-top"><span class="uk-badge uk-badge-outline {lang ? 'uk-text-primary' : 'uk-text-muted'}">{ lang ? _.find(languages,{code:lang}).label:App.$data.languageDefaultLabel }</span></div>
 
                         <select bind="lang">
-<!--                            <option value="">{App.$data.languageDefaultLabel}</option>-->
+                            <!--                            <option value="">{App.$data.languageDefaultLabel}</option>-->
                             <option each="{language in languages}" value="{language.code}">{language.label}</option>
                         </select>
                     </div>
@@ -155,7 +155,7 @@
                     <div class="uk-margin-small-top">
                         <span class="uk-position-relative">
                             <cp-revisions-info class="uk-badge uk-text-large" rid="{singleton._id}"></cp-revisions-info>
-                            <a class="uk-position-cover" href="@route('/singletons/revisions/'.$singleton['name'])/{singleton._id}"></a>
+                            <a class="uk-position-cover" href="<?= $this->route('singleton-revisions', ['name' => $singleton['name'], 'id' => $singleton['_id']]) ?>"></a>
                         </span>
                     </div>
                 </div>
@@ -167,7 +167,7 @@
                     </div>
                 </div>
 
-                @trigger('singletons.form.aside', [$singleton['name']])
+                <?php $this->trigger('singletons.form.aside', [$singleton['name']]) ?>
 
             </div>
 

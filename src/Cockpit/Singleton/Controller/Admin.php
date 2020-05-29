@@ -3,23 +3,26 @@
 namespace Cockpit\Singleton\Controller;
 
 use Cockpit\App\Revisions;
+use Cockpit\Framework\TemplateController;
 use Cockpit\Singleton\Singleton;
 use Cockpit\Singleton\SingletonRepository;
 use Cockpit\Framework\IDs;
-use Lime\App;
+use League\Plates\Engine;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
-final class Admin extends \Cockpit\AuthController
+final class Admin extends TemplateController
 {
     /** @var SingletonRepository */
     private $singletons;
     /** @var Revisions */
     private $revisions;
 
-    public function __construct(SingletonRepository $singletons, App $app, \Cockpit\App\Revisions $revisions)
+    public function __construct(SingletonRepository $singletons, Revisions $revisions, Engine $engine)
     {
         $this->singletons = $singletons;
         $this->revisions = $revisions;
-        parent::__construct($app);
+        parent::__construct($engine);
     }
 
     public function index()
@@ -50,7 +53,7 @@ final class Admin extends \Cockpit\AuthController
         return $this->render('singletons:views/index.php', ['singletons' => $arraySingletons]);
     }
 
-    public function form($name = null)
+    public function form(RequestInterface $request, ResponseInterface $response, $name = null)
     {
         if (!$name) {
             return false;
@@ -66,10 +69,12 @@ final class Admin extends \Cockpit\AuthController
             return $this->helper('admin')->denyRequest();
         }*/
 
+        /*
         $this->app->helper('admin')->favicon = [
             'path' => 'singletons:icon.svg',
             'color' => '#FF000',//$singleton['color']
         ];
+        */
         /*
                 $lockId = "singleton_{$singleton['name']}";
 
@@ -82,8 +87,9 @@ final class Admin extends \Cockpit\AuthController
         */
 
         $singletonArray = $singleton->data();
-        return $this->render(
-            'singletons:views/form.php', [
+        return $this->renderResponse(
+            $response,
+            'singletons::views/form', [
             'singleton' => $singleton->toArray(),
             'data' => empty($singletonArray) ? null : $singletonArray
         ]);

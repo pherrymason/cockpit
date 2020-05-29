@@ -10,9 +10,7 @@ final class PathResolver
     private $siteURL;
     /** @var string */
     private $docsRoot;
-    /**
-     * @var string
-     */
+    /** @var string */
     private $baseURL;
 
     public function __construct(array $pathMap, string $docsRoot, string $baseURL, ?string $siteURL)
@@ -62,12 +60,12 @@ final class PathResolver
 
             foreach ($this->pathMap[$parts[0]] as $path) {
                 if (\file_exists($path . $parts[1])) {
-                    return $path . $parts[1];
+                    return rtrim($path . $parts[1], '/');
                 }
             }
         }
 
-        return $this->pathMap[$file] ?? null;
+        return isset($this->pathMap[$file]) ? rtrim($this->pathMap[$file], '/') : null;
     }
 
     public function setPath($a, $b)

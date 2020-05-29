@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Singletons\Controller;
+namespace Cockpit\Singletons\Controller;
 
-
+/** @deprecated  */
 class Admin extends \Cockpit\AuthController {
 
     public function index() {

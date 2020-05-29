@@ -20,12 +20,17 @@ return [
     },
 
     \Cockpit\App\Assets\Uploader::class => function (ContainerInterface $c) {
+
+
         return new \Cockpit\App\Assets\Uploader(
             $c->get(\League\Flysystem\Filesystem::class),
             $c->get('path'),
             $c->get(\Cockpit\App\Assets\AssetRepository::class),
+            $c->get(\Cockpit\App\Assets\FolderRepository::class),
             $c->get(\Cockpit\Framework\EventSystem::class),
-            new \Cocur\Slugify\Slugify(), ['*'], 100000
+            new \Cocur\Slugify\Slugify(),
+            ['*'],
+            30000000
             );
     },
 

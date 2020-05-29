@@ -13,6 +13,7 @@
     ],
     "autoload": {
         "psr-0": {
+            "": ["lib/"],
             "Lime\\": "lib/Lime/",
             "LimeExtra\\": "lib/LimeExtra/"
         },
@@ -20,7 +21,6 @@
             "Cockpit\\": "src/Cockpit/",
             "Cockpit\\App\\": "src/Cockpit/App/",
             "Cockpit\\Collections\\": "src/Cockpit/Collections/",
-            "Cockpit\\Singletons\\": "src/Cockpit/Singletons/",
             "Cockpit\\Forms\\": "src/Cockpit/Forms/",
 			"Cockpit\\Framework\\": "src/Cockpit/Framework"
         }
@@ -47,7 +47,13 @@
         "ramsey/uuid": "^3.9",
         "filp/whoops": "^2.5",
         "cocur/slugify": "^4.0",
-        "league/plates": "^3.3"
+        "league/plates": "^3.3",
+        "slim/slim": "^4.5",
+        "slim/psr7": "^1.1",
+        "vlucas/phpdotenv": "^4.1",
+        "mezzio/mezzio-authentication": "^1.1",
+        "doctrine/dbal": "^2.10",
+        "franzl/whoops-middleware": "^1.2"
     },
 
     "config": {
