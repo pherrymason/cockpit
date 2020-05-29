@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cockpit\Controller;
+namespace Cockpit\App\Controller;
 
 class Base extends \Cockpit\AuthController {
 

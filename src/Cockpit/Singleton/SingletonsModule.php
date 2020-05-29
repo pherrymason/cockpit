@@ -7,9 +7,9 @@ use Cockpit\Singleton\Controller\Admin;
 use League\Plates\Engine;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
-use Cockpit\Module as ModuleInterface;
+use Cockpit\Module;
 
-final class Module implements ModuleInterface
+final class SingletonsModule implements Module
 {
     public function registerRoutes(App $app)
     {

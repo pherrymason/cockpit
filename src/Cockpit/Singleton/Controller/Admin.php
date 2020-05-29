@@ -18,11 +18,11 @@ final class Admin extends TemplateController
     /** @var Revisions */
     private $revisions;
 
-    public function __construct(SingletonRepository $singletons, Revisions $revisions, Engine $engine)
+    public function __construct(SingletonRepository $singletons, Revisions $revisions, Engine $engine, \Psr\Container\ContainerInterface $container)
     {
         $this->singletons = $singletons;
         $this->revisions = $revisions;
-        parent::__construct($engine);
+        parent::__construct($engine,$container);
     }
 
     public function index()
@@ -88,6 +88,7 @@ final class Admin extends TemplateController
 
         $singletonArray = $singleton->data();
         return $this->renderResponse(
+            $request,
             $response,
             'singletons::views/form', [
             'singleton' => $singleton->toArray(),

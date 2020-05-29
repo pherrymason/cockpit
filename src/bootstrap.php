@@ -1,7 +1,7 @@
 <?php
 
 use Cockpit\Framework\AppFactory;
-use Cockpit\Singleton\Module;
+use Cockpit\Singleton\SingletonsModule;
 use Slim\App;
 use Slim\Handlers\Strategies\RequestResponseArgs;
 
@@ -10,7 +10,6 @@ include(dirname(__DIR__).'/vendor/autoload.php');
 function getCockpitApp(array $configuration): App
 {
     $app = AppFactory::createCockpit($configuration);
-
     $app->setBasePath(
         (function () {
             $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
@@ -31,9 +30,11 @@ function getCockpitApp(array $configuration): App
     $container = $app->getContainer();
     $routeParser = $app->getRouteCollector()->getRouteParser();
     $container->set('router', $routeParser);
+    $container->set('basePath', $app->getBasePath());
 
     $modules = [
-        new Module()
+        new \Cockpit\App\CockpitModule(),
+        new SingletonsModule()
     ];
 
 
