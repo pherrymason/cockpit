@@ -10,15 +10,37 @@
 
 namespace Cockpit\App\Controller;
 
-class Base extends \Cockpit\AuthController {
+use Cockpit\Framework\TemplateController;
+use League\Plates\Engine;
+use Mezzio\Authentication\UserInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
-    public function dashboard() {
+class Base extends TemplateController
+{
+    /**
+     * @var \Cockpit\Framework\EventSystem
+     */
+    private $eventSystem;
 
-        $settings = $this->app->storage->getKey('cockpit/options', 'dashboard.widgets.'.$this->user["_id"], []);
+    public function __construct(\Cockpit\Framework\EventSystem $eventSystem, Engine $templateEngine, \Psr\Container\ContainerInterface $container)
+    {
+        parent::__construct($templateEngine, $container);
+        $this->eventSystem = $eventSystem;
+    }
+
+    public function dashboard(RequestInterface $request, ResponseInterface $response)
+    {
+        $config = $this->container->get('database.config');
+        $keyStorage = $this->container->get($config['driver']);
+
+        /** @var UserInterface $user */
+        $user = $request->getAttributes()[UserInterface::class];
+        $settings = $keyStorage->getKey('cockpit/options', 'dashboard.widgets.'.$user->getDetail('id'), []);
 
         $widgets  = new \ArrayObject([]);
 
-        $this->app->trigger('admin.dashboard.widgets', [$widgets]);
+        $this->eventSystem->trigger('admin.dashboard.widgets', [$widgets]);
 
         $areas = [
             'main' => new \SplPriorityQueue(),
@@ -37,7 +59,7 @@ class Base extends \Cockpit\AuthController {
             $areas[$area]->insert($widget, -1 * $prio);
         }
 
-        return $this->render('cockpit:views/base/dashboard.php', compact('areas', 'widgets'));
+        return $this->renderResponse($request, $response, 'base/dashboard', compact('areas', 'widgets'));
     }
 
     public function savedashboard() {
@@ -57,7 +79,7 @@ class Base extends \Cockpit\AuthController {
         $list  = new \ArrayObject([]);
 
         if ($query) {
-            $this->app->trigger('cockpit.search', [$query, $list]);
+            $this->eventSystem->trigger('cockpit.search', [$query, $list]);
         }
 
         return json_encode($list->getArrayCopy());

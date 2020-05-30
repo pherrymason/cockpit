@@ -13,10 +13,8 @@ abstract class TemplateController
 {
     /** @var Engine */
     protected $templateEngine;
-    /**
-     * @var \Psr\Container\ContainerInterface
-     */
-    private $container;
+    /** @var \Psr\Container\ContainerInterface */
+    protected $container;
 
     public function __construct(Engine $templateEngine, \Psr\Container\ContainerInterface $container)
     {
