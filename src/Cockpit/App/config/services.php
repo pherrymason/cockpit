@@ -19,12 +19,17 @@ return [
         );
     },
 
+    'assets.filesystem' => function (ContainerInterface $c) {
+        return new \League\Flysystem\Filesystem(
+             new \League\Flysystem\Adapter\Local($c->get('paths')['assets'])
+        );
+    },
+
     \Cockpit\App\Assets\Uploader::class => function (ContainerInterface $c) {
 
-
         return new \Cockpit\App\Assets\Uploader(
-            $c->get(\League\Flysystem\Filesystem::class),
-            $c->get('path'),
+            $c->get('assets.filesystem'),
+            $c->get(\Cockpit\Framework\PathResolver::class),
             $c->get(\Cockpit\App\Assets\AssetRepository::class),
             $c->get(\Cockpit\App\Assets\FolderRepository::class),
             $c->get(\Cockpit\Framework\EventSystem::class),
@@ -56,14 +61,6 @@ return [
     },
 
     // Controllers -----------------------------------------------
-    \Cockpit\App\Controller\Assets::class => function (ContainerInterface $c) {
-        return new \Cockpit\App\Controller\Assets(
-            $c->get('app'),
-            $c->get(\Cockpit\App\Assets\AssetRepository::class),
-            $c->get(\Cockpit\App\Assets\FolderRepository::class),
-            $c->get(\Cockpit\App\Assets\Uploader::class)
-        );
-    },
 
     \Cockpit\App\Controller\Utils::class => function (ContainerInterface $c) {
         return new \Cockpit\App\Controller\Utils(

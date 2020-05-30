@@ -5,9 +5,11 @@ namespace Cockpit\App\Controller;
 use Cockpit\App\Assets\AssetRepository;
 use Cockpit\Framework\Database\Constraint;
 use Lime\App;
+use Psr\Http\Message\RequestInterface;
+use Zend\Diactoros\Response\JsonResponse;
 use function Cockpit\Controller\parent_sort;
 
-final class Assets extends \Cockpit\AuthController
+final class Assets
 {
     /** @var AssetRepository */
     private $assets;
@@ -15,13 +17,15 @@ final class Assets extends \Cockpit\AuthController
     private $folders;
     /** @var \Cockpit\App\Assets\Uploader */
     private $uploader;
+    /** @var \Cockpit\Framework\EventSystem */
+    private $eventSystem;
 
-    public function __construct(App $app, AssetRepository $assets, \Cockpit\App\Assets\FolderRepository $folders, \Cockpit\App\Assets\Uploader $uploader)
+    public function __construct(AssetRepository $assets, \Cockpit\App\Assets\FolderRepository $folders, \Cockpit\App\Assets\Uploader $uploader, \Cockpit\Framework\EventSystem $eventSystem)
     {
-        parent::__construct($app);
         $this->assets = $assets;
         $this->folders = $folders;
         $this->uploader = $uploader;
+        $this->eventSystem = $eventSystem;
     }
 
     public function index()
@@ -29,27 +33,29 @@ final class Assets extends \Cockpit\AuthController
         return $this->render('cockpit:views/assets/index.php');
     }
 
-    public function listAssets()
+    public function listAssets(RequestInterface $request)
     {
+        $params = $request->getParsedBody();
+
         $contraint = new Constraint(
-            $this->param('filter', $_REQUEST['filter'] ?? null),
-            $this->param('limit', null),
-            $this->param('sort', ['created' => -1]),
-            $this->param('skip', null)
+            $params['filter'] ?? $_REQUEST['filter'] ?? null,
+            $params['limit'] ?? null,
+            $params['sort'] ?? ['created' => -1],
+            $params['skip'] ?? null
         );
 
         $assets = $this->assets->byConstraint($contraint);
-        $this->app->trigger('cockpit.assets.list', [$assets]);
+        $this->eventSystem->trigger('cockpit.assets.list', [$assets]);
 
         // virtual folders
-        $folderFilter = $this->param('folder', null);
+        $folderFilter = $params['folder'] ?? null;
         $filters = [];
         /*if ($folderFilter) {
             $filters = ['_p' => $folderFilter];
         }*/
         $folders = $this->folders->children(new Constraint($filters, null, ['name' => 1]), $folderFilter);
 
-        return ['assets' => $assets['assets'], 'folders' => $folders, 'total' => $assets['total']];
+        return new JsonResponse(['assets' => $assets['assets'], 'folders' => $folders, 'total' => $assets['total']]);
     }
 
     public function asset($id)
@@ -59,8 +65,8 @@ final class Assets extends \Cockpit\AuthController
 
     public function upload()
     {
-        $meta = ['folder' => $this->param('folder', '')];
-        $folder = $this->param('folder', null);
+        $meta = ['folder' => $params['folder'] ?? ''];
+        $folder = $params['folder'] ?? null;
         $userID = $this->app->module('cockpit')->getUser('_id');
 
         $result = $this->uploader->upload('files', $folder, $userID);
@@ -72,7 +78,7 @@ final class Assets extends \Cockpit\AuthController
 
     public function removeAssets()
     {
-        if ($assets = $this->param('assets', false)) {
+        if ($assets = $params['assets'] ?? false) {
             return $this->module('cockpit')->removeAssets($assets);
         }
 
@@ -81,7 +87,7 @@ final class Assets extends \Cockpit\AuthController
 
     public function updateAsset()
     {
-        if ($asset = $this->param('asset', false)) {
+        if ($asset = $params['asset'] ?? false) {
             return $this->module('cockpit')->updateAssets($asset);
         }
 
@@ -90,8 +96,8 @@ final class Assets extends \Cockpit\AuthController
 
     public function addFolder()
     {
-        $name = $this->param('name', null);
-        $parent = $this->param('parent', '');
+        $name = $params['name'] ?? null;
+        $parent = $params['parent'] ?? '';
 
         if (!$name) return;
 
@@ -107,8 +113,8 @@ final class Assets extends \Cockpit\AuthController
 
     public function renameFolder()
     {
-        $folder = $this->param('folder');
-        $name = $this->param('name');
+        $folder = $params['folder'];
+        $name = $params['name'];
 
         if (!$folder || !$name) {
             return false;
@@ -123,7 +129,7 @@ final class Assets extends \Cockpit\AuthController
 
     public function removeFolder()
     {
-        $folder = $this->param('folder');
+        $folder = $params['folder'];
 
         if (!$folder || !isset($folder['_id'])) {
             return false;

@@ -3,6 +3,7 @@
 namespace Cockpit\App;
 
 use Cockpit\App\Controller\Accounts;
+use Cockpit\App\Controller\Assets;
 use Cockpit\App\Controller\Base;
 use Cockpit\App\Controller\Utils;
 use Cockpit\App\UI\Menu;
@@ -77,6 +78,12 @@ final class CockpitModule implements Module
             $group->get('/create', Accounts::class.':create')->setName('accounts_create');
             $group->post('/save', Accounts::class.':save')->setName('accounts_save');
             $group->post('/remove', Accounts::class.':remove')->setName('accounts_remove');
+        });
+
+
+        // Assets
+        $app->group('/assetsmanager', function (RouteCollectorProxy $group) {
+            $group->post('/listAssets', Assets::class.':listAssets')->setName('assets_list');
         });
 
 
