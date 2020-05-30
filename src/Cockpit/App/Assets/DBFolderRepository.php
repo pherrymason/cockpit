@@ -31,7 +31,7 @@ final class DBFolderRepository implements FolderRepository
         return $this->createFolderFromDatabaseResult($result);
     }
 
-    public function createFolderFromDatabaseResult(array $dbResult): Folder
+    protected function createFolderFromDatabaseResult(array $dbResult): Folder
     {
         $parentFolder = null;
         if ($dbResult['_p']) {
@@ -40,6 +40,39 @@ final class DBFolderRepository implements FolderRepository
 
         return new Folder($dbResult['_id'], $dbResult['name'], $parentFolder);
     }
+
+    public function byConstraint(Constraint $constraints): array
+    {
+        $sql = 'SELECT * FROM '.self::TABLE.' ';
+        list($sql, $params) = $this->applyConstraints($constraints, $sql);
+
+        $stmt = $this->db->executeQuery($sql, $params);
+        if ($constraints->limit() || $constraints->skip()) {
+            $total = $this->countAllByConstraint($constraints);
+        } else {
+            $total = $stmt->rowCount();
+        }
+
+        $folders = $stmt->fetchAll();
+
+        return [
+            'folders' => $folders,
+            'total' => $total
+        ];
+    }
+
+    public function countAllByConstraint(Constraint $constraints): int
+    {
+        $sql = 'SELECT COUNT(_id) as id FROM '.self::TABLE;
+        $newConstraint = new Constraint($constraints->filter());
+        list($sql, $params) = $this->applyConstraints($newConstraint, $sql);
+
+        $stmt = $this->db->executeQuery($sql, $params);
+        $data = $stmt->fetch();
+
+        return (int)$data['id'];
+    }
+
 
     public function children(Constraint $constraint, ?string $parentID = null)
     {

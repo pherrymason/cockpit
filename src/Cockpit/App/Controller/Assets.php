@@ -2,30 +2,43 @@
 
 namespace Cockpit\App\Controller;
 
+use Cockpit\App\Assets\Asset;
 use Cockpit\App\Assets\AssetRepository;
 use Cockpit\App\Assets\Folder;
+use Cockpit\App\Assets\FolderRepository;
+use Cockpit\App\Assets\Uploader;
 use Cockpit\Framework\Database\Constraint;
+use Cockpit\Framework\EventSystem;
+use League\Flysystem\Filesystem;
 use Mezzio\Authentication\UserInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Slim\Exception\HttpNotFoundException;
 use Zend\Diactoros\Response\JsonResponse;
 
 final class Assets
 {
     /** @var AssetRepository */
     private $assets;
-    /** @var \Cockpit\App\Assets\FolderRepository */
+    /** @var FolderRepository */
     private $folders;
-    /** @var \Cockpit\App\Assets\Uploader */
+    /** @var Uploader */
     private $uploader;
-    /** @var \Cockpit\Framework\EventSystem */
+    /** @var EventSystem */
     private $eventSystem;
+    /** @var Filesystem  */
+    private $fileSystem;
+    /** @var string */
+    private $assetsAbsolutePath;
 
-    public function __construct(AssetRepository $assets, \Cockpit\App\Assets\FolderRepository $folders, \Cockpit\App\Assets\Uploader $uploader, \Cockpit\Framework\EventSystem $eventSystem)
+    public function __construct(AssetRepository $assets, FolderRepository $folders, Uploader $uploader, EventSystem $eventSystem, Filesystem $fileSystem, string $assetsAbsolutePath)
     {
         $this->assets = $assets;
         $this->folders = $folders;
         $this->uploader = $uploader;
         $this->eventSystem = $eventSystem;
+        $this->fileSystem = $fileSystem;
+        $this->assetsAbsolutePath = dirname($assetsAbsolutePath);
     }
 
     public function index()
@@ -58,9 +71,11 @@ final class Assets
         return new JsonResponse(['assets' => $assets['assets'], 'folders' => $folders, 'total' => $assets['total']]);
     }
 
-    public function asset($id)
+    public function asset(RequestInterface $request, ResponseInterface $response, $id)
     {
-        return $this->assets->byId($id);
+        $asset = $this->assets->byId($id);
+
+        return new JsonResponse($asset);
     }
 
     public function upload(RequestInterface $request)
@@ -83,22 +98,70 @@ final class Assets
 //        return $this->module('cockpit')->uploadAssets('files', $meta);
     }
 
-    public function removeAssets()
+    public function removeAssets(RequestInterface $request)
     {
-        if ($assets = $params['assets'] ?? false) {
-            return $this->module('cockpit')->removeAssets($assets);
+        $params = $request->getParsedBody();
+        $assets = $params['assets'] ?? false;
+        if (!$assets) {
+            return new HttpNotFoundException();
         }
 
-        return false;
+        $assets = isset($assets[0]) ? $assets : [$assets];
+
+        foreach($assets as &$inputAsset) {
+
+            if (!isset($inputAsset['_id'])) {
+                continue;
+            }
+
+            /** @var Asset|null $asset */
+            $asset = $this->assets->byId($inputAsset['_id']);
+
+            if (!$asset) {
+                continue;
+            }
+
+            $this->assets->delete($asset['_id']);
+            $this->fileSystem->delete($this->assetsAbsolutePath.'/'.$asset['path']);
+
+//            if ($this->app->filestorage->has('assets://'.trim($asset['path'], '/'))) {
+//                $this->app->filestorage->delete('assets://'.trim($asset['path'], '/'));
+//            }
+            $asset = null;
+        }
+
+        $this->eventSystem->trigger('cockpit.assets.remove', [$assets]);
+
+        return $assets;
     }
 
-    public function updateAsset()
+    public function updateAsset(RequestInterface $request)
     {
-        if ($asset = $params['asset'] ?? false) {
-            return $this->module('cockpit')->updateAssets($asset);
+        $params = $request->getParsedBody();
+        $asset = $params['asset'] ?? false;
+        if (!$asset) {
+            return new HttpNotFoundException();
         }
 
-        return false;
+        /** @var UserInterface $user */
+        $user = $request->getAttributes()[UserInterface::class];
+        $assets = isset($asset[0]) ? $asset : [$asset];
+
+        foreach ($assets as &$asset) {
+
+            $existingAsset = $this->assets->byId($asset['_id']);
+            if (!$existingAsset) {
+                continue;
+            }
+
+            $asset['modified'] = time();
+            $asset['_by'] = $user->getDetail('id');
+
+            $this->eventSystem->trigger('cockpit.asset.save', [&$asset]);
+//            $this->assets->save($asset);
+        }
+
+        return new JsonResponse($assets);
     }
 
     public function addFolder(RequestInterface $request)
@@ -158,13 +221,11 @@ final class Assets
 
     public function _folders()
     {
-        $_folders = $this->app->storage->find('cockpit/assets_folders', [
-            'sort' => ['name' => 1]
-        ])->toArray();
+        $folders = $this->folders->byConstraint(new Constraint(null, null, ['name' => 1]));
 
-        $folders = $this->parent_sort($_folders);
+        $folders = $this->parent_sort($folders['folders']);
 
-        return $folders;
+        return new JsonResponse($folders);
     }
 
     private function parent_sort(array $objects, array &$result = [], $parent = '', $depth = 0)

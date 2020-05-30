@@ -57,6 +57,11 @@ final class Asset
         return $this->filename;
     }
 
+    public function filenamePath(): string
+    {
+        return $this->folder->path().$this->filename;
+    }
+
     public function title(): string
     {
         return $this->title;
@@ -130,6 +135,7 @@ final class Asset
     public function toArray(): array
     {
         return [
+            '_id' => $this->id,
             'path' => $this->filename,
             'title' => $this->title,
             'mime' => $this->mime(),

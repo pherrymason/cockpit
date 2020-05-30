@@ -56,6 +56,16 @@ return [
     },
 
     // Controllers -----------------------------------------------
+    \Cockpit\App\Controller\Assets::class => function (ContainerInterface $c) {
+        return new \Cockpit\App\Controller\Assets(
+            $c->get(\Cockpit\App\Assets\AssetRepository::class),
+            $c->get(\Cockpit\App\Assets\FolderRepository::class),
+            $c->get(\Cockpit\App\Assets\Uploader::class),
+            $c->get(\Cockpit\Framework\EventSystem::class),
+            $c->get(\League\Flysystem\Filesystem::class),
+            $c->get('paths')['assets']
+        );
+    },
 
     \Cockpit\App\Controller\Utils::class => function (ContainerInterface $c) {
         return new \Cockpit\App\Controller\Utils(

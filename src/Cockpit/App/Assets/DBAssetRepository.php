@@ -25,7 +25,7 @@ final class DBAssetRepository implements AssetRepository
         $this->assetsBasePath = $assetsBasePath;
     }
 
-    public function byId(string $assetID)
+    public function byId(string $assetID): array
     {
         $sql = 'SELECT * FROM '.self::TABLE.' WHERE _id=:id';
         $stmt = $this->db->executeQuery($sql, ['id' => $assetID]);
@@ -112,5 +112,10 @@ final class DBAssetRepository implements AssetRepository
                 'VALUES (' . implode(', ', $placeholders) . ')';
 
         $this->db->executeUpdate($sql, $params, $types);
+    }
+
+    public function delete(string $assetID)
+    {
+        $this->db->executeUpdate('DELETE FROM '.self::TABLE.' WHERE _id=:id LIMIT 1', ['id' => $assetID]);
     }
 }

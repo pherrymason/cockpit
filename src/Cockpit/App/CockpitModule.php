@@ -86,6 +86,10 @@ final class CockpitModule implements Module
             $group->post('/listAssets', Assets::class.':listAssets')->setName('assets_list');
             $group->post('/addFolder', Assets::class.':addFolder')->setName('assets_folder');
             $group->post('/upload', Assets::class.':upload')->setName('assets_upload');
+            $group->post('/asset/{id:[0-9\-a-z]+}', Assets::class.':asset')->setName('assets_asset');
+            $group->post('/updateAsset', Assets::class.':updateAsset')->setName('assets_asset');
+            $group->post('/_folders', Assets::class.':_folders')->setName('assets_folders');
+            $group->post('/removeAssets', Assets::class.':removeAssets')->setName('assets_folders');
         });
 
 
