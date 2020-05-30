@@ -3,17 +3,18 @@
 namespace Cockpit\App\Controller;
 
 use Cockpit\App\Revisions\RevisionsRepository;
+use Psr\Http\Message\RequestInterface;
+use Zend\Diactoros\Response\JsonResponse;
 
-final class Utils extends \Cockpit\AuthController
+final class Utils
 {
     /** @var RevisionsRepository */
     private $revisions;
     /** @var \Cockpit\App\Assets\Thumbnail */
     private $thumbnail;
 
-    public function __construct($app, \Cockpit\App\Revisions\RevisionsRepository $revisions, \Cockpit\App\Assets\Thumbnail $thumbnail)
+    public function __construct(\Cockpit\App\Revisions\RevisionsRepository $revisions, \Cockpit\App\Assets\Thumbnail $thumbnail)
     {
-        parent::__construct($app);
         $this->revisions = $revisions;
         $this->thumbnail = $thumbnail;
     }
@@ -26,7 +27,7 @@ final class Utils extends \Cockpit\AuthController
             'src' => $this->param('src', false),
             'fp' => $this->param('fp', null),
             'mode' => $this->param('m', 'thumbnail'),
-            'filters' => (array) $this->param('f', []),
+            'filters' => (array)$this->param('f', []),
             'width' => intval($this->param('w', null)),
             'height' => intval($this->param('h', null)),
             'quality' => intval($this->param('q', 85)),
@@ -36,28 +37,28 @@ final class Utils extends \Cockpit\AuthController
         ];
 
         // Set single filter when available
-        foreach([
-                    'blur', 'brighten',
-                    'colorize', 'contrast',
-                    'darken', 'desaturate',
-                    'edge detect', 'emboss',
-                    'flip', 'invert', 'opacity', 'pixelate', 'sepia', 'sharpen', 'sketch'
-                ] as $f) {
+        foreach ([
+                     'blur', 'brighten',
+                     'colorize', 'contrast',
+                     'darken', 'desaturate',
+                     'edge detect', 'emboss',
+                     'flip', 'invert', 'opacity', 'pixelate', 'sepia', 'sharpen', 'sketch'
+                 ] as $f) {
             if ($this->param($f)) $options[$f] = $this->param($f);
         }
 
         return $this->thumbnail->thumbnailURL($options);
     }
 
-    public function revisionsCount()
+    public function revisionsCount(RequestInterface $request)
     {
-        \session_write_close();
+        $input = $request->getParsedBody();
 
-        if ($id = $this->param('id')) {
+        $cnt = 0;
+        if ($id = $input['id']) {
             $cnt = $this->revisions->count($id);
-            return (string)$cnt;
         }
 
-        return 0;
+        return new JsonResponse(['count' => $cnt]);
     }
 }

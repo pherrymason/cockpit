@@ -28,7 +28,7 @@
     $publicStorageURL = $cmsConfig['storage_path'];
 */
 ?><!doctype html>
-<html lang="<?= $i18n->locale ?>" data-base="<?= $this->base('/') ?>" data-route="<?= $this->route('/')?>" data-version="{{ $app['cockpit/version'] }}" data-locale="<?= $i18n->locale ?>">
+<html lang="<?= $i18n->locale ?>" data-base="<?= $this->base('/') ?>" data-route="<?= $this->base('/')?>" data-version="{{ $app['cockpit/version'] }}" data-locale="<?= $i18n->locale ?>">
 <head>
     <meta charset="UTF-8">
     <title><?= implode(' &raquo; ', $_title).(count($_title) ? ' - ':'').$appName ?></title>

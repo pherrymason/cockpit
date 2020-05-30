@@ -2,12 +2,16 @@
 
 namespace Cockpit\App;
 
+use Cockpit\App\Controller\Accounts;
 use Cockpit\App\Controller\Base;
+use Cockpit\App\Controller\Utils;
 use Cockpit\App\UI\Menu;
 use Cockpit\Framework\PathResolver;
 use Cockpit\Module;
+use Cockpit\Singleton\Controller\Admin;
 use League\Plates\Engine;
 use Slim\App;
+use Slim\Routing\RouteCollectorProxy;
 
 final class CockpitModule implements Module
 {
@@ -59,6 +63,25 @@ final class CockpitModule implements Module
     public function registerRoutes(App $app)
     {
         $app->get('/', Base::class.':dashboard')->setName('home');
+
+        // Accounts
+        $app->group('/accounts', function (RouteCollectorProxy $group) {
+            $group->map(
+                ['GET'],
+                '',
+                Accounts::class.':index'
+            )->setName('accounts');
+
+            $group->get('/account/{uid:[0-9]+}', Accounts::class.':account')->setName('accounts_account');
+            $group->map(['GET','POST'],'/find', Accounts::class.':find')->setName('accounts_find');
+            $group->get('/create', Accounts::class.':create')->setName('accounts_create');
+            $group->post('/save', Accounts::class.':save')->setName('accounts_save');
+            $group->post('/remove', Accounts::class.':remove')->setName('accounts_remove');
+        });
+
+
+        // Utils
+        $app->post('/cockpit/utils/revisionsCount', Utils::class.':revisionsCount')->setName('utils_revisionsCount');
     }
 
     public function registerPaths(PathResolver $pathResolver, Engine $engine): void

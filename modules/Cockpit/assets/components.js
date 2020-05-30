@@ -1373,14 +1373,13 @@ riot.tag2('cp-revisions-info', '<span> <span class="uk-icon-spinner uk-icon-spin
 
             this.loading = true;
 
-            App.request('/cockpit/utils/revisionsCount', {id:opts.rid}, 'text').then(function(cnt){
-
-                if (!App.Utils.isNumeric(cnt)) {
-                    cnt = 'n/a';
+            App.request('/cockpit/utils/revisionsCount', {id:opts.rid}).then(function(data){
+                if (!App.Utils.isNumeric(data.count)) {
+                    data.count = 'n/a';
                 }
 
                 $this.loading = false;
-                $this.cnt = cnt;
+                $this.cnt = data.count;
                 $this.update();
 
             }).catch(function(e){});

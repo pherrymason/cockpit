@@ -8,10 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Cockpit\Controller;
+namespace Cockpit\App\Controller;
 
-class Accounts extends \Cockpit\AuthController {
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\Response\JsonResponse;
 
+class Accounts
+{
     public function index() {
 
         if (!$this->module('cockpit')->hasaccess('cockpit', 'accounts')) {
@@ -210,13 +214,13 @@ class Accounts extends \Cockpit\AuthController {
         return false;
     }
 
-    public function find() {
-
-        \session_write_close();
-
+    public function find(RequestInterface $request, ResponseInterface $response)
+    {
+//        \session_write_close();
+        $input = $request->getParsedBody();
         $options = array_merge([
             'sort'   => ['user' => 1]
-        ], $this->param('options', []));
+        ], $input['options'] ?? []);
 
         if (isset($options['filter'])) {
 
@@ -237,6 +241,7 @@ class Accounts extends \Cockpit\AuthController {
             }
         }
 
+        /*
         $accounts = $this->app->storage->find('cockpit/accounts', $options)->toArray();
         $count    = (!isset($options['skip']) && !isset($options['limit'])) ? count($accounts) : $this->app->storage->count('cockpit/accounts', isset($options['filter']) ? $options['filter'] : []);
         $pages    = isset($options['limit']) ? ceil($count / $options['limit']) : 1;
@@ -250,8 +255,15 @@ class Accounts extends \Cockpit\AuthController {
             unset($account['password'], $account['api_key'], $account['_reset_token']);
             $this->app->trigger('cockpit.accounts.disguise', [&$account]);
         }
+        */
+        $accounts = [];
+        $count= 0;
+        $pages = 0;
+        $page = 0;
 
-        return compact('accounts', 'count', 'pages', 'page');
+        return new JsonResponse(
+            ['accounts' =>$accounts, 'count' => $count, 'pages' => $pages, 'page' => $page]
+        );
     }
 
     protected function getLanguages() {

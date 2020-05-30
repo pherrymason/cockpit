@@ -58,6 +58,7 @@ function getCockpitApp(array $configuration): App
 
     $middleware = $container->get(\Mezzio\Authentication\AuthenticationMiddleware::class);
     $app->addMiddleware($middleware);
+    $app->addMiddleware(new \Cockpit\Framework\Middlewares\JsonBodyParserMiddleware());
     //$app->addErrorMiddleware(true, true, true);
     $app->addMiddleware(new \Franzl\Middleware\Whoops\WhoopsMiddleware());
 

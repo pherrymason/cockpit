@@ -43,7 +43,6 @@ final class SingletonsModule implements Module
                     '/revisions/{name:[a-z0-9]+}/{id:[a-z0-9]+}',
                     Admin::class.':revisions'
                 )->setName('singleton-revisions');
-
             }
         );
     }

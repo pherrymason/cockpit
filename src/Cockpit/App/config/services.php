@@ -67,7 +67,6 @@ return [
 
     \Cockpit\App\Controller\Utils::class => function (ContainerInterface $c) {
         return new \Cockpit\App\Controller\Utils(
-            $c->get('app'),
             $c->get(\Cockpit\App\Revisions\RevisionsRepository::class),
             $c->get(\Cockpit\App\Assets\Thumbnail::class)
         );
