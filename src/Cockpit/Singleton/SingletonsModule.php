@@ -2,6 +2,8 @@
 
 namespace Cockpit\Singleton;
 
+use Cockpit\App\UI\Menu;
+use Cockpit\App\UI\MenuItem;
 use Cockpit\Framework\PathResolver;
 use Cockpit\Singleton\Controller\Admin;
 use League\Plates\Engine;
@@ -11,6 +13,11 @@ use Cockpit\Module;
 
 final class SingletonsModule implements Module
 {
+    public function registerUI(Menu $menu): void
+    {
+        $menu->addMenuItem(new MenuItem('Singletons', 'assets:singletons/icon.svg', 'singletons', false));
+    }
+
     public function registerRoutes(App $app)
     {
         $app->group(

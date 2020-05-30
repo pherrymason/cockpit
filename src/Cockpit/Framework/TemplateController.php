@@ -2,6 +2,7 @@
 
 namespace Cockpit\Framework;
 
+use Cockpit\App\UI\Menu;
 use League\Plates\Engine;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -47,7 +48,9 @@ abstract class TemplateController
             // not implemented
             'extract' => [],
             'components' => new \ArrayObject([]),    // vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:79
-            'menuModules' => new \ArrayObject([]), // vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:84
+
+            'menuModules' => $this->container->get(Menu::class)->items(), // {menu.modules} vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:84
+            'modules' => $this->container->get('modules')
         ];
 
         return $data;

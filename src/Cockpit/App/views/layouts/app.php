@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @var \Cockpit\App\UI\MenuItem[] $menuModules
+ */
     // Generate title
    $_title = [];
     foreach (explode('/', $route) as $part) {
@@ -29,7 +31,7 @@
     <meta charset="UTF-8">
     <title><?= implode(' &raquo; ', $_title).(count($_title) ? ' - ':'').$appName ?></title>
     <link rel="icon" href="<?= $this->base('/favicon.png') ?>" type="image/png">
-    {{ $app->helper('admin')->favicon('red') }}
+    <?php /*{{ $app->helper('admin')->favicon('red') }}*/ ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <script>
@@ -76,24 +78,24 @@
 
                             <div class="uk-dropdown app-panel-dropdown uk-dropdown-close">
 
-                                <?php if($menuModules->count()): ?>
+                                <?php if(count($menuModules)): ?>
                                 <div class="uk-visible-small">
                                     <span class="uk-text-upper uk-text-small uk-text-bold"><?= $this->lang('Modules') ?></span>
                                 </div>
 
                                 <ul class="uk-grid uk-grid-match uk-grid-small uk-text-center uk-visible-small uk-margin-bottom">
 
-                                    <?php foreach($modules ?? [] as $item): ?>
+                                    <?php foreach($menuModules ?? [] as $item): ?>
                                     <li class="uk-width-1-2 uk-width-medium-1-3 uk-grid-margin" data-route="{{ $item['route'] }}">
-                                        <a class="uk-display-block uk-panel-box uk-panel-card-hover uk-panel-space {{ (@$item['active']) ? 'uk-bg-primary uk-contrast':'' }}" href="<?= $this->route($item['route'])?>">
+                                        <a class="uk-display-block uk-panel-box uk-panel-card-hover uk-panel-space {{ (@$item['active']) ? 'uk-bg-primary uk-contrast':'' }}" href="<?= $this->route($item->routeName())?>">
                                             <div class="uk-svg-adjust">
-                                                <?php if(preg_match('/\.svg$/i', $item['icon'])): ?>
-                                                <img src="@url($item['icon'])" alt="<?= $this->lang($item['label']) ?>" data-uk-svg width="40" height="40" />
+                                                <?php if(preg_match('/\.svg$/i', $item->iconPath())): ?>
+                                                <img src="<?= $this->base($item->iconPath())?>" alt="<?= $this->lang($item->label()) ?>" data-uk-svg width="40" height="40" />
                                                 <?php else: ?>
-                                                <img src="@url('assets:app/media/icons/module.svg')" alt="<?= $this->lang($item['label']) ?>" data-uk-svg width="40" height="40" />
+                                                <img src="<?= $this->base('assets:app/media/icons/module.svg')?>" alt="<?= $this->lang($item->label()) ?>" data-uk-svg width="40" height="40" />
                                                 <?php endif; ?>
                                             </div>
-                                            <div class="uk-text-truncate uk-text-small uk-margin-small-top"><?= $this->lang($item['label']) ?></div>
+                                            <div class="uk-text-truncate uk-text-small uk-margin-small-top"><?= $this->lang($item->label()) ?></div>
                                         </a>
                                     </li>
                                     <?php endforeach; ?>
@@ -177,20 +179,20 @@
                         <cp-search></cp-search>
                     </div>
 
-                    <?php if($menuModules->count()): ?>
+                    <?php if(count($menuModules)): ?>
                     <div class="uk-hidden-small">
                         <ul class="uk-subnav app-modulesbar">
-                            <?php foreach($modules as $item): ?>
+                            <?php foreach($menuModules as $item): ?>
                             <li>
-                                <a class="uk-svg-adjust {{ (@$item['active']) ? 'uk-active':'' }}" href="<?= $this->route($item['route'])?>" title="<?= $this->lang($item['label']) ?>" aria-label="<?= $this->lang($item['label']) ?>" data-uk-tooltip="offset:10">
-                                    <?php if(preg_match('/\.svg$/i', $item['icon'])): ?>
-                                    <img src="@url($item['icon'])" alt="<?= $this->lang($item['label']) ?>" data-uk-svg width="20px" height="20px" />
+                                <a class="uk-svg-adjust {{ (@$item['active']) ? 'uk-active':'' }}" href="<?= $this->route($item->routeName())?>" title="<?= $this->lang($item->label()) ?>" aria-label="<?= $this->lang($item->label()) ?>" data-uk-tooltip="offset:10">
+                                    <?php if(preg_match('/\.svg$/i', $item->iconPath())): ?>
+                                    <img src="<?= $this->base($item->iconPath())?>" alt="<?= $this->lang($item->label()) ?>" data-uk-svg width="20px" height="20px" />
                                     <?php else: ?>
-                                    <img src="@url('assets:app/media/icons/module.svg')" alt="<?= $this->lang($item['label']) ?>" data-uk-svg width="20px" height="20px" />
+                                    <img src="<?= $this->base('assets:app/media/icons/module.svg')?>" alt="<?= $this->lang($item->label()) ?>" data-uk-svg width="20px" height="20px" />
                                     <?php endif; ?>
 
-                                    <?php if($item['active']): ?>
-                                    <span class="uk-text-small uk-margin-small-left uk-text-bolder"><?= $this->lang($item['label']) ?></span>
+                                    <?php if($item->active()): ?>
+                                    <span class="uk-text-small uk-margin-small-left uk-text-bolder"><?= $this->lang($item->label()) ?></span>
                                     <?php endif; ?>
                                 </a>
                             </li>

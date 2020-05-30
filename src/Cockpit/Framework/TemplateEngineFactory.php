@@ -4,6 +4,7 @@ namespace Cockpit\Framework;
 
 use League\Plates\Engine;
 use Psr\Container\ContainerInterface;
+use Slim\Interfaces\RouteCollectorInterface;
 
 class TemplateEngineFactory
 {
@@ -23,6 +24,7 @@ class TemplateEngineFactory
     {
         $engine->registerFunction('route', function (?string $routeName, array $data = [], array $queryParams = []) use ($c) {
             $routeParser = $c->get('router');
+//            $routeParser = $c->get(RouteCollectorInterface::class);
 
             try {
                 return $routeParser->urlFor($routeName ?? '', $data, $queryParams);
