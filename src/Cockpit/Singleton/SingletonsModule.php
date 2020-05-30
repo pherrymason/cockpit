@@ -49,7 +49,7 @@ final class SingletonsModule implements Module
             '/singletons',
             function (RouteCollectorProxy $group) {
                 $group->map(['GET'], '', Admin::class . ':index')->setName('singletons');
-
+                $group->get('/singleton', Admin::class.':singleton')->setName('singletons-singleton');
                 $group->get('/form/{name:[a-z0-9]+}', Admin::class . ':form')->setName('singleton');
 
                 $group->get('/{name:[a-z0-9]+}', Admin::class . ':singleton')->setName('singleton-structure');

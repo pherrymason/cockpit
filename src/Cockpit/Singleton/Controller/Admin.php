@@ -32,7 +32,7 @@ final class Admin extends TemplateController
         parent::__construct($engine, $container);
     }
 
-    public function index()
+    public function index(RequestInterface $request, ResponseInterface $response)
     {
         $userGroup = 'admin';
         $singletons = $this->singletons->byGroup($userGroup);
@@ -57,7 +57,7 @@ final class Admin extends TemplateController
             return mb_strtolower($a['label']) <=> mb_strtolower($b['label']);
         });
 */
-        return $this->render('singletons:views/index.php', ['singletons' => $arraySingletons]);
+        return $this->renderResponse($request, $response, 'singletons::views/index', ['singletons' => $arraySingletons]);
     }
 
     public function form(RequestInterface $request, ResponseInterface $response, $name = null)
