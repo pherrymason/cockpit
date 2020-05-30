@@ -3,11 +3,10 @@
 namespace Cockpit\App\Controller;
 
 use Cockpit\App\Assets\AssetRepository;
+use Cockpit\App\Assets\Folder;
 use Cockpit\Framework\Database\Constraint;
-use Lime\App;
 use Psr\Http\Message\RequestInterface;
 use Zend\Diactoros\Response\JsonResponse;
-use function Cockpit\Controller\parent_sort;
 
 final class Assets
 {
@@ -94,21 +93,23 @@ final class Assets
         return false;
     }
 
-    public function addFolder()
+    public function addFolder(RequestInterface $request)
     {
+        $params = $request->getParsedBody();
         $name = $params['name'] ?? null;
         $parent = $params['parent'] ?? '';
 
-        if (!$name) return;
+        if (!$name) {
+            return;
+        }
 
-        $folder = [
-            'name' => $name,
-            '_p' => $parent
-        ];
+        $parentFolder = $this->folders->byID($parent);
+        $folder = Folder::create($name, $parentFolder);
 
-        $this->app->storage->save('cockpit/assets_folders', $folder);
+        $this->folders->save($folder);
+//        $this->app->storage->save('cockpit/assets_folders', $folder);
 
-        return $folder;
+        return new JsonResponse($folder->toArray());
     }
 
     public function renameFolder()

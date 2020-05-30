@@ -380,7 +380,7 @@ riot.tag2('cp-assets', '<div ref="list" show="{mode==\'list\'}"> <div ref="uploa
 
         this.addFolder = function() {
 
-            App.ui.prompt(App.i18n.get('Folder Name:'), '', function(name) {
+            App.ui.prompt(App.i18n.get('Folder Name:'), '', function() {
 
                 if (!name.trim()) return;
 
@@ -1374,6 +1374,7 @@ riot.tag2('cp-revisions-info', '<span> <span class="uk-icon-spinner uk-icon-spin
             this.loading = true;
 
             App.request('/cockpit/utils/revisionsCount', {id:opts.rid}).then(function(data){
+              console.log(data);
                 if (!App.Utils.isNumeric(data.count)) {
                     data.count = 'n/a';
                 }

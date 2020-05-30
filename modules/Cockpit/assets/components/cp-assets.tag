@@ -528,7 +528,7 @@
 
         addFolder() {
 
-            App.ui.prompt(App.i18n.get('Folder Name:'), '', function(name) {
+            App.ui.prompt(App.i18n.get('Folder Name:'), '', function() {
 
                 if (!name.trim()) return;
 

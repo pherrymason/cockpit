@@ -6,7 +6,10 @@ use Cockpit\Framework\Database\Constraint;
 
 interface FolderRepository
 {
+    public function byID(string $parent): ?Folder;
+
     public function children(Constraint $constraint, ?string $parentFolderID);
 
     public function save(Folder $folder): void;
+
 }

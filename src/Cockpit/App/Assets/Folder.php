@@ -2,6 +2,8 @@
 
 namespace Cockpit\App\Assets;
 
+use Cockpit\Framework\IDs;
+
 final class Folder
 {
     /** @var string */
@@ -12,6 +14,11 @@ final class Folder
     private $parentFolder;
     /** @var Folder[] */
     private $childrenFolders;
+
+    public static function create(string $name, ?Folder $parentFolder)
+    {
+        return new self(IDs::new(), $name, $parentFolder);
+    }
 
     public function __construct(string $id, string $name, ?Folder $parentFolder = null)
     {
@@ -62,5 +69,14 @@ final class Folder
         $path[] = $this->name();
 
         return '/' . ltrim(implode('/', $path), '/');
+    }
+
+    public function toArray()
+    {
+        return [
+            '_id' => $this->id,
+            'name' => $this->name,
+            'path' => $this->path()
+        ];
     }
 }

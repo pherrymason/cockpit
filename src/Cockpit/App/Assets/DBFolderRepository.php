@@ -20,6 +20,27 @@ final class DBFolderRepository implements FolderRepository
         $this->db = $db;
     }
 
+    public function byID(string $folderID): ?Folder
+    {
+        $result = $this->db->executeQuery('SELECT * FROM '.self::TABLE.' WHERE _id=:id', ['id' => $folderID])->fetch();
+
+        if (!$result) {
+            return null;
+        }
+
+        return $this->createFolderFromDatabaseResult($result);
+    }
+
+    public function createFolderFromDatabaseResult(array $dbResult): Folder
+    {
+        $parentFolder = null;
+        if ($dbResult['_p']) {
+            $parentFolder = $this->byID($dbResult['_p']);
+        }
+
+        return new Folder($dbResult['_id'], $dbResult['name'], $parentFolder);
+    }
+
     public function children(Constraint $constraint, ?string $parentID = null)
     {
         $sql = 'SELECT * FROM '.self::TABLE . ' ';
