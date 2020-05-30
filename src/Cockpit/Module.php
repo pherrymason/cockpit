@@ -9,7 +9,7 @@ use Slim\App;
 
 interface Module
 {
-    public function registerUI(Menu $menu): void;
+    public function registerUI(Menu $menu, \Cockpit\Framework\Template\PageAssets $assets): void;
     public function registerRoutes(App $app);
 
     public function registerPaths(PathResolver $pathResolver, Engine $engine): void;

@@ -33,7 +33,7 @@
 
             <div class="uk-h3 uk-flex uk-flex-middle uk-text-bold">
                 <div class="uk-margin-small-right">
-                    <img src="@url($singleton['icon'] ? 'assets:app/media/icons/'.$singleton['icon']:'singletons:icon.svg')" width="40" alt="icon">
+                    <img src="<?php $this->base($singleton['icon'] ? 'assets:app/media/icons/'.$singleton['icon']:'singletons:icon.svg') ?>" width="40" alt="icon">
                 </div>
                 <div class="uk-flex-item-1">{ singleton.label || singleton.name }</div>
                 <?php if($this->isSuperAdmin()): ?>
@@ -71,7 +71,7 @@
 
         <?php if($singleton['description']): ?>
         <div class="uk-margin uk-text-muted">
-            {{ htmlspecialchars($singleton['description']) }}
+            <?= $this->e($singleton['description']) ?>
         </div>
         <?php endif ?>
 
@@ -86,7 +86,6 @@
                         <div class="uk-width-medium-{field.width}" each="{field,idx in fields}" show="{checkVisibilityRule(field) && (!group || (group == field.group)) }" if="{ hasFieldAccess(field.name) }" no-reorder>
 
                             <cp-fieldcontainer>
-
                                 <label title="{ field.name }">
 
                                     <span class="uk-text-bold"><i class="uk-icon-pencil-square uk-margin-small-right"></i> { field.label || App.Utils.ucfirst(field.name) }</span>

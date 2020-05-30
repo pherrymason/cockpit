@@ -34,12 +34,16 @@ function getCockpitApp(array $configuration): App
 
     $modules = [
         new \Cockpit\App\CockpitModule(),
+        new \Cockpit\Collections\CollectionsModule(),
         new SingletonsModule()
     ];
     $container->set('modules', $modules);
 
     foreach ($modules as $module) {
-        $module->registerUI($container->get(\Cockpit\App\UI\Menu::class));
+        $module->registerUI(
+            $container->get(\Cockpit\App\UI\Menu::class),
+            $container->get(\Cockpit\Framework\Template\PageAssets::class)
+        );
 
         $module->registerPaths(
             $container->get(\Cockpit\Framework\PathResolver::class),

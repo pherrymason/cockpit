@@ -13,7 +13,7 @@ use Cockpit\Module;
 
 final class SingletonsModule implements Module
 {
-    public function registerUI(Menu $menu): void
+    public function registerUI(Menu $menu, \Cockpit\Framework\Template\PageAssets $assets): void
     {
         $menu->addMenuItem(new MenuItem('Singletons', 'assets:singletons/icon.svg', 'singletons', false));
     }

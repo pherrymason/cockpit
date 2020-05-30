@@ -3,7 +3,9 @@
 namespace Cockpit\Framework;
 
 use Cockpit\App\UI\Menu;
+use Cockpit\Framework\Template\PageAssets;
 use League\Plates\Engine;
+use Mezzio\Authentication\UserInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -42,60 +44,52 @@ abstract class TemplateController
             'appName' => $this->container->get('app.name'),
             'i18n' => $this->container->get('i18n'),
             'route' => $request->getAttributes()['__routingResults__']->getUri(),
-            'scripts' => $this->scripts(),
-            'styles' => $this->styles(),
 
             // not implemented
-            'extract' => [],
+            'extract' => $this->sharedData($request),
             'components' => new \ArrayObject([]),    // vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:79
-
-            'menuModules' => $this->container->get(Menu::class)->items(), // {menu.modules} vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:84
-            'modules' => $this->container->get('modules')
+            'pageAssets' => $this->container->get(PageAssets::class),
+            'menuModules' => $this->container->get(Menu::class)->items(
+            ), // {menu.modules} vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:84
+            'modules' => $this->container->get('modules'),
+            'user' => $request->getAttributes()[UserInterface::class]
         ];
 
         return $data;
     }
 
-    private function scripts(): array {
-        return [
-            // polyfills
-            'assets:polyfills/dom4.js',
-            'assets:polyfills/document-register-element.js',
-            'assets:polyfills/URLSearchParams.js',
-
-            // libs
-            'assets:lib/moment.js',
-            'assets:lib/jquery.js',
-            'assets:lib/lodash.js',
-            'assets:lib/riot/riot.js',
-            'assets:lib/riot/riot.bind.js',
-            'assets:lib/riot/riot.view.js',
-            'assets:lib/uikit/js/uikit.min.js',
-            'assets:lib/uikit/js/components/notify.min.js',
-            'assets:lib/uikit/js/components/tooltip.min.js',
-            'assets:lib/uikit/js/components/lightbox.min.js',
-            'assets:lib/uikit/js/components/sortable.min.js',
-            'assets:lib/uikit/js/components/sticky.min.js',
-            'assets:lib/mousetrap.js',
-            'assets:lib/storage.js',
-            'assets:lib/i18n.js',
-
-            // app
-            'assets:app/js/app.js',
-            'assets:app/js/app.utils.js',
-            'assets:app/js/codemirror.js',
-            'assets:app/components/cp-actionbar.js',
-            'assets:app/components/cp-fieldcontainer.js',
-            'assets:cockpit/components.js',
-            'assets:cockpit/cockpit.js',
-        ];
-    }
-
-    private function styles(): array
+    private function sharedData(RequestInterface $request)
     {
-        return [
+        $languages = $this->container->get('languages');
+        $defaultLanguage = $this->container->get('defaultLanguage');
+        /** @var UserInterface $user */
+        $user = $request->getAttributes()[UserInterface::class];
 
-            'assets:app/css/style.css',
+        $sharedData = [
+            'acl' => ['finder' => true],
+            'appLanguages' => [],
+            'defaultLanguage' => $defaultLanguage,
+            'languageDefaultLabel' => $languages[$defaultLanguage],
+            'groups' => ['admin' => true],
+            'locale' => 'en',
+            'site_url' => '/admin/',
+            'user' => [
+                'active' => '1',
+                'data' => [],
+                'email' => '',
+                'group' => 'admin',
+                'i18n' => 'en',
+                'name' => $user->getIdentity(),
+                'user' => $user->getIdentity()
+            ]
         ];
+
+        foreach ($languages as $code => $languageName) {
+            $sharedData['appLanguages'][] = ['code' => $code, 'label' => $languageName];
+            $sharedData['languages'][] = ['code' => $code, 'label' => $languageName];
+        }
+
+
+        return $sharedData;
     }
 }

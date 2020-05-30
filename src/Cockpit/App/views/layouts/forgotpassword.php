@@ -46,7 +46,7 @@
                         <img src="@url('assets:app/media/icons/password-reset.svg')" width="80" height="80" alt="" />
                     </p>
 
-                    <h2 class="uk-text-bold uk-text-truncate"><span>{{ $app['app.name'] }}</span></h2>
+                    <h2 class="uk-text-bold uk-text-truncate"><span><?= $appName ?></span></h2>
 
                     <p class="uk-text-bold">@lang('Password Recovery')</p>
 

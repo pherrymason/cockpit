@@ -62,7 +62,7 @@
 
                     <div class="uk-margin login-image"></div>
 
-                    <h2 class="uk-text-bold uk-text-truncate"><span>{{ $app['app.name'] }}</span></h2>
+                    <h2 class="uk-text-bold uk-text-truncate"><span><?= $appName ?></span></h2>
 
                     <div class="uk-animation-shake uk-margin-top" if="{ error }">
                         <span class="uk-badge uk-badge-outline uk-text-danger">{ error }</span>

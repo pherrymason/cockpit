@@ -1,6 +1,8 @@
 <?php
 /**
  * @var \Cockpit\App\UI\MenuItem[] $menuModules
+ * @var \Cockpit\Framework\Template\PageAssets $pageAssets
+ * @var \Mezzio\Authentication\UserInterface $user
  */
     // Generate title
    $_title = [];
@@ -40,10 +42,10 @@
         var ASSETS_URL = '/';
         var PUBLIC_STORAGE_URL = '{{ $publicStorageURL }}';
     </script>
-    <?php foreach ($scripts as $script): ?>
+    <?php foreach ($pageAssets->assets('scripts') as $script): ?>
         <script src="<?= $this->base($script)?>"></script>
     <?php endforeach; ?>
-    <?php foreach ($styles as $style): ?>
+    <?php foreach ($pageAssets->assets('styles') as $style): ?>
         <link href="<?= $this->base($style) ?>" type="text/css" rel="stylesheet"/>
     <?php endforeach; ?>
     <script src="<?= $this->route('/cockpit.i18n.data')?>"></script>
@@ -206,7 +208,7 @@
                         <div data-uk-dropdown="mode:'click'">
 
                             <a class="uk-display-block" href="<?= $this->route('/accounts/account')?>" style="width:30px;height:30px;" aria-label="<?= $this->lang('Edit account') ?>" riot-mount>
-                                <cp-gravatar email="{{ $app['user/email'] }}" size="30" alt="{{ $app["user/name"] ?? $app["user/user"] }}"></cp-gravatar>
+                                <cp-gravatar email="<?= $user->getDetail('email', 'admin@admin.com') ?>" size="30" alt="<?= $user->getIdentity() ?>"></cp-gravatar>
                             </a>
 
                             <div class="uk-dropdown uk-dropdown-navbar uk-dropdown-flip">
@@ -241,7 +243,7 @@
     <?php /*@block('app.layout.footer')*/ ?>
 
     <!-- RIOT COMPONENTS -->
-    <?php foreach($components as $component): ?>
+    <?php foreach($pageAssets->assets('components') as $component): ?>
     <script type="riot/tag" src="<?= $this->base($component) ?>?nc={{ $app['debug'] ? time() : $app['cockpit/version'] }}"></script>
     <?php endforeach; ?>
 

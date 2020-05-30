@@ -542,7 +542,11 @@
 
       if (expr.slice(0, 11) !== 'try{return ') { expr = 'return ' + expr; }
 
-      return new Function('E', expr + ';')    // eslint-disable-line no-new-func
+      try {
+        return new Function('E', expr + ';')    // eslint-disable-line no-new-func
+      } catch (Error) {
+        debugger;
+      }
     }
 
     var RE_DQUOTE = /\u2057/g;

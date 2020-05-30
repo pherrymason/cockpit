@@ -13,7 +13,7 @@
             </div>
 
             <div class="uk-form-row uk-text-center uk-h2 uk-text-bold">
-                {{ $app['app.name'] }}
+               <?= $appName ?>
             </div>
 
             <div class="uk-form-row uk-margin-large-top">
