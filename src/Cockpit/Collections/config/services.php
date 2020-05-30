@@ -36,7 +36,7 @@ return [
     },
 
     // Repositories
-    \Cockpit\Collections\DBCollectionRepository::class => function (ContainerInterface $c) {
+    \Cockpit\Collections\CollectionRepository::class => function (ContainerInterface $c) {
         return new \Cockpit\Collections\DBCollectionRepository(
             $c->get('dbal.mysql'),
             $c->get(\Cockpit\Collections\MySQLCollectionTableManager::class)

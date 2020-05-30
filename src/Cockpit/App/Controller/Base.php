@@ -53,8 +53,8 @@ class Base extends TemplateController
             $name = $widget['name'];
             $area = isset($widget['area']) && in_array($widget['area'], ['main', 'aside-left', 'aside-right']) ? $widget['area'] : 'main';
 
-            $area = \Lime\fetch_from_array($settings, "{$name}/area", $area);
-            $prio = \Lime\fetch_from_array($settings, "{$name}/prio", 0);
+            $area = $settings[$name]['area'] ?? $area;
+            $prio = $settings[$name]['prio'] ?? 0;
 
             $areas[$area]->insert($widget, -1 * $prio);
         }

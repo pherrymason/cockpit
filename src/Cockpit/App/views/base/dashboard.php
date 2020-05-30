@@ -5,7 +5,6 @@
 
 use Cockpit\App\UI\MenuItem;
 
-echo "HOla";
 ?>
 <div class="dashboard-header-panel uk-container-breakout">
 

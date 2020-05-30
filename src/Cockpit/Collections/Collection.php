@@ -61,6 +61,11 @@ final class Collection
         return $this->name;
     }
 
+    public function label(): string
+    {
+        return $this->label;
+    }
+
     public function color(): string
     {
         return $this->color;

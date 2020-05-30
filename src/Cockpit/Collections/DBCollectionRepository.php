@@ -61,6 +61,8 @@ final class DBCollectionRepository implements CollectionRepository
         $_collections = $this->all();
         $collections = [];
 
+        return $_collections;
+        // @todo
         if ($this->app->module('cockpit')->isSuperAdmin()) {
             return $_collections;
         }

@@ -34,20 +34,21 @@ function getCockpitApp(array $configuration): App
 
     $modules = [
         new \Cockpit\App\CockpitModule(),
-        new \Cockpit\Collections\CollectionsModule(),
-        new SingletonsModule()
+        $container->get(\Cockpit\Collections\CollectionsModule::class),
+        $container->get(SingletonsModule::class)
     ];
     $container->set('modules', $modules);
 
     foreach ($modules as $module) {
-        $module->registerUI(
-            $container->get(\Cockpit\App\UI\Menu::class),
-            $container->get(\Cockpit\Framework\Template\PageAssets::class)
-        );
-
         $module->registerPaths(
             $container->get(\Cockpit\Framework\PathResolver::class),
             $container->get(\League\Plates\Engine::class)
+        );
+
+        $module->registerUI(
+            $container->get(\Cockpit\App\UI\Menu::class),
+            $container->get(\Cockpit\Framework\Template\PageAssets::class),
+            $container->get(\Cockpit\Framework\EventSystem::class)
         );
 
         // Define routes

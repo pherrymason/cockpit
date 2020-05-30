@@ -4,28 +4,63 @@ namespace Cockpit\Collections;
 
 use Cockpit\App\UI\Menu;
 use Cockpit\App\UI\MenuItem;
+use Cockpit\Collections\Controller\Admin;
+use Cockpit\Framework\EventSystem;
 use Cockpit\Framework\PathResolver;
+use Cockpit\Framework\Template\PageAssets;
 use Cockpit\Module;
+use Cockpit\Singleton\SingletonRepository;
 use League\Plates\Engine;
 use Slim\App;
+use Slim\Routing\RouteCollectorProxy;
 
 final class CollectionsModule implements Module
 {
-    public function registerUI(Menu $menu, \Cockpit\Framework\Template\PageAssets $assets): void
+    /** @var CollectionRepository */
+    private $collections;
+    /** @var Engine */
+    private $engine;
+
+    public function __construct(CollectionRepository $collections, Engine $engine)
     {
-        $menu->addMenuItem(new MenuItem('\'Collections\'', 'assets:collections/icon.svg', 'collections', false));
+        $this->collections = $collections;
+        $this->engine = $engine;
+    }
+
+    public function registerUI(Menu $menu, PageAssets $assets, EventSystem $eventSystem): void
+    {
+        $menu->addMenuItem(new MenuItem('Collections', 'assets:collections/icon.svg', 'collections', false));
 
         $assets->addAsset('components', 'assets:collections/field-collectionlink.tag');
         $assets->addAsset('scripts', 'assets:collections/link-collectionitem.js');
+
+
+        $eventSystem->on("admin.dashboard.widgets", [$this, 'installDashboardWidgets'], 100);
+    }
+
+    public function installDashboardWidgets($widgets)
+    {
+            $collections = $this->collections->byGroup(null, false);
+
+            $widgets[] = [
+                "name"    => "collections",
+                "content" => $this->engine->render("collections::views/widgets/dashboard", compact('collections')),
+                "area"    => 'aside-left'
+            ];
     }
 
     public function registerRoutes(App $app)
     {
-        // TODO: Implement registerRoutes() method.
+        $app->group(
+          '/collections',
+          function (RouteCollectorProxy $group) {
+            $group->get('/entries/{name:[0-9a-z\-]+}', Admin::class.':entries')->setName('collections_entry');
+          }
+        );
     }
 
     public function registerPaths(PathResolver $pathResolver, Engine $engine): void
     {
-        // TODO: Implement registerPaths() method.
+        $this->engine->addFolder('collections', __DIR__);
     }
 }

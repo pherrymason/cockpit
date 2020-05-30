@@ -9,14 +9,13 @@ use Cockpit\App\Controller\Utils;
 use Cockpit\App\UI\Menu;
 use Cockpit\Framework\PathResolver;
 use Cockpit\Module;
-use Cockpit\Singleton\Controller\Admin;
 use League\Plates\Engine;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 final class CockpitModule implements Module
 {
-    public function registerUI(Menu $menu, \Cockpit\Framework\Template\PageAssets $assets): void
+    public function registerUI(Menu $menu, \Cockpit\Framework\Template\PageAssets $assets, \Cockpit\Framework\EventSystem $eventSystem): void
     {
         $assets->addAssets('scripts', [
             // polyfills
