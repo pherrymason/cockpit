@@ -23,26 +23,14 @@ final class SingletonsModule implements Module
         $app->group(
             '/singletons',
             function (RouteCollectorProxy $group) {
-                $group->map(
-                    ['GET'],
-                    '',
-                    Admin::class.':index'
-                )->setName('singletons');
+                $group->map(['GET'], '', Admin::class.':index')->setName('singletons');
 
-                $group->get(
-                    '/form/{name:[a-z0-9]+}',
-                    Admin::class.':form'
-                )->setName('singleton');
+                $group->get('/form/{name:[a-z0-9]+}', Admin::class.':form')->setName('singleton');
 
-                $group->get(
-                    '/{name:[a-z0-9]+}',
-                    Admin::class.':singleton'
-                )->setName('singleton-structure');
+                $group->get('/{name:[a-z0-9]+}', Admin::class.':singleton')->setName('singleton-structure');
 
-                $group->get(
-                    '/revisions/{name:[a-z0-9]+}/{id:[a-z0-9]+}',
-                    Admin::class.':revisions'
-                )->setName('singleton-revisions');
+                $group->get('/revisions/{name:[a-z0-9]+}/{id:[a-z0-9]+}', Admin::class.':revisions')->setName('singleton-revisions');
+                $group->post('/update_data/{name:[a-z0-9]+}', Admin::class.':update_data')->setName('singleton-update_data');
             }
         );
     }

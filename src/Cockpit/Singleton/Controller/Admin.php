@@ -8,8 +8,12 @@ use Cockpit\Singleton\Singleton;
 use Cockpit\Singleton\SingletonRepository;
 use Cockpit\Framework\IDs;
 use League\Plates\Engine;
+use Mezzio\Authentication\UserInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Exception\HttpNotFoundException;
+use Zend\Diactoros\Response\JsonResponse;
 
 final class Admin extends TemplateController
 {
@@ -17,12 +21,15 @@ final class Admin extends TemplateController
     private $singletons;
     /** @var Revisions */
     private $revisions;
+    /** @var \Cockpit\Framework\EventSystem */
+    private $eventSystem;
 
-    public function __construct(SingletonRepository $singletons, Revisions $revisions, Engine $engine, \Psr\Container\ContainerInterface $container)
+    public function __construct(SingletonRepository $singletons, Revisions $revisions, Engine $engine, \Cockpit\Framework\EventSystem $eventSystem, ContainerInterface $container)
     {
         $this->singletons = $singletons;
         $this->revisions = $revisions;
-        parent::__construct($engine,$container);
+        $this->eventSystem = $eventSystem;
+        parent::__construct($engine, $container);
     }
 
     public function index()
@@ -166,29 +173,35 @@ final class Admin extends TemplateController
         }
 
         // @todo Singletons can't be modified
-        $this->app->trigger('singleton.save.before', [$singleton->toArray()]);
-        $this->app->trigger("singleton.save.before.{$name}", [$singleton->toArray()]);
+        $this->eventSystem->trigger('singleton.save.before', [$singleton->toArray()]);
+        $this->eventSystem->trigger("singleton.save.before.{$name}", [$singleton->toArray()]);
 
         // Save singleton definition
         $this->singletons->save($singleton);
 
         // @todo Singletons can't be modified
-        $this->app->trigger('singleton.save.after', [$singleton]);
-        $this->app->trigger("singleton.save.after.{$name}", [$singleton]);
+        $this->eventSystem->trigger('singleton.save.after', [$singleton]);
+        $this->eventSystem->trigger("singleton.save.after.{$name}", [$singleton]);
 
         //return isset($data['_id']) ? $this->updateSingleton($name, $data) : $this->createSingleton($name, $data);
 
         return json_encode(['result' => $singleton->toArray()]);
     }
 
-    public function update_data($singleton)
+    public function update_data(RequestInterface $request, ResponseInterface $response, $name)
     {
-        $singleton = $this->singletons->byName($singleton);
-        $data = $this->param('data');
+        $singleton = $this->singletons->byName($name);
+
+        $params = $request->getParsedBody();
+
+        $data = $params['data'] ?? null;
 
         if (!$singleton || !$data) {
-            return false;
+            throw new HttpNotFoundException();
         }
+
+        /** @var UserInterface $user */
+        $user = $request->getAttributes()[UserInterface::class];
 
         /*
         if (!$this->module('singletons')->hasaccess($singleton->name(), 'form')) {
@@ -201,7 +214,7 @@ final class Admin extends TemplateController
                     $this->stop(['error' => "Saving failed! Singleton is locked!"], 412);
                 }
         */
-        $data['_mby'] = $this->module('cockpit')->getUser('_id');
+        $data['_mby'] = $user->getDetail('id');
 
         if (isset($data['_by'])) {
             $data['_by'] = $data['_mby'];
@@ -213,15 +226,15 @@ final class Admin extends TemplateController
         }
 
         // @todo Events can't modify singleton
-        $this->app->trigger('singleton.saveData.before', [$singleton->toArray(), &$data]);
-        $this->app->trigger("singleton.saveData.before.{$singleton->name()}", [$singleton->toArray(), &$data]);
+        $this->eventSystem->trigger('singleton.saveData.before', [$singleton->toArray(), &$data]);
+        $this->eventSystem->trigger("singleton.saveData.before.{$singleton->name()}", [$singleton->toArray(), &$data]);
 
         unset($data['_d']);
         $this->singletons->saveData($singleton->name(), $data);
 
         // @todo Events can't modify singleton
-        $this->app->trigger('singleton.saveData.after', [$singleton->toArray(), $data]);
-        $this->app->trigger("singleton.saveData.after.{$singleton->name()}", [$singleton->toArray(), $data]);
+        $this->eventSystem->trigger('singleton.saveData.after', [$singleton->toArray(), $data]);
+        $this->eventSystem->trigger("singleton.saveData.after.{$singleton->name()}", [$singleton->toArray(), $data]);
 
         if ($revision) {
             $this->revisions->add($singleton, $data['_by'], 'singletons/' . $singleton->name());
@@ -229,6 +242,6 @@ final class Admin extends TemplateController
 
         //      $this->app->helper('admin')->lockResourceId($lockId);
 
-        return ['data' => $data];
+        return new JsonResponse(['data' => $data]);
     }
 }
