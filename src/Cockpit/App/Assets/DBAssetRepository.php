@@ -16,10 +16,13 @@ final class DBAssetRepository implements AssetRepository
     private $db;
 
     const TABLE = 'cockpit_assets';
+    /** @var string */
+    private $assetsBasePath;
 
-    public function __construct(Connection $db)
+    public function __construct(Connection $db, string $assetsBasePath)
     {
         $this->db = $db;
+        $this->assetsBasePath = $assetsBasePath;
     }
 
     public function byId(string $assetID)
@@ -76,7 +79,7 @@ final class DBAssetRepository implements AssetRepository
         $params = [
             '_id' => $asset->id(),
             'folder' => $asset->folder()->id(),
-            'path' => $asset->folder()->path().'/'.$asset->filename(),
+            'path' => $this->assetsBasePath . $asset->folder()->path().'/'.$asset->filename(),
             'title' => $asset->title(),
             'mime' => $asset->mime(),
             'description' => $asset->description(),

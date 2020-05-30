@@ -42,6 +42,11 @@ final class PathResolver
         return str_replace($this->docsRoot, '', $path);
     }
 
+    public function assetsPath(): string
+    {
+        return rtrim($this->pathMap['assets'][0], '/');
+    }
+
     /**
      * @return false|string
      */

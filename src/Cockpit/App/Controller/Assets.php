@@ -5,6 +5,7 @@ namespace Cockpit\App\Controller;
 use Cockpit\App\Assets\AssetRepository;
 use Cockpit\App\Assets\Folder;
 use Cockpit\Framework\Database\Constraint;
+use Mezzio\Authentication\UserInterface;
 use Psr\Http\Message\RequestInterface;
 use Zend\Diactoros\Response\JsonResponse;
 
@@ -62,13 +63,20 @@ final class Assets
         return $this->assets->byId($id);
     }
 
-    public function upload()
+    public function upload(RequestInterface $request)
     {
+        $params = $request->getParsedBody();
         $meta = ['folder' => $params['folder'] ?? ''];
-        $folder = $params['folder'] ?? null;
-        $userID = $this->app->module('cockpit')->getUser('_id');
+        $folderID = $params['folder'] ?? null;
+        $user = $request->getAttributes()[UserInterface::class];
 
-        $result = $this->uploader->upload('files', $folder, $userID);
+        $folder = null;
+        if ($folderID) {
+            $folder = $this->folders->byID($folderID);
+        }
+
+        $result = $this->uploader->upload('files', $folder, $user);
+
         return $result;
         // Register uploaded assets
 

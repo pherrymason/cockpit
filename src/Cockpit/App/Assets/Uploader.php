@@ -5,7 +5,10 @@ namespace Cockpit\App\Assets;
 use Cockpit\Framework\EventSystem;
 use Cockpit\Framework\IDs;
 use Cockpit\Framework\PathResolver;
+use Cocur\Slugify\Slugify;
 use League\Flysystem\Filesystem;
+use Mezzio\Authentication\UserInterface;
+use Zend\Diactoros\Response\JsonResponse;
 
 final class Uploader
 {
@@ -15,7 +18,7 @@ final class Uploader
     private $pathResolver;
     /** @var EventSystem */
     private $events;
-    /** @var \Cocur\Slugify\Slugify */
+    /** @var Slugify */
     private $slugify;
     /** @var array */
     private $allowedUploads;
@@ -26,7 +29,7 @@ final class Uploader
     /** @var FolderRepository */
     private $folders;
 
-    public function __construct(Filesystem $fileSystem, PathResolver $pathResolver, \Cockpit\App\Assets\AssetRepository $assets, \Cockpit\App\Assets\FolderRepository $folders, \Cockpit\Framework\EventSystem $events, \Cocur\Slugify\Slugify $slugify, array $allowedUploads, $maxUploadSize)
+    public function __construct(Filesystem $fileSystem, PathResolver $pathResolver, AssetRepository $assets, FolderRepository $folders, EventSystem $events, Slugify $slugify, array $allowedUploads, $maxUploadSize)
     {
         $this->fileSystem = $fileSystem;
         $this->pathResolver = $pathResolver;
@@ -38,7 +41,7 @@ final class Uploader
         $this->folders = $folders;
     }
 
-    public function upload(string $key, ?string $destinationVirtualFolder, string $userID)
+    public function upload(string $key, Folder $folder, UserInterface $user)
     {
         /**
          * {"name":["limoncello.jpg"],"type":["image\/jpeg"],"tmp_name":["\/private\/var\/tmp\/phpBKEFUu"],"error":[0],"size":[35475]}
@@ -55,19 +58,17 @@ final class Uploader
             return false;
         }
 
-        $meta = $destinationVirtualFolder !== null ? ['folder' => $destinationVirtualFolder] : [];
+        $meta = $folder !== null ? ['folder' => $folder] : [];
 
         $iMax = count($files['name']);
         for ($i = 0; $i < $iMax; $i++) {
             $pathinfo = pathinfo($files['name'][$i]);
             $cleanName = uniqid() . $this->slugify->slugify($pathinfo['filename']) . '.' . $pathinfo['extension'];
 
+            $path = $folder->path() . '/' . $cleanName;
+            $assetsPath = $this->pathResolver->assetsPath();
 
-            $path = '/' . date('Y/m/d') . '/' . $cleanName;
-            $relativeFilePath = $this->pathResolver->relativePath('#uploads:') . $path;
-
-            $_file = $this->pathResolver->path('#uploads:') . $path;
-            $_isAllowed = $this->isFileTypeAllowed($_file);
+            $_isAllowed = $this->isFileTypeAllowed($files['tmp_name'][$i]);
             $filesize = filesize($files['tmp_name'][$i]);
             $_sizeAllowed = $max_size ? $filesize < $max_size : true;
 
@@ -84,10 +85,10 @@ final class Uploader
                 $stream = fopen($files['tmp_name'][$i], 'r+');
 
                 $asset = $this->createAsset(
-                    $relativeFilePath,
+                    $assetsPath . $path,
                     (string)$filesize,
                     mime_content_type($files['tmp_name'][$i]),
-                    $userID,
+                    $user->getDetail('id'),
                     $folder
                 );
                 $assetArray = $asset->toArray();
@@ -95,7 +96,7 @@ final class Uploader
                 // @todo Changes done in assetArray are lost
                 $opts = ['mimetype' => $asset->mime()];
                 $this->events->trigger('cockpit.asset.upload', [&$assetArray, &$meta, &$opts]);
-                $this->fileSystem->writeStream($relativeFilePath, $stream);
+                $this->fileSystem->writeStream($assetsPath . $path, $stream);
 
                 if (is_resource($stream)) {
                     fclose($stream);
@@ -127,7 +128,7 @@ final class Uploader
             }
         }
 
-        return [
+        return new JsonResponse([
             'uploaded' => $uploaded,
             'failed' => $failed,
             'assets' => array_map(
@@ -136,7 +137,7 @@ final class Uploader
                 },
                 $assets
             )
-        ];
+        ]);
     }
 
     private function isFileTypeAllowed(string $filename): bool
@@ -153,15 +154,15 @@ final class Uploader
         return $matched === 1;
     }
 
-    private function createAsset(string $finalFilePath, string $filesize, string $mime, string $userID, Folder $folder): Asset
+    private function createAsset(string $fullFilenamePath, string $filesize, string $mime, string $userID, Folder $folder): Asset
     {
-        $name = basename($finalFilePath);
+        $filename = basename($fullFilenamePath);
 
         return new Asset(
             IDs::new(),
             $folder,
-            $finalFilePath,
-            $name,
+            $filename,
+            $filename,
             '',
             [],
             (string)$filesize,

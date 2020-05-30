@@ -13,7 +13,10 @@ class Authentication implements AuthenticationInterface
     public function authenticate(ServerRequestInterface $request): ?UserInterface
     {
         //@TODO
-        return new DefaultUser('admin', [], []);
+        $details = [
+            'id' => '1'
+        ];
+        return new DefaultUser('admin', [], $details);
     }
 
     public function unauthorizedResponse(ServerRequestInterface $request): ResponseInterface

@@ -10,7 +10,7 @@ return [
     },
 
     \League\Flysystem\AdapterInterface::class => function (ContainerInterface $c) {
-        return new \League\Flysystem\Adapter\Local($c->get('root_path'));
+        return new \League\Flysystem\Adapter\Local('/');
     },
 
     \League\Flysystem\Filesystem::class => function (ContainerInterface $c) {
@@ -19,16 +19,10 @@ return [
         );
     },
 
-    'assets.filesystem' => function (ContainerInterface $c) {
-        return new \League\Flysystem\Filesystem(
-             new \League\Flysystem\Adapter\Local($c->get('paths')['assets'])
-        );
-    },
-
     \Cockpit\App\Assets\Uploader::class => function (ContainerInterface $c) {
 
         return new \Cockpit\App\Assets\Uploader(
-            $c->get('assets.filesystem'),
+            $c->get( \League\Flysystem\Filesystem::class),
             $c->get(\Cockpit\Framework\PathResolver::class),
             $c->get(\Cockpit\App\Assets\AssetRepository::class),
             $c->get(\Cockpit\App\Assets\FolderRepository::class),
@@ -50,7 +44,8 @@ return [
 
     \Cockpit\App\Assets\AssetRepository::class => function (ContainerInterface $c) {
         return new \Cockpit\App\Assets\DBAssetRepository(
-            $c->get('dbal.mysql')
+            $c->get('dbal.mysql'),
+            $c->get('assets_base_url')
         );
     },
 
