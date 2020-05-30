@@ -28,9 +28,11 @@ abstract class TemplateController
             $this->templateEngine->addData($globalData);
         }
 
-        $template = $this->templateEngine->make($view);
-        $template->layout('layouts/app', $this->layoutData($request));
 
+        $this->templateEngine->addData($this->layoutData($request));
+
+        $template = $this->templateEngine->make($view);
+        $template->layout('layouts/app');
         $response->getBody()->write($template->render($data));
 
         return $response;
