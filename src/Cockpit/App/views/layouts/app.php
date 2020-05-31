@@ -115,7 +115,7 @@
                                 <ul class="uk-grid uk-grid-small uk-grid-width-1-2 uk-grid-width-medium-1-4 uk-text-center">
 
                                     <li class="uk-grid-margin">
-                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space {{ ($app['route'] == '/cockpit/dashboard') ? 'uk-bg-primary uk-contrast':'' }}" href="<?= $this->route('/cockpit/dashboard')?>">
+                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space {{ ($app['route'] == '/cockpit/dashboard') ? 'uk-bg-primary uk-contrast':'' }}" href="<?= $this->route('home')?>">
                                             <div class="uk-svg-adjust">
                                                 <img class="uk-margin-small-right inherit-color" src="<?= $this->base('assets:app/media/icons/dashboard.svg') ?>" width="40" height="40" data-uk-svg alt="assets" />
                                             </div>
@@ -124,7 +124,7 @@
                                     </li>
 
                                     <li class="uk-grid-margin">
-                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space {{ (strpos($app['route'],'/assetsmanager')===0) ? 'uk-bg-primary uk-contrast':'' }}" href="<?= $this->route('/assetsmanager')?>">
+                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space <?= (strpos($route,'/assetsmanager')===0) ? 'uk-bg-primary uk-contrast':'' ?>" href="<?= $this->route('assets')?>">
                                             <div class="uk-svg-adjust">
                                                 <img class="uk-margin-small-right inherit-color" src="<?= $this->base('assets:app/media/icons/assets.svg') ?>" width="40" height="40" data-uk-svg alt="assets" /> 
                                             </div>
@@ -134,7 +134,7 @@
 
                                     <?php if ($this->hasAccess('cockpit', 'finder')): ?>
                                     <li class="uk-grid-margin">
-                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space {{ (strpos($app['route'],'/finder')===0) ? 'uk-bg-primary uk-contrast':'' }}" href="<?= $this->route('/finder')?>">
+                                        <a class="uk-display-block uk-panel-card-hover uk-panel-box uk-panel-space <?= (strpos($route,'/finder')===0) ? 'uk-bg-primary uk-contrast':'' ?>" href="<?= $this->route('/finder')?>">
                                             <div class="uk-svg-adjust">
                                                 <img class="uk-margin-small-right inherit-color" src="<?= $this->base('assets:app/media/icons/finder.svg') ?>" width="40" height="40" data-uk-svg alt="assets" /> 
                                             </div>
@@ -145,7 +145,7 @@
 
                                     <?php if ($this->hasAccess('cockpit', 'settings')): ?>
                                     <li class="uk-grid-margin">
-                                        <a class="uk-display-block uk-panel-box uk-panel-card-hover uk-panel-space {{ (strpos($app['route'],'/settings')===0) ? 'uk-bg-primary uk-contrast':'' }}" href="<?= $this->route('/settings')?>">
+                                        <a class="uk-display-block uk-panel-box uk-panel-card-hover uk-panel-space <?= (strpos($route,'/settings')===0) ? 'uk-bg-primary uk-contrast':'' ?>" href="<?= $this->route('/settings')?>">
                                             <div class="uk-svg-adjust">
                                                 <img class="uk-margin-small-right inherit-color" src="<?= $this->base('assets:app/media/icons/settings.svg') ?>" width="40" height="40" data-uk-svg alt="assets" />
                                             </div>
@@ -156,7 +156,7 @@
 
                                     <?php if ($this->hasAccess('cockpit', 'accounts')): ?>
                                     <li class="uk-grid-margin">
-                                        <a class="uk-display-block uk-panel-box uk-panel-card-hover uk-panel-space {{ (strpos($app['route'],'/accounts')===0) ? 'uk-bg-primary uk-contrast':'' }}" href="<?= $this->route('/accounts')?>">
+                                        <a class="uk-display-block uk-panel-box uk-panel-card-hover uk-panel-space <?= (strpos($route,'/accounts')===0) ? 'uk-bg-primary uk-contrast':'' ?>" href="<?= $this->route('/accounts')?>">
                                             <div class="uk-svg-adjust">
                                                 <img class="uk-margin-small-right inherit-color" src="<?= $this->base('assets:app/media/icons/accounts.svg') ?>" width="40" height="40" data-uk-svg alt="assets" /> 
                                             </div>
@@ -186,7 +186,7 @@
                         <ul class="uk-subnav app-modulesbar">
                             <?php foreach($menuModules as $item): ?>
                             <li>
-                                <a class="uk-svg-adjust {{ (@$item['active']) ? 'uk-active':'' }}" href="<?= $this->route($item->routeName())?>" title="<?= $this->lang($item->label()) ?>" aria-label="<?= $this->lang($item->label()) ?>" data-uk-tooltip="offset:10">
+                                <a class="uk-svg-adjust <?= $item->active() ? 'uk-active':'' ?>" href="<?= $this->route($item->routeName())?>" title="<?= $this->lang($item->label()) ?>" aria-label="<?= $this->lang($item->label()) ?>" data-uk-tooltip="offset:10">
                                     <?php if(preg_match('/\.svg$/i', $item->iconPath())): ?>
                                     <img src="<?= $this->base($item->iconPath())?>" alt="<?= $this->lang($item->label()) ?>" data-uk-svg width="20px" height="20px" />
                                     <?php else: ?>
@@ -213,7 +213,7 @@
 
                             <div class="uk-dropdown uk-dropdown-navbar uk-dropdown-flip">
                                 <ul class="uk-nav uk-nav-navbar">
-                                    <li class="uk-nav-header uk-text-truncate">{{ $app["user"]["name"] ? $app["user"]["name"] : $app["user"]["user"] }}</li>
+                                    <li class="uk-nav-header uk-text-truncate"><?= $user->getIdentity() ?></li>
                                     <li><a href="<?= $this->route('/accounts/account')?>"><?= $this->lang('Account') ?></a></li>
                                     <li class="uk-nav-divider"></li>
                                         <li class="uk-nav-item-danger"><a href="<?= $this->route('/auth/logout')?>"><?= $this->lang('Logout') ?></a></li>

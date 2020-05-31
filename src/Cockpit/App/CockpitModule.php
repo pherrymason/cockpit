@@ -82,6 +82,7 @@ final class CockpitModule implements Module
 
         // Assets
         $app->group('/assetsmanager', function (RouteCollectorProxy $group) {
+            $group->get('', Assets::class.':index')->setName('assets');
             $group->post('/listAssets', Assets::class.':listAssets')->setName('assets_list');
             $group->post('/addFolder', Assets::class.':addFolder')->setName('assets_folder');
             $group->post('/upload', Assets::class.':upload')->setName('assets_upload');
