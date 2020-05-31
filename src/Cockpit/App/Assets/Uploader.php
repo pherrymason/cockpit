@@ -8,7 +8,7 @@ use Cockpit\Framework\PathResolver;
 use Cocur\Slugify\Slugify;
 use League\Flysystem\Filesystem;
 use Mezzio\Authentication\UserInterface;
-use Zend\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\Response\JsonResponse;
 
 final class Uploader
 {

@@ -1,5 +1,4 @@
 <style>
-
     .uk-nestable-list.filtered {
         padding-left: 0;
     }
@@ -7,21 +6,20 @@
     .uk-nestable-list.filtered .uk-nestable-toggle {
         display: none;
     }
-
 </style>
 
-<script type="riot/tag" src="@base('assets:collections/entries-tree.tag')"></script>
+<script type="riot/tag" src="<?= $this->base('assets:collections/entries-tree.tag') ?>"></script>
 
 <div class="uk-margin-top" riot-view>
 
     <div class="uk-margin uk-text-center uk-text-muted" show="{ (Array.isArray(entries) && entries.length) || filter}">
 
-        <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="50" alt="icon" data-uk-svg>
-        @if($collection['description'])
+        <img class="uk-svg-adjust" src="<?= $this->base('assets:collections/icon.svg') ?>" width="50" alt="icon" data-uk-svg>
+        <?php if($collection['description']): ?>
         <div class="uk-container-center uk-margin-top uk-width-medium-1-2">
-            {{ htmlspecialchars($collection['description']) }}
+            <?= $this->e($collection['description']) ?>
         </div>
-        @endif
+        <?php endif ?>
     </div>
 
     <div show="{ ready }">
@@ -30,14 +28,14 @@
 
             <div class="uk-animation-scale">
 
-                <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="50" alt="icon" data-uk-svg>
-                @if($collection['description'])
+                <img class="uk-svg-adjust" src="<?= $this->base('assets:collections/icon.svg') ?>" width="50" alt="icon" data-uk-svg>
+                <?php if($collection['description']): ?>
                 <div class="uk-margin-top uk-text-small uk-text-muted">
-                    {{ htmlspecialchars($collection['description']) }}
+                    <?= $this->e($collection['description']) ?>
                 </div>
-                @endif
+                <?php endif ?>
                 <hr>
-                <span class="uk-text-large"><strong>@lang('No entries').</strong> <a href="@route('/collections/entry/'.$collection['name'])">@lang('Create an entry').</a></span>
+                <span class="uk-text-large"><strong><?= $this->lang('No entries') ?>.</strong> <a href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>"><?= $this->lang('Create an entry') ?>.</a></span>
 
             </div>
 
@@ -60,7 +58,7 @@
                 <div class="uk-form-icon uk-form uk-width-1-1 uk-text-muted">
 
                     <i class="uk-icon-search"></i>
-                    <input class="uk-width-1-1 uk-form-large uk-form-blank" type="text" ref="txtfilter" placeholder="@lang('Filter items...')" onchange="{ updatefilter }">
+                    <input class="uk-width-1-1 uk-form-large uk-form-blank" type="text" ref="txtfilter" placeholder="<?= $this->lang('Filter items...') ?>" onchange="{ updatefilter }">
 
                 </div>
             </div>
@@ -68,26 +66,26 @@
             <div class="uk-float-right">
 
                 <div class="uk-display-inline-block uk-margin-small-right" data-uk-dropdown="mode:'click'" if="{ selected.length }">
-                    <button class="uk-button uk-button-large uk-animation-fade">@lang('Batch Action') <span class="uk-badge uk-badge-contrast uk-margin-small-left">{ selected.length }</span></button>
+                    <button class="uk-button uk-button-large uk-animation-fade"><?= $this->lang('Batch Action') ?> <span class="uk-badge uk-badge-contrast uk-margin-small-left">{ selected.length }</span></button>
                     <div class="uk-dropdown">
                         <ul class="uk-nav uk-nav-dropdown uk-dropdown-close">
-                            <li class="uk-nav-header">@lang('Actions')</li>
-                            <li><a onclick="{ batchedit }">@lang('Edit')</a></li>
-                            @if($app->module('collections')->hasaccess($collection['name'], 'entries_delete'))
-                            <li class="uk-nav-item-danger"><a onclick="{ removeselected }">@lang('Delete')</a></li>
-                            @endif
+                            <li class="uk-nav-header"><?= $this->lang('Actions') ?></li>
+                            <li><a onclick="{ batchedit }"><?= $this->lang('Edit') ?></a></li>
+                            <?php if($this->hasAccess($collection['name'], 'entries_delete')): ?>
+                            <li class="uk-nav-item-danger"><a onclick="{ removeselected }"><?= $this->lang('Delete') ?></a></li>
+                            <?php endif ?>
                         </ul>
                     </div>
                 </div>
 
-                @if($app->module('collections')->hasaccess($collection['name'], 'entries_create'))
-                <a class="uk-button uk-button-large uk-button-primary" href="@route('/collections/entry/'.$collection['name'])">@lang('Add Entry')</a>
-                @endif
+                <?php if($this->hasAccess($collection['name'], 'entries_create')): ?>
+                <a class="uk-button uk-button-large uk-button-primary" href="<?= $this->route('/collections/entry/'.$collection['name']) ?>"><?= $this->lang('Add Entry') ?></a>
+                <?php endif ?>
             </div>
         </div>
 
         <div class="uk-text-xlarge uk-text-muted uk-viewport-height-1-3 uk-flex uk-flex-center uk-flex-middle" if="{ !entries.length && filter && !loading }">
-            <div>@lang('No entries found')</div>
+            <div><?= $this->lang('No entries found') ?></div>
         </div>
 
         <div class="uk-margin-top" if="{ (Array.isArray(entries) && entries.length) && !filter}">
@@ -96,7 +94,7 @@
 
         <div class="uk-margin-top" if="{(Array.isArray(entries) && entries.length) && filter}">
 
-            <span class="uk-badge uk-badge-outline uk-text-warning uk-text-uppercase">@lang('Filtered Items')</span>
+            <span class="uk-badge uk-badge-outline uk-text-warning uk-text-uppercase"><?= $this->lang('Filtered Items') ?></span>
 
             <ul class="uk-nestable-list filtered uk-margin-top" data-is="entries-tree-list" entries="{entries}" collection="{collection}" fields="{fields}"></ul>
         </div>

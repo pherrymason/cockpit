@@ -4,7 +4,7 @@ namespace Cockpit\App\Controller;
 
 use Cockpit\App\Revisions\RevisionsRepository;
 use Psr\Http\Message\RequestInterface;
-use Zend\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\Response\JsonResponse;
 
 final class Utils
 {

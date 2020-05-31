@@ -40,22 +40,26 @@ final class CollectionsModule implements Module
 
     public function installDashboardWidgets($widgets)
     {
-            $collections = $this->collections->byGroup(null, false);
+        $collections = $this->collections->byGroup(null, false);
 
-            $widgets[] = [
-                "name"    => "collections",
-                "content" => $this->engine->render("collections::views/widgets/dashboard", compact('collections')),
-                "area"    => 'aside-left'
-            ];
+        $widgets[] = [
+            "name" => "collections",
+            "content" => $this->engine->render("collections::views/widgets/dashboard", compact('collections')),
+            "area" => 'aside-left'
+        ];
     }
 
     public function registerRoutes(App $app)
     {
         $app->group(
-          '/collections',
-          function (RouteCollectorProxy $group) {
-            $group->get('/entries/{name:[0-9a-z\-]+}', Admin::class.':entries')->setName('collections_entry');
-          }
+            '/collections',
+            function (RouteCollectorProxy $group) {
+                $group->get('', Admin::class . ':index')->setName('collections');
+                $group->post('/find', Admin::class . ':find')->setName('collections_find');
+                $group->get('/entries/{name:[0-9a-z\-]+}', Admin::class . ':entries')->setName('collections_entries');
+                $group->get('/entry/{name:[0-9a-z\-]+}', Admin::class . ':entry')->setName('collections_entry');
+                $group->post('/utils/getUserCollections', Admin::class . ':getUserCollections')->setName('collections_user_collections');
+            }
         );
     }
 

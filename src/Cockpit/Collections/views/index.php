@@ -1,5 +1,5 @@
 <script>
-    window.__collections = {{ json_encode($collections) }};
+    window.__collections = <?= json_encode($collections) ?>;
 </script>
 
 <style>
@@ -11,7 +11,7 @@
 
 <div>
     <ul class="uk-breadcrumb">
-        <li class="uk-active"><span>@lang('Collections')</span></li>
+        <li class="uk-active"><span><?= $this->lang('Collections') ?></span></li>
     </ul>
 </div>
 
@@ -24,15 +24,15 @@
             <div class="uk-form-icon uk-form uk-text-muted">
 
                 <i class="uk-icon-filter"></i>
-                <input class="uk-form-large uk-form-blank" type="text" ref="txtfilter" placeholder="@lang('Filter collections...')" aria-label="@lang('Filter collections...')" onkeyup="{ updatefilter }">
+                <input class="uk-form-large uk-form-blank" type="text" ref="txtfilter" placeholder="<?= $this->lang('Filter collections...') ?>" aria-label="<?= $this->lang('Filter collections...') ?>" onkeyup="{ updatefilter }">
 
             </div>
 
-            @hasaccess?('collections', 'create')
+            <?php if($this->hasAccess('collections', 'create')): ?>
             <div class="uk-float-right">
-                <a class="uk-button uk-button-large uk-button-primary uk-width-1-1" href="@route('/collections/collection')">@lang('Add Collection')</a>
+                <a class="uk-button uk-button-large uk-button-primary uk-width-1-1" href="<?= $this->route('/collections/collection') ?>"><?= $this->lang('Add Collection') ?></a>
             </div>
-            @end
+            <?php endif; ?>
 
         </div>
 
@@ -41,13 +41,13 @@
             <div class="uk-animation-scale">
 
                 <p>
-                    <img class="uk-svg-adjust uk-text-muted" src="@url('assets:collections/icon.svg')" width="80" height="80" alt="Collections" data-uk-svg />
+                    <img class="uk-svg-adjust uk-text-muted" src="<?= $this->base('assets:collections/icon.svg') ?>" width="80" height="80" alt="Collections" data-uk-svg />
                 </p>
                 <hr>
-                <span class="uk-text-large"><strong>@lang('No Collections').</strong>
-                @hasaccess?('collections', 'create')
-                <a href="@route('/collections/collection')">@lang('Create one')</a></span>
-                @end
+                <span class="uk-text-large"><strong><?= $this->lang('No Collections') ?>.</strong>
+                <?php if($this->hasAccess('collections', 'create')): ?>
+                <a href="<?= $this->route('/collections/collection') ?>"><?= $this->lang('Create one') ?></a></span>
+                <?php endif; ?>
             </div>
 
         </div>
@@ -68,9 +68,9 @@
 
                     <div class="uk-panel-teaser uk-position-relative">
                         <canvas width="600" height="350"></canvas>
-                        <a aria-label="{ collection.label }" href="@route('/collections/entries')/{collection.name}" class="uk-position-cover uk-flex uk-flex-middle uk-flex-center">
+                        <a aria-label="{ collection.label }" href="<?= $this->base('/collections/entries') ?>/{collection.name}" class="uk-position-cover uk-flex uk-flex-middle uk-flex-center">
                             <div class="uk-width-1-4 uk-svg-adjust" style="color:{ (collection.meta.color) }">
-                                <img riot-src="{ collection.meta.icon ? '@url('assets:app/media/icons/')'+collection.meta.icon : '@url('assets:collections/icon.svg')'}" alt="icon" data-uk-svg>
+                                <img riot-src="{ collection.meta.icon ? '<?= $this->base('assets:app/media/icons/') ?>'+collection.meta.icon : '<?= $this->base('assets:collections/icon.svg') ?>'}" alt="icon" data-uk-svg>
                             </div>
                         </a>
                     </div>
@@ -83,23 +83,23 @@
 
                             <div class="uk-dropdown">
                                 <ul class="uk-nav uk-nav-dropdown">
-                                    <li class="uk-nav-header">@lang('Actions')</li>
-                                    <li><a href="@route('/collections/entries')/{collection.name}">@lang('Entries')</a></li>
-                                    <li><a href="@route('/collections/entry')/{collection.name}" if="{ collection.meta.allowed.entries_create }">@lang('Add entry')</a></li>
+                                    <li class="uk-nav-header"><?= $this->lang('Actions') ?></li>
+                                    <li><a href="<?= $this->route('/collections/entries') ?>/{collection.name}"><?= $this->lang('Entries') ?></a></li>
+                                    <li><a href="<?= $this->route('/collections/entry') ?>/{collection.name}" if="{ collection.meta.allowed.entries_create }"><?= $this->lang('Add entry') ?></a></li>
                                     <li if="{ collection.meta.allowed.edit || collection.meta.allowed.delete }" class="uk-nav-divider"></li>
-                                    <li if="{ collection.meta.allowed.edit }"><a href="@route('/collections/collection')/{ collection.name }">@lang('Edit')</a></li>
-                                    @hasaccess?('collections', 'delete')
-                                    <li class="uk-nav-item-danger" if="{ collection.meta.allowed.delete }"><a class="uk-dropdown-close" onclick="{ parent.remove }">@lang('Delete')</a></li>
-                                    @end
+                                    <li if="{ collection.meta.allowed.edit }"><a href="<?= $this->route('/collections/collection') ?>/{ collection.name }"><?= $this->lang('Edit') ?></a></li>
+                                    <?php if($this->hasAccess('collections', 'delete')): ?>
+                                    <li class="uk-nav-item-danger" if="{ collection.meta.allowed.delete }"><a class="uk-dropdown-close" onclick="{ parent.remove }"><?= $this->lang('Delete') ?></a></li>
+                                    <?php endif; ?>
                                     <li class="uk-nav-divider" if="{ collection.meta.allowed.edit }" if="{ collection.meta.allowed.entries_delete }"></li>
-                                    <li><a href="@route('/collections/trash/collection')/{collection.name}" if="{ collection.meta.allowed.entries_delete }">@lang('Trash')</a></li>
+                                    <li><a href="<?= $this->route('/collections/trash/collection') ?>/{collection.name}" if="{ collection.meta.allowed.entries_delete }"><?= $this->lang('Trash') ?></a></li>
                                     <li class="uk-nav-divider" if="{ collection.meta.allowed.edit }"></li>
-                                    <li class="uk-text-truncate" if="{ collection.meta.allowed.edit }"><a href="@route('/collections/export')/{ collection.name }" download="{ collection.meta.name }.collection.json">@lang('Export entries')</a></li>
-                                    <li class="uk-text-truncate" if="{ collection.meta.allowed.edit }"><a href="@route('/collections/import/collection')/{ collection.name }">@lang('Import entries')</a></li>
+                                    <li class="uk-text-truncate" if="{ collection.meta.allowed.edit }"><a href="<?= $this->route('/collections/export') ?>/{ collection.name }" download="{ collection.meta.name }.collection.json"><?= $this->lang('Export entries') ?></a></li>
+                                    <li class="uk-text-truncate" if="{ collection.meta.allowed.edit }"><a href="<?= $this->route('/collections/import/collection') ?>/{ collection.name }"><?= $this->lang('Import entries') ?></a></li>
                                 </ul>
                             </div>
                         </div>
-                        <div class="uk-flex-item-1 uk-text-center uk-text-truncate"><a class="uk-text-bold uk-link-muted" href="@route('/collections/entries')/{collection.name}">{ collection.label }</a></div>
+                        <div class="uk-flex-item-1 uk-text-center uk-text-truncate"><a class="uk-text-bold uk-link-muted" href="<?= $this->route('/collections/entries') ?>/{collection.name}">{ collection.label }</a></div>
                         <div class="panel-footer-aside uk-text-right">
                             <span class="uk-badge" riot-style="background-color:{ (collection.meta.color) }">
                                 <span if="{ collection.meta.itemsCount !==null }">{ collection.meta.itemsCount }</span>
@@ -197,7 +197,7 @@
                 this.collections.forEach(function(collection) {
 
                     if (collections[collection.name]) {
-                        collection.meta.itemsCount = collections[collection.name].itemsCount;
+                        collection.meta.itemsCount = '?';//collections[collection.name].itemsCount;
                     }
                 });
                 

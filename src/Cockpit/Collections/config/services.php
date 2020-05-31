@@ -4,15 +4,15 @@ use Psr\Container\ContainerInterface;
 
 return [
     // Controllers
+        /*
     \Cockpit\Collections\Controller\Admin::class => function (ContainerInterface $c) {
         return new \Cockpit\Collections\Controller\Admin(
             $c->get(\Cockpit\Collections\DBCollectionRepository::class),
             $c->get(\Cockpit\Collections\DBEntriesRepository::class),
             $c->get(\Cockpit\App\Revisions::class),
-            $c->get('app'),
-            $c->get(\League\Plates\Engine::class)
+            $c->get(\League\Plates\Engine::class), ,
         );
-    },
+    },*/
     \Cockpit\Collections\Controller\RestAPI::class => function (ContainerInterface $c) {
         return new \Cockpit\Collections\Controller\RestAPI(
             $c->get(\Cockpit\Collections\DBCollectionRepository::class),
@@ -43,7 +43,7 @@ return [
         );
     },
 
-    \Cockpit\Collections\DBEntriesRepository::class => function (ContainerInterface $c) {
+    \Cockpit\Collections\EntriesRepository::class => function (ContainerInterface $c) {
         return new \Cockpit\Collections\DBEntriesRepository(
             $c->get('dbal.mysql'),
             $c->get(\Cockpit\Collections\MySQLCollectionTableManager::class),

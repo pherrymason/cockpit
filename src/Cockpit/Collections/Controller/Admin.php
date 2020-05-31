@@ -8,10 +8,15 @@ use Cockpit\Collections\EntriesRepository;
 use Cockpit\Collections\Entry;
 use Cockpit\Collections\Role;
 use Cockpit\App\Revisions;
+use Cockpit\Framework\EventSystem;
+use Cockpit\Framework\TemplateController;
 use League\Plates\Engine;
-use Lime\App;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Laminas\Diactoros\Response\JsonResponse;
 
-final class Admin extends \Cockpit\Framework\Controller
+final class Admin extends TemplateController
 {
     /** @var CollectionRepository */
     private $collections;
@@ -19,27 +24,29 @@ final class Admin extends \Cockpit\Framework\Controller
     private $entries;
     /** @var Revisions */
     private $revisions;
+    /** @var EventSystem */
+    private $eventSystem;
 
-    public function __construct(CollectionRepository $collections, EntriesRepository $entries, Revisions $revisions, App $app, Engine $engine)
+    public function __construct(CollectionRepository $collections, EntriesRepository $entries, Revisions $revisions, Engine $engine, EventSystem $eventSystem, ContainerInterface $container)
     {
         $this->collections = $collections;
         $this->entries = $entries;
         $this->revisions = $revisions;
-        parent::__construct($app, $engine);
+        $this->eventSystem = $eventSystem;
+        parent::__construct($engine, $container);
     }
 
-    public function index()
+    public function index(RequestInterface $request, ResponseInterface $response)
     {
         $collections = $this->collections->all();
-        $frontendData = array_map(function (Collection $collection) {
-            return $collection->toArray();
-        }, $collections);
-
-/*        return $this->renderTemplate(
-            'collections::index.react.php',
-            ['collections' => $frontendData]
+        $frontendData = array_map(
+            function (Collection $collection) {
+                return $collection->toArray();
+            },
+            $collections
         );
-  */      return $this->render('collections:views/index.php', ['collections' => $frontendData]);
+
+        return $this->renderResponse($request, $response, 'collections::views/index', ['collections' => $frontendData]);
     }
 
     public function collection($name = null)
@@ -117,13 +124,22 @@ final class Admin extends \Cockpit\Framework\Controller
 
         // rules
         $rules = [
-            'create' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.create.php"),
-            'read' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.read.php"),
-            'update' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.update.php"),
-            'delete' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read("#storage:collections/rules/{$name}.delete.php"),
+            'create' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read(
+                "#storage:collections/rules/{$name}.create.php"
+            ),
+            'read' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read(
+                "#storage:collections/rules/{$name}.read.php"
+            ),
+            'update' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read(
+                "#storage:collections/rules/{$name}.update.php"
+            ),
+            'delete' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read(
+                "#storage:collections/rules/{$name}.delete.php"
+            ),
         ];
 
-        return $this->render('collections:views/collection.php',
+        return $this->render(
+            'collections:views/collection.php',
             [
                 'collection' => $collection->toArray(),
                 'templates' => $templates,
@@ -169,13 +185,13 @@ final class Admin extends \Cockpit\Framework\Controller
         return $collection;
     }
 
-    public function entries($collectionName)
+    public function entries(RequestInterface $request, ResponseInterface $response, string $name)
     {
 //        if (!$this->module('collections')->hasaccess($collection, 'entries_view')) {
 //            return $this->helper('admin')->denyRequest();
 //        }
 
-        $collection = $this->collections->byName($collectionName);
+        $collection = $this->collections->byName($name);
 
         if (!$collection) {
             return false;
@@ -190,11 +206,10 @@ final class Admin extends \Cockpit\Framework\Controller
 
 //        $context = _check_collection_rule($collection, 'read', ['options' => ['filter'=>[]]]);
 
-        $this->app->helper('admin')->favicon = [
+        /*$this->app->helper('admin')->favicon = [
             'path' => 'collections:icon.svg',
             'color' => $collection->color()
-        ];
-
+        ];*/
 //        if ($context && isset($context->options['fields'])) {
 //            foreach ($collection['fields'] as &$field) {
 //                if (isset($context->options['fields'][$field['name']]) && !$context->options['fields'][$field['name']]) {
@@ -203,23 +218,28 @@ final class Admin extends \Cockpit\Framework\Controller
 //            }
 //        }
 
-        $view = 'collections:views/entries.php';
+        $view = 'collections::views/entries';
+//      Allow different template for this specific collection
+//        if ($override = $this->app->path('#config:collections/' . $collection->name() . '/views/entries.php')) {
+//            $view = $override;
+//        }
 
-        if ($override = $this->app->path('#config:collections/' . $collection->name() . '/views/entries.php')) {
-            $view = $override;
-        }
-
-        return $this->render($view, [
-            'collection' => $collection->toArray()
-        ]);
+        return $this->renderResponse(
+            $request,
+            $response,
+            $view,
+            [
+                'collection' => $collection->toArray()
+            ]
+        );
     }
 
-    public function find()
+    public function find(RequestInterface $request)
     {
-//        \session_write_close();
+        $params = $request->getParsedBody();
 
-        $collectionName = $this->app->param('collection');
-        $options = $this->app->param('options');
+        $collectionName = $params['collection'];
+        $options = $params['options'];
 
         if (!$collectionName) {
             return false;
@@ -240,10 +260,10 @@ final class Admin extends \Cockpit\Framework\Controller
 //            }
 //        }
 
-        $this->app->trigger("collections.admin.find.before.{$collection->name()}", [&$options]);
+        $this->eventSystem->trigger("collections.admin.find.before.{$collection->name()}", [&$options]);
         $entries = $this->entries->byCollectionFiltered($collection, [], $options);
 
-        $this->app->trigger("collections.admin.find.after.{$collection->name()}", [&$entries, $options]);
+        $this->eventSystem->trigger("collections.admin.find.after.{$collection->name()}", [&$entries, $options]);
 
         $count = $this->entries->count($collection, $options['filter'] ?? []);
 
@@ -254,13 +274,17 @@ final class Admin extends \Cockpit\Framework\Controller
             $page = ceil($options['skip'] / $options['limit']) + 1;
         }
 
-        return [
-            'entries' => array_map(function (Entry $entry) {
-                return $entry->toArray();
-            }, $entries),
+        return new JsonResponse([
+            'entries' => array_map(
+                function (Entry $entry) {
+                    return $entry->toArray();
+                },
+                $entries
+            ),
             'count' => $count,
             'pages' => $pages,
-            'page' => $page];
+            'page' => $page]
+        );
     }
 
     public function entry($collectionName, $id = null)
@@ -325,11 +349,14 @@ final class Admin extends \Cockpit\Framework\Controller
             $view = $override;
         }
 
-        return $this->render($view, [
-            'collection' => $collection->toArray(),
-            'entry' => $entryAsArray,
-            'excludeFields' => $excludeFields
-        ]);
+        return $this->render(
+            $view,
+            [
+                'collection' => $collection->toArray(),
+                'entry' => $entryAsArray,
+                'excludeFields' => $excludeFields
+            ]
+        );
     }
 
     public function save_entry($collectionName)
@@ -389,7 +416,10 @@ final class Admin extends \Cockpit\Framework\Controller
         $entryArray = $entry->toArray();
 
         $this->app->trigger('collections.save.after', [$collection->name(), &$entryArray, $isUpdate]);
-        $this->app->trigger("collections.save.after.{$collection->name()}", [$collection->name(), &$entryArray, $isUpdate]);
+        $this->app->trigger(
+            "collections.save.after.{$collection->name()}",
+            [$collection->name(), &$entryArray, $isUpdate]
+        );
 
 //        $this->app->helper('admin')->lockResourceId($entry->id());
         if ($options['revision']) {
@@ -421,10 +451,27 @@ final class Admin extends \Cockpit\Framework\Controller
 
         $revisions = $this->revisions->getList($id);
 
-        return $this->render('collections:views/revisions.php', [
-            'collection' => $collection->toArray(),
-            'entry' => $entry->toArray(),
-            'revisions' => $revisions
-        ]);
+        return $this->render(
+            'collections:views/revisions.php',
+            [
+                'collection' => $collection->toArray(),
+                'entry' => $entry->toArray(),
+                'revisions' => $revisions
+            ]
+        );
+    }
+
+    public function getUserCollections()
+    {
+        $collections = $this->collections->byGroup(null, true);
+
+        return new JsonResponse(
+            array_map(
+                function (Collection $collection) {
+                    return $collection->toArray();
+                },
+                $collections
+            )
+        );
     }
 }

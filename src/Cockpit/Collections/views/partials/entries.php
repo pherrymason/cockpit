@@ -33,12 +33,12 @@
 
     <div class="uk-margin uk-text-center uk-text-muted" show="{ (Array.isArray(entries) && entries.length) || filter}">
 
-        <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="50" alt="icon" data-uk-svg>
-        @if($collection['description'])
+        <img class="uk-svg-adjust" src="<?= $this->base('assets:collections/icon.svg') ?>" width="50" alt="icon" data-uk-svg>
+        <?php if($collection['description']): ?>
         <div class="uk-container-center uk-margin-top uk-width-medium-1-2">
-            {{ htmlspecialchars($collection['description']) }}
+            <?= $this->e($collection['description']) ?>
         </div>
-        @endif
+        <?php endif ?>
     </div>
 
 
@@ -58,14 +58,14 @@
 
             <div class="uk-animation-scale">
 
-                <img class="uk-svg-adjust" src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="50" alt="icon" data-uk-svg>
-                @if($collection['description'])
+                <img class="uk-svg-adjust" src="<?= $this->base($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg') ?>" width="50" alt="icon" data-uk-svg>
+                <?php if($collection['description']): ?>
                 <div class="uk-margin-top uk-text-small uk-text-muted">
-                    {{ htmlspecialchars($collection['description']) }}
+                    <?= $this->e($collection['description']) ?>
                 </div>
-                @endif
+                <?php endif ?>
                 <hr>
-                <span class="uk-text-large"><strong>@lang('No entries').</strong> <a href="@route('/collections/entry/'.$collection['name'])">@lang('Create an entry').</a></span>
+                <span class="uk-text-large"><strong><?= $this->lang('No entries') ?>.</strong> <a href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>"><?= $this->lang('Create an entry') ?>.</a></span>
 
             </div>
 
@@ -97,7 +97,7 @@
                 <div class="uk-form-icon uk-form uk-width-1-1 uk-text-muted">
 
                     <i class="uk-icon-search"></i>
-                    <input class="uk-width-1-1 uk-form-large uk-form-blank" type="text" ref="txtfilter" placeholder="@lang('Filter items...')" onchange="{ updatefilter }">
+                    <input class="uk-width-1-1 uk-form-large uk-form-blank" type="text" ref="txtfilter" placeholder="<?= $this->lang('Filter items...') ?>" onchange="{ updatefilter }">
 
                 </div>
             </div>
@@ -105,28 +105,28 @@
             <div class="uk-float-right">
 
                 <div class="uk-display-inline-block uk-margin-small-right" data-uk-dropdown="mode:'click'" if="{ selected.length }">
-                    <button class="uk-button uk-button-large uk-animation-fade">@lang('Batch Action') <span class="uk-badge uk-badge-contrast uk-margin-small-left">{ selected.length }</span></button>
+                    <button class="uk-button uk-button-large uk-animation-fade"><?= $this->lang('Batch Action') ?> <span class="uk-badge uk-badge-contrast uk-margin-small-left">{ selected.length }</span></button>
                     <div class="uk-dropdown">
                         <ul class="uk-nav uk-nav-dropdown uk-dropdown-close">
-                            <li class="uk-nav-header">@lang('Actions')</li>
-                            <li><a onclick="{ batchedit }">@lang('Edit')</a></li>
-                            @if($app->module('collections')->hasaccess($collection['name'], 'entries_delete'))
-                            <li class="uk-nav-item-danger"><a onclick="{ removeselected }">@lang('Delete')</a></li>
-                            @endif
+                            <li class="uk-nav-header"><?= $this->lang('Actions') ?></li>
+                            <li><a onclick="{ batchedit }"><?= $this->lang('Edit') ?></a></li>
+                            <?php if($this->hasAccess($collection['name'], 'entries_delete')): ?>
+                            <li class="uk-nav-item-danger"><a onclick="{ removeselected }"><?= $this->lang('Delete') ?></a></li>
+                            <?php endif ?>
                         </ul>
                     </div>
                 </div>
 
 
 
-                <a class="uk-button uk-button-large uk-button-primary" href="@route('/collections/entry/'.$collection['name'])">@lang('Add Entry')</a>
+                <a class="uk-button uk-button-large uk-button-primary" href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>"><?= $this->lang('Add Entry') ?></a>
             </div>
         </div>
 
         <div class="uk-margin-top" show="{ !loading && (entries.length || filter) }">
 
         <div class="uk-text-xlarge uk-text-muted uk-viewport-height-1-3 uk-flex uk-flex-center uk-flex-middle" if="{ !entries.length && filter && !loading }">
-            <div>@lang('No entries found')</div>
+            <div><?= $this->lang('No entries found') ?></div>
         </div>
 
 
@@ -142,11 +142,11 @@
 
                             <cp-thumbnail src="{ parent.isImageField(entry) }" width="400" height="250" if="{ parent.isImageField(entry) }"></cp-thumbnail>
 
-                            <div class="uk-svg-adjust uk-text-primary" style="color:{{ @$collection['color'] }} !important;" if="{ !parent.isImageField(entry) }">
-                                <img src="@url($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg')" width="80" alt="icon" data-uk-svg>
+                            <div class="uk-svg-adjust uk-text-primary" style="color:<?= @$collection['color'] ?> !important;" if="{ !parent.isImageField(entry) }">
+                                <img src="<?= $this->base($collection['icon'] ? 'assets:app/media/icons/'.$collection['icon']:'assets:collections/icon.svg') ?>" width="80" alt="icon" data-uk-svg>
                             </div>
                         </div>
-                        <a class="uk-position-cover" href="@route('/collections/entry/'.$collection['name'])/{ entry._id }"></a>
+                        <a class="uk-position-cover" href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>/{ entry._id }"></a>
                     </div>
                     <div class="collection-grid-avatar-container">
                         <div class="collection-grid-avatar">
@@ -167,22 +167,22 @@
 
                             <div class="uk-dropdown uk-dropdown-flip">
                                 <ul class="uk-nav uk-nav-dropdown">
-                                    <li class="uk-nav-header">@lang('Actions')</li>
+                                    <li class="uk-nav-header"><?= $this->lang('Actions') ?></li>
 
-                                    @if($app->module('collections')->hasaccess($collection['name'], 'entries_edit'))
-                                    <li><a href="@route('/collections/entry/'.$collection['name'])/{ entry._id }">@lang('Edit')</a></li>
-                                    @else
-                                    <li><a href="@route('/collections/entry/'.$collection['name'])/{ entry._id }">@lang('View')</a></li>
-                                    @endif
+                                    <?php if($this->hasAccess($collection['name'], 'entries_edit')): ?>
+                                    <li><a href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>/{ entry._id }"><?= $this->lang('Edit') ?></a></li>
+                                    <?php else: ?>
+                                    <li><a href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>/{ entry._id }"><?= $this->lang('View') ?></a></li>
+                                    <?php endif ?>
 
-                                    @if($app->module('collections')->hasaccess($collection['name'], 'entries_delete'))
-                                    <li class="uk-nav-item-danger"><a class="uk-dropdown-close" onclick="{ parent.remove }">@lang('Delete')</a></li>
-                                    @endif
+                                    <?php if($this->hasAccess($collection['name'], 'entries_delete')): ?>
+                                    <li class="uk-nav-item-danger"><a class="uk-dropdown-close" onclick="{ parent.remove }"><?= $this->lang('Delete') ?></a></li>
+                                    <?php endif ?>
 
-                                    @if($app->module('collections')->hasaccess($collection['name'], 'entries_create'))
+                                    <?php if($this->hasAccess($collection['name'], 'entries_create')): ?>
                                     <li class="uk-nav-divider"></li>
-                                    <li><a class="uk-dropdown-close" onclick="{ parent.duplicateEntry }">@lang('Duplicate')</a></li>
-                                    @endif
+                                    <li><a class="uk-dropdown-close" onclick="{ parent.duplicateEntry }"><?= $this->lang('Duplicate') ?></a></li>
+                                    <?php endif ?>
                                 </ul>
                             </div>
                         </span>
@@ -191,7 +191,7 @@
                     <div class="uk-margin-top uk-scrollable-box">
                         <div class="uk-margin-small-bottom" each="{field,idy in parent.fields}" if="{ field.name != '_modified' && field.name != '_created' }">
                             <span class="uk-text-small uk-text-uppercase uk-text-muted">{ field.label || field.name }</span>
-                            <a class="uk-link-muted uk-text-small uk-display-block uk-text-truncate" href="@route('/collections/entry/'.$collection['name'])/{ parent.entry._id }">
+                            <a class="uk-link-muted uk-text-small uk-display-block uk-text-truncate" href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>/{ parent.entry._id }">
                                 <raw content="{ App.Utils.renderValue(field.type, parent.entry[field.name], field) }" if="{parent.entry[field.name] !== undefined}"></raw>
                                 <span class="uk-icon-eye-slash uk-text-muted" if="{parent.entry[field.name] === undefined}"></span>
                             </a>
@@ -223,7 +223,7 @@
                     <tr each="{entry,idx in entries}">
                         <td><input class="uk-checkbox" type="checkbox" data-check data-id="{ entry._id }"></td>
                         <td class="uk-text-truncate" each="{field,idy in parent.fields}" if="{ field.name != '_modified' && field.name != '_created' }">
-                            <a class="uk-link-muted" href="@route('/collections/entry/'.$collection['name'])/{ parent.entry._id }">
+                            <a class="uk-link-muted" href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>/{ parent.entry._id }">
                                 <raw content="{ App.Utils.renderValue(field.type, parent.entry[field.name], field) }" if="{parent.entry[field.name] !== undefined}"></raw>
                                 <span class="uk-icon-eye-slash uk-text-muted" if="{parent.entry[field.name] === undefined}">{field.name}</span>
                             </a>
@@ -237,22 +237,22 @@
 
                                 <div class="uk-dropdown uk-dropdown-flip">
                                     <ul class="uk-nav uk-nav-dropdown">
-                                        <li class="uk-nav-header">@lang('Actions')</li>
+                                        <li class="uk-nav-header"><?= $this->lang('Actions') ?></li>
 
-                                        @if($app->module('collections')->hasaccess($collection['name'], 'entries_edit'))
-                                        <li><a href="@route('/collections/entry/'.$collection['name'])/{ entry._id }">@lang('Edit')</a></li>
-                                        @else
-                                        <li><a href="@route('/collections/entry/'.$collection['name'])/{ entry._id }">@lang('View')</a></li>
-                                        @endif
+                                        <?php if($this->hasAccess($collection['name'], 'entries_edit')): ?>
+                                        <li><a href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>/{ entry._id }"><?= $this->lang('Edit') ?></a></li>
+                                        <?php else: ?>
+                                        <li><a href="<?= $this->route('collections_entry', ['name' => $collection['name']]) ?>/{ entry._id }"><?= $this->lang('View') ?></a></li>
+                                        <?php endif ?>
 
-                                        @if($app->module('collections')->hasaccess($collection['name'], 'entries_delete'))
-                                        <li class="uk-nav-item-danger"><a class="uk-dropdown-close" onclick="{ parent.remove }">@lang('Delete')</a></li>
-                                        @endif
+                                        <?php if($this->hasAccess($collection['name'], 'entries_delete')): ?>
+                                        <li class="uk-nav-item-danger"><a class="uk-dropdown-close" onclick="{ parent.remove }"><?= $this->lang('Delete') ?></a></li>
+                                        <?php endif ?>
 
-                                        @if($app->module('collections')->hasaccess($collection['name'], 'entries_create'))
+                                        <?php if($this->hasAccess($collection['name'], 'entries_create')): ?>
                                         <li class="uk-nav-divider"></li>
-                                        <li><a class="uk-dropdown-close" onclick="{ parent.duplicateEntry }">@lang('Duplicate')</a></li>
-                                        @endif
+                                        <li><a class="uk-dropdown-close" onclick="{ parent.duplicateEntry }"><?= $this->lang('Duplicate') ?></a></li>
+                                        <?php endif ?>
                                     </ul>
                                 </div>
                             </span>
@@ -272,11 +272,11 @@
 
                     <div class="uk-dropdown">
 
-                        <strong class="uk-text-small">@lang('Pages')</strong>
+                        <strong class="uk-text-small"><?= $this->lang('Pages') ?></strong>
 
                         <div class="uk-margin-small-top { pages > 5 ? 'uk-scrollable-box':'' }">
                             <ul class="uk-nav uk-nav-dropdown">
-                                <li class="uk-text-small" each="{k,v in new Array(pages)}"><a class="uk-dropdown-close" onclick="{ parent.loadpage.bind(parent, v+1) }">@lang('Page') {v + 1}</a></li>
+                                <li class="uk-text-small" each="{k,v in new Array(pages)}"><a class="uk-dropdown-close" onclick="{ parent.loadpage.bind(parent, v+1) }"><?= $this->lang('Page') ?> {v + 1}</a></li>
                             </ul>
                         </div>
                     </div>
@@ -285,21 +285,21 @@
             </ul>
 
             <div class="uk-button-group uk-margin-small-left">
-                <a class="uk-button uk-button-small" onclick="{ loadpage.bind(this, page-1) }" if="{page-1 > 0}">@lang('Previous')</a>
-                <a class="uk-button uk-button-small" onclick="{ loadpage.bind(this, page+1) }" if="{page+1 <= pages}">@lang('Next')</a>
+                <a class="uk-button uk-button-small" onclick="{ loadpage.bind(this, page-1) }" if="{page-1 > 0}"><?= $this->lang('Previous') ?></a>
+                <a class="uk-button uk-button-small" onclick="{ loadpage.bind(this, page+1) }" if="{page+1 <= pages}"><?= $this->lang('Next') ?></a>
             </div>
 
             <div class="uk-margin-small-right" data-uk-dropdown="mode:'click'">
                 <a class="uk-button uk-button-link uk-button-small uk-text-muted">{limit}</a>
                 <div class="uk-dropdown">
                     <ul class="uk-nav uk-nav-dropdown">
-                        <li class="uk-nav-header">@lang('Show')</li>
+                        <li class="uk-nav-header"><?= $this->lang('Show') ?></li>
                         <li><a onclick="{updateLimit.bind(this, 20)}">20</a></li>
                         <li><a onclick="{updateLimit.bind(this, 40)}">40</a></li>
                         <li><a onclick="{updateLimit.bind(this, 80)}">80</a></li>
                         <li><a onclick="{updateLimit.bind(this, 100)}">100</a></li>
                         <li class="uk-nav-divider"></li>
-                        <li><a onclick="{updateLimit.bind(this, null)}">@lang('All')</a></li>
+                        <li><a onclick="{updateLimit.bind(this, null)}"><?= $this->lang('All') ?></a></li>
                     </ul>
                 </div>
             </div>
@@ -310,15 +310,15 @@
 
     </div>
 
-    @if($app->module('collections')->hasaccess($collection['name'], 'entries_edit'))
+    <?php if($this->hasAccess($collection['name'], 'entries_edit')): ?>
     <entries-batchedit collection="{collection}" fields={fieldsidx}></entries-batchedit>
-    @endif
+    <?php endif ?>
 
     <script type="view/script">
 
         var $this = this, $root = App.$(this.root);
 
-        this.collection = {{ json_encode($collection) }};
+        this.collection = <?= json_encode($collection) ?>;
         this.originalFields = [...this.collection.fields];
         this.loading    = true;
         this.count      = 0;
@@ -362,8 +362,8 @@
                     return fieldCopy;
                 });
 
-            $this.fieldsidx['_created'] = {name:'_created', 'label':'@lang('Created')', type: 'text'};
-            $this.fieldsidx['_modified'] = {name:'_modified', 'label':'@lang('Modified')', type: 'text'};
+            $this.fieldsidx['_created'] = {name:'_created', 'label':'<?= $this->lang('Created') ?>', type: 'text'};
+            $this.fieldsidx['_modified'] = {name:'_modified', 'label':'<?= $this->lang('Modified') ?>', type: 'text'};
 
             fields.push($this.fieldsidx['_created']);
             fields.push($this.fieldsidx['_modified']);

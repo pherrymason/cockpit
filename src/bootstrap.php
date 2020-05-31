@@ -61,7 +61,8 @@ function getCockpitApp(array $configuration): App
     $app->addMiddleware($middleware);
     $app->addMiddleware(new \Cockpit\Framework\Middlewares\JsonBodyParserMiddleware());
     //$app->addErrorMiddleware(true, true, true);
-    $app->addMiddleware(new \Franzl\Middleware\Whoops\WhoopsMiddleware());
+
+    $app->addMiddleware(new Middlewares\Whoops());
 
     return $app;
 }

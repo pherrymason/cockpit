@@ -6,10 +6,10 @@
 
     <div class="uk-modal-dialog uk-form" ref="loginDialog">
 
-        <form class="uk-form" method="post" action="@route('/auth/check')" onsubmit="{ submit }">
+        <form class="uk-form" method="post" action="<?= $this->route('/auth/check') ?>" onsubmit="{ submit }">
 
             <div class="uk-text-center">
-                <img src="@base('assets:app/media/icons/login.svg')" width="100" height="100">
+                <img src="<?= $this->base('assets:app/media/icons/login.svg') ?>" width="100" height="100">
             </div>
 
             <div class="uk-form-row uk-text-center uk-h2 uk-text-bold">
@@ -17,15 +17,15 @@
             </div>
 
             <div class="uk-form-row uk-margin-large-top">
-                <input ref="user" class="uk-form-large uk-width-1-1" type="text" placeholder="@lang('Username')" required>
+                <input ref="user" class="uk-form-large uk-width-1-1" type="text" placeholder="<?= $this->lang('Username') ?>" required>
             </div>
 
             <div class="uk-form-row">
-                <input ref="password" class="uk-form-large uk-width-1-1" type="password" placeholder="@lang('Password')" required>
+                <input ref="password" class="uk-form-large uk-width-1-1" type="password" placeholder="<?= $this->lang('Password') ?>" required>
             </div>
 
             <div class="uk-margin-top">
-                <button class="uk-button uk-button-primary uk-button-large uk-width-1-1">@lang('Authenticate')</button>
+                <button class="uk-button uk-button-primary uk-button-large uk-width-1-1"><?= $this->lang('Authenticate') ?></button>
             </div>
 
         </form>
