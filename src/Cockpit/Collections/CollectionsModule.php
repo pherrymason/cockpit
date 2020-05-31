@@ -58,6 +58,8 @@ final class CollectionsModule implements Module
                 $group->post('/find', Admin::class . ':find')->setName('collections_find');
                 $group->get('/entries/{name:[0-9a-z\-]+}', Admin::class . ':entries')->setName('collections_entries');
                 $group->get('/entry/{name:[0-9a-z\-]+}', Admin::class . ':entry')->setName('collections_entry');
+                $group->get('/entry/{name:[0-9a-z\-]+}/{id:[0-9a-z\-]+}', Admin::class . ':entry')->setName('collections_entry');
+                $group->post('/save_entry/{name:[0-9a-z\-_]+}', Admin::class . ':save_entry')->setName('collections_save_entry');
                 $group->post('/utils/getUserCollections', Admin::class . ':getUserCollections')->setName('collections_user_collections');
             }
         );

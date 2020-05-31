@@ -11,10 +11,12 @@ use Cockpit\App\Revisions;
 use Cockpit\Framework\EventSystem;
 use Cockpit\Framework\TemplateController;
 use League\Plates\Engine;
+use Mezzio\Authentication\UserInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Laminas\Diactoros\Response\JsonResponse;
+use Slim\Exception\HttpNotFoundException;
 
 final class Admin extends TemplateController
 {
@@ -287,7 +289,7 @@ final class Admin extends TemplateController
         );
     }
 
-    public function entry($collectionName, $id = null)
+    public function entry(RequestInterface $request, ResponseInterface $response, $name, $id = null)
     {
 //        if ($id && !$this->module('collections')->hasaccess($collection, 'entries_view')) {
 //            return $this->helper('admin')->denyRequest();
@@ -297,7 +299,7 @@ final class Admin extends TemplateController
 //            return $this->helper('admin')->denyRequest();
 //        }
 
-        $collection = $this->collections->byName($collectionName);
+        $collection = $this->collections->byName($name);
         $excludeFields = [];
 
         if (!$collection) {
@@ -311,10 +313,10 @@ final class Admin extends TemplateController
 //            'description' => ''
 //        ], $collection);
 
-        $this->app->helper('admin')->favicon = [
+        /*$this->app->helper('admin')->favicon = [
             'path' => 'collections:icon.svg',
             'color' => $collection->color()
-        ];
+        ];*/
 
         if ($id) {
             $entry = $this->entries->byId($collection, $id);
@@ -322,7 +324,8 @@ final class Admin extends TemplateController
             //$entry = $this->app->storage->findOne("collections/{$collection['_id']}", ['_id' => $id]);
 
             if (!$entry) {
-                return cockpit()->helper('admin')->denyRequest();
+                throw new HttpNotFoundException();
+                //return cockpit()->helper('admin')->denyRequest();
             }
 
 //            if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($id, $meta)) {
@@ -343,13 +346,15 @@ final class Admin extends TemplateController
 //            }
 //        }
 
-        $view = 'collections:views/entry.php';
+        $view = 'collections::views/entry';
 
-        if ($override = $this->app->path('#config:collections/' . $collection->name() . '/views/entry.php')) {
-            $view = $override;
-        }
+       // if ($override = $this->app->path('#config:collections/' . $collection->name() . '/views/entry.php')) {
+       //     $view = $override;
+       //}
 
-        return $this->render(
+        return $this->renderResponse(
+            $request,
+            $response,
             $view,
             [
                 'collection' => $collection->toArray(),
@@ -359,15 +364,16 @@ final class Admin extends TemplateController
         );
     }
 
-    public function save_entry($collectionName)
+    public function save_entry(RequestInterface $request, ResponseInterface $response, $name)
     {
-        $collection = $this->collections->byName($collectionName);
+        $collection = $this->collections->byName($name);
 
         if (!$collection) {
             return false;
         }
 
-        $entry = $this->param('entry', false);
+        $params = $request->getParsedBody();
+        $entry = $params['entry'] ?? false;
 
         if (!$entry) {
             return false;
@@ -381,7 +387,10 @@ final class Admin extends TemplateController
 //            return $this->helper('admin')->denyRequest();
 //        }
 
-        $entry['_mby'] = $this->module('cockpit')->getUser('_id');
+        /** @var UserInterface $user */
+        $user = $request->getAttributes()[UserInterface::class];
+
+        $entry['_mby'] = $user->getDetail('id');
         $entry['_modified'] = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
         $isUpdate = false;
         if (isset($entry['_id'])) {
@@ -408,27 +417,24 @@ final class Admin extends TemplateController
 //            }
         }
 
-        $this->app->trigger('collections.save.before', [$collection->name(), &$entry, $isUpdate]);
-        $this->app->trigger("collections.save.before.{$collection->name()}", [$collection->name(), &$entry, $isUpdate]);
+        $this->eventSystem->trigger('collections.save.before', [$collection->name(), &$entry, $isUpdate]);
+        $this->eventSystem->trigger("collections.save.before.{$collection->name()}", [$collection->name(), &$entry, $isUpdate]);
 
         $options = ['revision' => $revision];
         $entry = $this->entries->save($collection, $entry, $options);
         $entryArray = $entry->toArray();
 
-        $this->app->trigger('collections.save.after', [$collection->name(), &$entryArray, $isUpdate]);
-        $this->app->trigger(
+        $this->eventSystem->trigger('collections.save.after', [$collection->name(), &$entryArray, $isUpdate]);
+        $this->eventSystem->trigger(
             "collections.save.after.{$collection->name()}",
             [$collection->name(), &$entryArray, $isUpdate]
         );
 
-//        $this->app->helper('admin')->lockResourceId($entry->id());
         if ($options['revision']) {
-            $user = $this->app->module('cockpit')->getUser();
-            $this->revisions->add($entry, $user['_id'], "collections/{$collection->name()}");
-//            $this->app->helper('revisions')->add($entry['_id'], $entry, $user['_id'], "collections/{$collection}");
+            $this->revisions->add($entry, $user->getDetail('id'), "collections/{$collection->name()}");
         }
 
-        return $entry;
+        return new JsonResponse($entry);
     }
 
     public function revisions($collectionName, $id)
