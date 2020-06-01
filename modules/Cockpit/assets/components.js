@@ -379,9 +379,7 @@ riot.tag2('cp-assets', '<div ref="list" show="{mode==\'list\'}"> <div ref="uploa
         }.bind(this)
 
         this.addFolder = function() {
-
-            App.ui.prompt(App.i18n.get('Folder Name:'), '', function() {
-
+            App.ui.prompt(App.i18n.get('Folder Name:'), '', function(name) {
                 if (!name.trim()) return;
 
                 App.request('/assetsmanager/addFolder', {name:name, parent:$this.folder}).then(function(folder) {

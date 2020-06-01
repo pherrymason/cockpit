@@ -28,12 +28,10 @@
     $publicStorageURL = $cmsConfig['storage_path'];
 */
 ?><!doctype html>
-<html lang="<?= $i18n->locale ?>" data-base="<?= $this->base('/') ?>" data-route="<?= $this->base('/')?>" data-version="{{ $app['cockpit/version'] }}" data-locale="<?= $i18n->locale ?>">
+<html lang="<?= $i18n->locale ?>" data-base="<?= $this->base('/') ?>" data-route="<?= $this->base('/')?>" data-version="0" data-locale="<?= $i18n->locale ?>">
 <head>
     <meta charset="UTF-8">
-    <title><?= implode(' &raq<?php foreach ($pageAssets->assets(\'scripts\') as $script): ?>
-        <script src="<?= $this->base($script)?>"></script>
-    <?php endforeach; ?uo; ', $_title).(count($_title) ? ' - ':'').$appName ?></title>
+    <title><?= implode(' &raquo; ', $_title).(count($_title) ? ' - ':'').$appName ?></title>
     <link rel="icon" href="<?= $this->base('/favicon.png') ?>" type="image/png">
     <?php /*{{ $app->helper('admin')->favicon('red') }}*/ ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
