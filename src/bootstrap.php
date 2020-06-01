@@ -5,8 +5,6 @@ use Cockpit\Singleton\SingletonsModule;
 use Slim\App;
 use Slim\Handlers\Strategies\RequestResponseArgs;
 
-include(dirname(__DIR__).'/vendor/autoload.php');
-
 function getCockpitApp(array $configuration): App
 {
     $app = AppFactory::createCockpit($configuration);
