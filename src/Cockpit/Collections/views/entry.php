@@ -211,8 +211,6 @@
         }
 
         // fill with default values
-        console.log($this.languages);
-
         this.fields.forEach(function(field) {
             $this.fieldsidx[field.name] = field;
 

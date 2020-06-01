@@ -223,7 +223,7 @@ final class DBEntriesRepository implements EntriesRepository
             }
         }
 
-        return new Entry($data['id'], $data);
+        return new Entry($data['id'], $data, $collection->fields());
     }
 
     protected function mergeResults(Collection $collection, array $entries): array

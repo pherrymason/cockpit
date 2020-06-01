@@ -13,19 +13,25 @@ final class Entry implements ContentUnit
     private $data;
     /** @var array */
     private $localizedData;
+    /** @var Field[] */
+    private $fields;
 
-
-    public function __construct(string $id, array $data)
+    public function __construct(string $id, array $data, array $fields)
     {
         $this->id = $id;
         $this->localizedData = $data['localized'];
         unset($data['localized']);
         $this->data = $data;
+        $this->fields = [];
+        /** @var Field[] $fields */
+        foreach ($fields as $field) {
+            $this->fields[$field->name()] = $field;
+        }
     }
 
     public static function create(): self
     {
-        return new Entry(IDs::new(), []);
+        return new Entry(IDs::new(), [], []);
     }
 
     public function id(): string
@@ -55,7 +61,22 @@ final class Entry implements ContentUnit
             '_id' => $this->id
         ];
 
-        $data = array_merge($data, $this->data);
+        foreach ($this->data as $fieldName => $value) {
+            if (!isset($this->fields[$fieldName])) {
+                $data[$fieldName] = $value;
+                continue;
+            }
+
+            switch ($this->fields[$fieldName]->type()) {
+                case Field::TYPE_ASSET:
+                    $data[$fieldName] = !empty($value) ? json_decode($value, true) : null;
+                    break;
+
+                default:
+                    $data[$fieldName] = $value;
+                    break;
+            }
+        }
 
         if (!is_numeric($data['_created'])) {
             $created = new \DateTimeImmutable($data['_created']);
@@ -69,7 +90,20 @@ final class Entry implements ContentUnit
 
         foreach ($this->localizedData as $langCode => $fields) {
             foreach ($fields as $fieldName => $value ) {
-                $data[$fieldName.'_'.$langCode] = $value;
+                if (!isset($this->fields[$fieldName])) {
+                    $data[$fieldName.'_'.$langCode] = $value;
+                    continue;
+                }
+
+                switch ($this->fields[$fieldName]->type()) {
+                    case Field::TYPE_ASSET:
+                        $data[$fieldName.'_'.$langCode] = json_decode($value, true);
+                        break;
+
+                    default:
+                        $data[$fieldName.'_'.$langCode] = $value;
+                        break;
+                }
             }
         }
 
