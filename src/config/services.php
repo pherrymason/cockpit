@@ -7,6 +7,21 @@ use Psr\Container\ContainerInterface;
  */
 
 $services = [
+    \Doctrine\DBAL\Connection::class => function (ContainerInterface $c) {
+        $config = new \Doctrine\DBAL\Configuration();
+        $params = $c->get('database.config');
+        $connectionParams = [
+            'driver' => 'pdo_mysql',
+            'host' => $params['server'],
+            'dbname' => $params['options']['db'],
+            'user' => $params['options']['user'],
+            'password' => $params['options']['password'],
+            'charset' => 'UTF8'
+        ];
+
+        return \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+    },
+
     'dbal.mysql' => function (ContainerInterface $c) {
         $config = new \Doctrine\DBAL\Configuration();
         $params = $c->get('database.config');

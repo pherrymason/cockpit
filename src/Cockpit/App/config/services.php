@@ -63,7 +63,9 @@ return [
             $c->get(\Cockpit\App\Assets\Uploader::class),
             $c->get(\Cockpit\Framework\EventSystem::class),
             $c->get(\League\Flysystem\Filesystem::class),
-            $c->get('paths')['assets']
+            $c->get('paths')['assets'],
+            $c->get(\League\Plates\Engine::class),
+            $c
         );
     },
 

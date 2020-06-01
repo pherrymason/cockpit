@@ -59,7 +59,7 @@ class Base extends TemplateController
             $areas[$area]->insert($widget, -1 * $prio);
         }
 
-        return $this->renderResponse($request, $response, 'base/dashboard', compact('areas', 'widgets'));
+        return $this->renderResponse($request, 'base/dashboard', compact('areas', 'widgets'));
     }
 
     public function savedashboard() {

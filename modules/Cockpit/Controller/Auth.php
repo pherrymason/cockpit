@@ -12,7 +12,6 @@ namespace Cockpit\Controller;
 
 class Auth extends \LimeExtra\Controller {
 
-
     public function check() {
 
         if ($data = $this->param('auth')) {

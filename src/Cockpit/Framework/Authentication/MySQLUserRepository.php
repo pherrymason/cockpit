@@ -3,6 +3,8 @@
 namespace Cockpit\Framework\Authentication;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
+use Mezzio\Authentication\DefaultUserFactory;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Authentication\Exception;
@@ -13,10 +15,10 @@ final class MySQLUserRepository implements UserRepositoryInterface
 
     /** @var Connection */
     private $connection;
-    /** @var \Mezzio\Authentication\DefaultUserFactory */
+    /** @var */
     private $userFactory;
 
-    public function __construct(Connection $connection, \Mezzio\Authentication\DefaultUserFactory $userFactory)
+    public function __construct(Connection $connection, $userFactory)
     {
         $this->connection = $connection;
         $this->userFactory = $userFactory;
@@ -42,11 +44,11 @@ final class MySQLUserRepository implements UserRepositoryInterface
         $stmt->execute();
 
         $result = $stmt->fetch();
-        if (! $result) {
+        if (!$result) {
             return null;
         }
 
-        if (password_verify($password ?? '', $result->{$this->config['field']['password']} ?? '')) {
+        if (password_verify($password ?? '', $result['password'] ?? '')) {
             return ($this->userFactory)(
                 $credential,
                 $this->getUserRoles($credential),
@@ -62,42 +64,29 @@ final class MySQLUserRepository implements UserRepositoryInterface
      * @param string $identity
      * @return string[]
      */
-    protected function getUserRoles(string $identity) : array
+    protected function getUserRoles(string $identity): array
     {
-        if (! isset($this->config['sql_get_roles'])) {
-            return [];
-        }
-
-        if (false === strpos($this->config['sql_get_roles'], ':identity')) {
-            throw new Exception\InvalidConfigException(
-                'The sql_get_roles configuration setting must include an :identity parameter'
+        try {
+            $sql = 'SELECT * FROM ' . self::TABLE . ' WHERE `user`=:user LIMIT 1';
+            $result = $this->connection->executeQuery($sql, ['user' => $identity])->fetch();
+        } catch (DBALException $e) {
+            throw new Exception\RuntimeException(
+                sprintf(
+                    'Error preparing retrieval of user details: %s',
+                    $e->getMessage()
+                )
             );
         }
 
-        try {
-            $stmt = $this->pdo->prepare($this->config['sql_get_roles']);
-        } catch (PDOException $e) {
-            throw new Exception\RuntimeException(sprintf(
-                                                     'Error preparing retrieval of user roles: %s',
-                                                     $e->getMessage()
-                                                 ));
-        }
-        if (false === $stmt) {
-            throw new Exception\RuntimeException(sprintf(
-                                                     'Error preparing retrieval of user roles: unknown error'
-                                                 ));
-        }
-        $stmt->bindParam(':identity', $identity);
-
-        if (! $stmt->execute()) {
-            return [];
+        if (false === $result) {
+            throw new Exception\RuntimeException(
+                sprintf(
+                    'Error preparing retrieval of user roles: unknown error'
+                )
+            );
         }
 
-        $roles = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_NUM) as $role) {
-            $roles[] = $role[0];
-        }
-        return $roles;
+        return [$result['group']];
     }
 
     /**
@@ -106,36 +95,33 @@ final class MySQLUserRepository implements UserRepositoryInterface
      * @param string $identity
      * @return string[]
      */
-    protected function getUserDetails(string $identity) : array
+    protected function getUserDetails(string $identity): array
     {
-        if (! isset($this->config['sql_get_details'])) {
-            return [];
-        }
-
-        if (false === strpos($this->config['sql_get_details'], ':identity')) {
-            throw new Exception\InvalidConfigException(
-                'The sql_get_details configuration setting must include a :identity parameter'
+        try {
+            $sql = 'SELECT * FROM ' . self::TABLE . ' WHERE `user`=:user LIMIT 1';
+            $result = $this->connection->executeQuery($sql, ['user' => $identity])->fetch();
+        } catch (DBALException $e) {
+            throw new Exception\RuntimeException(
+                sprintf(
+                    'Error preparing retrieval of user details: %s',
+                    $e->getMessage()
+                )
             );
         }
 
-        try {
-            $stmt = $this->pdo->prepare($this->config['sql_get_details']);
-        } catch (PDOException $e) {
-            throw new Exception\RuntimeException(sprintf(
-                                                     'Error preparing retrieval of user details: %s',
-                                                     $e->getMessage()
-                                                 ));
+        if ($result === false) {
+            throw new Exception\RuntimeException(
+                sprintf(
+                    'Error preparing retrieval of user details: unknown error'
+                )
+            );
         }
-        if (false === $stmt) {
-            throw new Exception\RuntimeException(sprintf(
-                                                     'Error preparing retrieval of user details: unknown error'
-                                                 ));
-        }
-        $stmt->bindParam(':identity', $identity);
 
-        if (! $stmt->execute()) {
-            return [];
-        }
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return [
+            'id' => $result['_id'],
+            'user' => $result['user'],
+            'name' => $result['name'],
+            'i18n' => $result['i18n']
+        ];
     }
 }

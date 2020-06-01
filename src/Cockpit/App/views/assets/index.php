@@ -1,6 +1,6 @@
 <div>
     <ul class="uk-breadcrumb">
-        <li class="uk-active"><span>@lang('Assets')</span></li>
+        <li class="uk-active"><span><?= $this->lang('Assets')?></span></li>
     </ul>
 </div>
 

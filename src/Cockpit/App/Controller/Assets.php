@@ -9,6 +9,7 @@ use Cockpit\App\Assets\FolderRepository;
 use Cockpit\App\Assets\Uploader;
 use Cockpit\Framework\Database\Constraint;
 use Cockpit\Framework\EventSystem;
+use Cockpit\Framework\TemplateController;
 use League\Flysystem\Filesystem;
 use Mezzio\Authentication\UserInterface;
 use Psr\Http\Message\RequestInterface;
@@ -16,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpNotFoundException;
 use Laminas\Diactoros\Response\JsonResponse;
 
-final class Assets
+final class Assets extends TemplateController
 {
     /** @var AssetRepository */
     private $assets;
@@ -30,8 +31,12 @@ final class Assets
     private $fileSystem;
     /** @var string */
     private $assetsAbsolutePath;
+    /**
+     * @var \League\Plates\Engine
+     */
+    private $engine;
 
-    public function __construct(AssetRepository $assets, FolderRepository $folders, Uploader $uploader, EventSystem $eventSystem, Filesystem $fileSystem, string $assetsAbsolutePath)
+    public function __construct(AssetRepository $assets, FolderRepository $folders, Uploader $uploader, EventSystem $eventSystem, Filesystem $fileSystem, string $assetsAbsolutePath, \League\Plates\Engine $engine, \Psr\Container\ContainerInterface $container)
     {
         $this->assets = $assets;
         $this->folders = $folders;
@@ -39,11 +44,14 @@ final class Assets
         $this->eventSystem = $eventSystem;
         $this->fileSystem = $fileSystem;
         $this->assetsAbsolutePath = dirname($assetsAbsolutePath);
+        parent::__construct($engine, $container);
+        $this->engine = $engine;
+        $this->container = $container;
     }
 
-    public function index()
+    public function index(RequestInterface $request, ResponseInterface $response)
     {
-        return $this->render('cockpit:views/assets/index.php');
+        return $this->renderResponse($request, 'cockpit::views/assets/index');
     }
 
     public function listAssets(RequestInterface $request)

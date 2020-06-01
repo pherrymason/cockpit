@@ -57,7 +57,7 @@ final class Admin extends TemplateController
             return mb_strtolower($a['label']) <=> mb_strtolower($b['label']);
         });
 */
-        return $this->renderResponse($request, $response, 'singletons::views/index', ['singletons' => $arraySingletons]);
+        return $this->renderResponse($request, 'singletons::views/index', ['singletons' => $arraySingletons]);
     }
 
     public function form(RequestInterface $request, ResponseInterface $response, $name = null)
@@ -96,11 +96,12 @@ final class Admin extends TemplateController
         $singletonArray = $singleton->data();
         return $this->renderResponse(
             $request,
-            $response,
-            'singletons::views/form', [
-            'singleton' => $singleton->toArray(),
-            'data' => empty($singletonArray) ? null : $singletonArray
-        ]);
+            'singletons::views/form',
+            [
+                'singleton' => $singleton->toArray(),
+                'data' => empty($singletonArray) ? null : $singletonArray
+            ]
+        );
     }
 
     public function singleton($name = null)

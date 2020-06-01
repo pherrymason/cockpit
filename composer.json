@@ -54,7 +54,9 @@
         "mezzio/mezzio-authentication": "^1.1",
         "doctrine/dbal": "^2.10",
         "middlewares/whoops": "^2.0",
-        "laminas/laminas-diactoros": "^2.3"
+        "laminas/laminas-diactoros": "^2.3",
+        "mezzio/mezzio-authentication-session": "^1.0",
+        "mezzio/mezzio-session-ext": "^1.9"
     },
 
     "config": {

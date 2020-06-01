@@ -31,7 +31,9 @@
 <html lang="<?= $i18n->locale ?>" data-base="<?= $this->base('/') ?>" data-route="<?= $this->base('/')?>" data-version="{{ $app['cockpit/version'] }}" data-locale="<?= $i18n->locale ?>">
 <head>
     <meta charset="UTF-8">
-    <title><?= implode(' &raquo; ', $_title).(count($_title) ? ' - ':'').$appName ?></title>
+    <title><?= implode(' &raq<?php foreach ($pageAssets->assets(\'scripts\') as $script): ?>
+        <script src="<?= $this->base($script)?>"></script>
+    <?php endforeach; ?uo; ', $_title).(count($_title) ? ' - ':'').$appName ?></title>
     <link rel="icon" href="<?= $this->base('/favicon.png') ?>" type="image/png">
     <?php /*{{ $app->helper('admin')->favicon('red') }}*/ ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -207,16 +209,16 @@
 
                         <div data-uk-dropdown="mode:'click'">
 
-                            <a class="uk-display-block" href="<?= $this->route('/accounts/account')?>" style="width:30px;height:30px;" aria-label="<?= $this->lang('Edit account') ?>" riot-mount>
-                                <cp-gravatar email="<?= $user->getDetail('email', 'admin@admin.com') ?>" size="30" alt="<?= $user->getIdentity() ?>"></cp-gravatar>
+                            <a class="uk-display-block" href="<?= $this->route('accounts_account')?>" style="width:30px;height:30px;" aria-label="<?= $this->lang('Edit account') ?>" riot-mount>
+                                <cp-gravatar email="<?= $user !== null ? $user->getDetail('email', 'admin@admin.com') : '' ?>" size="30" alt="<?= $user !== null ? $user->getIdentity() : '' ?>"></cp-gravatar>
                             </a>
 
                             <div class="uk-dropdown uk-dropdown-navbar uk-dropdown-flip">
                                 <ul class="uk-nav uk-nav-navbar">
-                                    <li class="uk-nav-header uk-text-truncate"><?= $user->getIdentity() ?></li>
+                                    <li class="uk-nav-header uk-text-truncate"><?= $user !== null ? $user->getIdentity() : '' ?></li>
                                     <li><a href="<?= $this->route('/accounts/account')?>"><?= $this->lang('Account') ?></a></li>
                                     <li class="uk-nav-divider"></li>
-                                        <li class="uk-nav-item-danger"><a href="<?= $this->route('/auth/logout')?>"><?= $this->lang('Logout') ?></a></li>
+                                        <li class="uk-nav-item-danger"><a href="<?= $this->route('logout')?>"><?= $this->lang('Logout') ?></a></li>
                                 </ul>
                             </div>
                         </div>

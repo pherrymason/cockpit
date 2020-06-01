@@ -4,6 +4,7 @@ namespace Cockpit\Framework;
 
 use Cockpit\App\UI\Menu;
 use Cockpit\Framework\Template\PageAssets;
+use Laminas\Diactoros\Response\HtmlResponse;
 use League\Plates\Engine;
 use Mezzio\Authentication\UserInterface;
 use Psr\Http\Message\RequestInterface;
@@ -22,24 +23,34 @@ abstract class TemplateController
         $this->container = $container;
     }
 
-    public function renderResponse(RequestInterface $request, ResponseInterface $response, string $view, array $data = [], array $globalData = [])
+    public function renderResponseLayout(RequestInterface $request, string $view, array $data = [], array $globalData = []): HtmlResponse
     {
         if (count($globalData)) {
             $this->templateEngine->addData($globalData);
         }
 
+        $this->templateEngine->addData($this->layoutData($request));
+
+        return new HtmlResponse($this->templateEngine->render($view, $data));
+    }
+
+    public function renderResponse(RequestInterface $request, string $view, array $data = [], array $globalData = []): HtmlResponse
+    {
+        if (count($globalData)) {
+            $this->templateEngine->addData($globalData);
+        }
 
         $this->templateEngine->addData($this->layoutData($request));
 
         $template = $this->templateEngine->make($view);
         $template->layout('layouts/app');
-        $response->getBody()->write($template->render($data));
 
-        return $response;
+        return new HtmlResponse($template->render($data));
     }
 
     private function layoutData(RequestInterface $request): array
     {
+        $user = $request->getAttributes()[UserInterface::class] ?? null;
         $data = [
             'appName' => $this->container->get('app.name'),
             'i18n' => $this->container->get('i18n'),
@@ -49,10 +60,9 @@ abstract class TemplateController
             'extract' => $this->sharedData($request),
             'components' => new \ArrayObject([]),    // vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:79
             'pageAssets' => $this->container->get(PageAssets::class),
-            'menuModules' => $this->container->get(Menu::class)->items(
-            ), // {menu.modules} vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:84
+            'menuModules' => $this->container->get(Menu::class)->items(), // {menu.modules} vendor/raulferras/cockpit/modules/Cockpit/Helper/Admin.php:84
             'modules' => $this->container->get('modules'),
-            'user' => $request->getAttributes()[UserInterface::class]
+            'user' => $user
         ];
 
         return $data;
@@ -79,8 +89,8 @@ abstract class TemplateController
                 'email' => '',
                 'group' => 'admin',
                 'i18n' => 'en',
-                'name' => $user->getIdentity(),
-                'user' => $user->getIdentity()
+                'name' => $user !== null ? $user->getIdentity() : null,
+                'user' => $user !== null ? $user->getIdentity() : null
             ]
         ];
 

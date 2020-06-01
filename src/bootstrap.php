@@ -27,13 +27,19 @@ function getCockpitApp(array $configuration): App
 
     $routeCollector = $app->getRouteCollector();
     $routeCollector->setDefaultInvocationStrategy(new RequestResponseArgs());
+
+    /** @var \Psr\Container\ContainerInterface $container */
     $container = $app->getContainer();
     $routeParser = $app->getRouteCollector()->getRouteParser();
     $container->set('router', $routeParser);
+    $container->set(\Slim\Interfaces\RouteParserInterface::class, $routeParser);
     $container->set('basePath', $app->getBasePath());
 
+
+    $authenticationMiddleware = $container->get(\Mezzio\Authentication\AuthenticationMiddleware::class);
+
     $modules = [
-        new \Cockpit\App\CockpitModule(),
+        new \Cockpit\App\CockpitModule($authenticationMiddleware),
         $container->get(\Cockpit\Collections\CollectionsModule::class),
         $container->get(SingletonsModule::class)
     ];
@@ -56,12 +62,8 @@ function getCockpitApp(array $configuration): App
     }
 
 
-
-    $middleware = $container->get(\Mezzio\Authentication\AuthenticationMiddleware::class);
-    $app->addMiddleware($middleware);
+    $app->addMiddleware($container->get(\Mezzio\Session\SessionMiddleware::class));
     $app->addMiddleware(new \Cockpit\Framework\Middlewares\JsonBodyParserMiddleware());
-    //$app->addErrorMiddleware(true, true, true);
-
     $app->addMiddleware(new Middlewares\Whoops());
 
     return $app;

@@ -48,7 +48,7 @@ final class Admin extends TemplateController
             $collections
         );
 
-        return $this->renderResponse($request, $response, 'collections::views/index', ['collections' => $frontendData]);
+        return $this->renderResponse($request, 'collections::views/index', ['collections' => $frontendData]);
     }
 
     public function collection($name = null)
@@ -228,7 +228,6 @@ final class Admin extends TemplateController
 
         return $this->renderResponse(
             $request,
-            $response,
             $view,
             [
                 'collection' => $collection->toArray()
@@ -354,7 +353,6 @@ final class Admin extends TemplateController
 
         return $this->renderResponse(
             $request,
-            $response,
             $view,
             [
                 'collection' => $collection->toArray(),
