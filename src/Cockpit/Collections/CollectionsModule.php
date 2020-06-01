@@ -11,6 +11,7 @@ use Cockpit\Framework\Template\PageAssets;
 use Cockpit\Module;
 use Cockpit\Singleton\SingletonRepository;
 use League\Plates\Engine;
+use Mezzio\Authentication\AuthenticationMiddleware;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
@@ -20,11 +21,14 @@ final class CollectionsModule implements Module
     private $collections;
     /** @var Engine */
     private $engine;
+    /** @var AuthenticationMiddleware */
+    private $authenticationMiddleware;
 
-    public function __construct(CollectionRepository $collections, Engine $engine)
+    public function __construct(CollectionRepository $collections, Engine $engine, AuthenticationMiddleware $authenticationMiddleware)
     {
         $this->collections = $collections;
         $this->engine = $engine;
+        $this->authenticationMiddleware = $authenticationMiddleware;
     }
 
     public function registerUI(Menu $menu, PageAssets $assets, EventSystem $eventSystem): void
@@ -62,7 +66,7 @@ final class CollectionsModule implements Module
                 $group->post('/save_entry/{name:[0-9a-z\-_]+}', Admin::class . ':save_entry')->setName('collections_save_entry');
                 $group->post('/utils/getUserCollections', Admin::class . ':getUserCollections')->setName('collections_user_collections');
             }
-        );
+        )->addMiddleware($this->authenticationMiddleware);
     }
 
     public function registerPaths(PathResolver $pathResolver, Engine $engine): void

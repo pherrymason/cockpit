@@ -35,11 +35,8 @@ function getCockpitApp(array $configuration): App
     $container->set(\Slim\Interfaces\RouteParserInterface::class, $routeParser);
     $container->set('basePath', $app->getBasePath());
 
-
-    $authenticationMiddleware = $container->get(\Mezzio\Authentication\AuthenticationMiddleware::class);
-
     $modules = [
-        new \Cockpit\App\CockpitModule($authenticationMiddleware),
+        $container->get(\Cockpit\App\CockpitModule::class),
         $container->get(\Cockpit\Collections\CollectionsModule::class),
         $container->get(SingletonsModule::class)
     ];

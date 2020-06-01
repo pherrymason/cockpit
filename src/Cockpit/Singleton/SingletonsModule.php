@@ -17,11 +17,14 @@ final class SingletonsModule implements Module
     private $singletons;
     /** @var Engine */
     private $engine;
+    /** @var \Mezzio\Authentication\AuthenticationMiddleware */
+    private $authenticationMiddleware;
 
-    public function __construct(SingletonRepository $singletons, Engine $engine)
+    public function __construct(SingletonRepository $singletons, Engine $engine, \Mezzio\Authentication\AuthenticationMiddleware $authenticationMiddleware)
     {
         $this->singletons = $singletons;
         $this->engine = $engine;
+        $this->authenticationMiddleware = $authenticationMiddleware;
     }
 
     public function registerUI(Menu $menu, \Cockpit\Framework\Template\PageAssets $assets, \Cockpit\Framework\EventSystem $eventSystem): void
@@ -61,7 +64,7 @@ final class SingletonsModule implements Module
                     'singleton-update_data'
                 );
             }
-        );
+        )->addMiddleware($this->authenticationMiddleware);
     }
 
     public function registerPaths(PathResolver $pathResolver, Engine $engine): void
