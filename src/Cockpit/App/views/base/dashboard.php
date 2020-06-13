@@ -16,7 +16,7 @@ use Cockpit\App\UI\MenuItem;
 
                 <div class="uk-flex">
                     <div riot-mount>
-                        <cp-gravatar email="<?= $user->getDetails('email') ?>" size="55" alt="<?= $user->getIdentity() ?>"></cp-gravatar>
+                        <cp-gravatar email="<?= $user->getDetails()['email'] ?? '' ?>" size="55" alt="<?= $user->getIdentity() ?>"></cp-gravatar>
                     </div>
                     <div class="uk-flex-item-1 uk-margin-left">
                         <h2 class="uk-margin-remove"><?= $this->lang('Welcome back')?></h2>
