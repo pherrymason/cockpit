@@ -73,7 +73,15 @@ final class Uploader
             $_sizeAllowed = $max_size ? $filesize < $max_size : true;
 
             if ($files['error'][$i] || !$_isAllowed || !$_sizeAllowed) {
-                $failed[] = $files['name'][$i];
+                if (isset($files['error'][$i])) {
+                    $reason = 'upload error: '.$files['error'][$i];
+                } else if(!$_isAllowed) {
+                    $reason = 'not allowed';
+                } else if(!$_sizeAllowed) {
+                    $reason = 'too big: '.$max_size;
+                }
+
+                $failed[] = $files['name'][$i] . ':' . $reason;
                 continue;
             }
 
@@ -106,7 +114,7 @@ final class Uploader
                 $uploaded[] = $files['name'][$i];
             } catch (\Exception $e) {
                 // Error uploading file
-                $failed[] = $files['name'][$i];
+                $failed[] = $files['name'][$i].': '.$e->getMessage();
             }
         }
 
