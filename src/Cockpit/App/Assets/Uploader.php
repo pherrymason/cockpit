@@ -63,7 +63,7 @@ final class Uploader
         $iMax = count($files['name']);
         for ($i = 0; $i < $iMax; $i++) {
             $pathinfo = pathinfo($files['name'][$i]);
-            $cleanName = uniqid() . $this->slugify->slugify($pathinfo['filename']) . '.' . $pathinfo['extension'];
+            $cleanName = $this->slugify->slugify($pathinfo['filename']) . '.' . $pathinfo['extension'];
 
             $path = $folder->path() . '/' . $cleanName;
             $assetsPath = $this->pathResolver->assetsPath();
