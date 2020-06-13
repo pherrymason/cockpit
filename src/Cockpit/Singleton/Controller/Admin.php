@@ -198,11 +198,11 @@ final class Admin extends TemplateController
         $data = $params['data'] ?? null;
 
         if (!$singleton || !$data) {
-            throw new HttpNotFoundException();
+            throw new HttpNotFoundException($request);
         }
 
         /** @var UserInterface $user */
-        $user = $request->getAttributes()[UserInterface::class];
+        $user = $request->getAttribute(UserInterface::class);
 
         /*
         if (!$this->module('singletons')->hasaccess($singleton->name(), 'form')) {

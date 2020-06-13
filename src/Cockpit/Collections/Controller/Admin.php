@@ -386,7 +386,7 @@ final class Admin extends TemplateController
 //        }
 
         /** @var UserInterface $user */
-        $user = $request->getAttributes()[UserInterface::class];
+        $user = $request->getAttribute(UserInterface::class);
 
         $entry['_mby'] = $user->getDetail('id');
         $entry['_modified'] = (new \DateTimeImmutable())->format('Y-m-d H:i:s');

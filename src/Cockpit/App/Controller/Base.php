@@ -35,7 +35,7 @@ class Base extends TemplateController
         $keyStorage = $this->container->get($config['driver']);
 
         /** @var UserInterface $user */
-        $user = $request->getAttributes()[UserInterface::class];
+        $user = $request->getAttribute(UserInterface::class);
         $settings = $keyStorage->getKey('cockpit/options', 'dashboard.widgets.'.$user->getDetail('id'), []);
 
         $widgets  = new \ArrayObject([]);

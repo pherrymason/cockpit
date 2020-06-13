@@ -91,7 +91,7 @@ final class Assets extends TemplateController
         $params = $request->getParsedBody();
         $meta = ['folder' => $params['folder'] ?? ''];
         $folderID = $params['folder'] ?? null;
-        $user = $request->getAttributes()[UserInterface::class];
+        $user = $request->getAttribute(UserInterface::class);
 
         $folder = null;
         if ($folderID) {
@@ -148,11 +148,11 @@ final class Assets extends TemplateController
         $params = $request->getParsedBody();
         $asset = $params['asset'] ?? false;
         if (!$asset) {
-            return new HttpNotFoundException();
+            return new HttpNotFoundException($request);
         }
 
         /** @var UserInterface $user */
-        $user = $request->getAttributes()[UserInterface::class];
+        $user = $request->getAttribute(UserInterface::class);
         $assets = isset($asset[0]) ? $asset : [$asset];
 
         foreach ($assets as &$asset) {

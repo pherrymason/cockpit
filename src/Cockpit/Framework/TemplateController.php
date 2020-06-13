@@ -50,11 +50,11 @@ abstract class TemplateController
 
     private function layoutData(RequestInterface $request): array
     {
-        $user = $request->getAttributes()[UserInterface::class] ?? null;
+        $user = $request->getAttribute(UserInterface::class);
         $data = [
             'appName' => $this->container->get('app.name'),
             'i18n' => $this->container->get('i18n'),
-            'route' => $request->getAttributes()['__routingResults__']->getUri(),
+            'route' => $request->getAttributes('__routingResults__')->getUri(),
 
             // not implemented
             'extract' => $this->sharedData($request),
@@ -73,7 +73,7 @@ abstract class TemplateController
         $languages = $this->container->get('languages');
         $defaultLanguage = $this->container->get('defaultLanguage');
         /** @var UserInterface $user */
-        $user = $request->getAttributes()[UserInterface::class];
+        $user = $request->getAttribute(UserInterface::class);
 
         $sharedData = [
             'acl' => ['finder' => true],
