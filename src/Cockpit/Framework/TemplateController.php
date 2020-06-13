@@ -54,7 +54,7 @@ abstract class TemplateController
         $data = [
             'appName' => $this->container->get('app.name'),
             'i18n' => $this->container->get('i18n'),
-            'route' => $request->getAttributes('__routingResults__')->getUri(),
+            'route' => $request->getAttribute('__routingResults__')->getUri(),
 
             // not implemented
             'extract' => $this->sharedData($request),
