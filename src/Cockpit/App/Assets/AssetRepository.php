@@ -6,7 +6,7 @@ use Cockpit\Framework\Database\Constraint;
 
 interface AssetRepository
 {
-    public function byId(string $assetID): array;
+    public function byId(string $assetID): ?array;
 
     public function byConstraint(Constraint $constraints);
 

@@ -111,7 +111,7 @@ final class Assets extends TemplateController
         $params = $request->getParsedBody();
         $assets = $params['assets'] ?? false;
         if (!$assets) {
-            return new HttpNotFoundException();
+            return new HttpNotFoundException($request);
         }
 
         $assets = isset($assets[0]) ? $assets : [$assets];
@@ -140,7 +140,7 @@ final class Assets extends TemplateController
 
         $this->eventSystem->trigger('cockpit.assets.remove', [$assets]);
 
-        return $assets;
+        return new JsonResponse($assets);
     }
 
     public function updateAsset(RequestInterface $request)

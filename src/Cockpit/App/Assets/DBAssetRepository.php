@@ -25,12 +25,14 @@ final class DBAssetRepository implements AssetRepository
         $this->assetsBasePath = $assetsBasePath;
     }
 
-    public function byId(string $assetID): array
+    public function byId(string $assetID): ?array
     {
         $sql = 'SELECT * FROM '.self::TABLE.' WHERE _id=:id';
         $stmt = $this->db->executeQuery($sql, ['id' => $assetID]);
 
-        return $stmt->fetch();
+        $result = $stmt->fetch();
+
+        return $result !== false ? $result : null;
     }
 
     public function byConstraint(Constraint $constraints)
