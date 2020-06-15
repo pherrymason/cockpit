@@ -125,11 +125,21 @@ final class DBEntriesRepository implements EntriesRepository
                 case Field::TYPE_IMAGE:
                 case Field::TYPE_ASSET:
                 case Field::TYPE_GALLERY:
+                case Field::TYPE_SET:
                     $types[$field->name()] = ParameterType::STRING;
-                    $value = empty($entry[$field->name()]) ? null : json_encode($entry[$field->name()]);
                     if ($field->localize()) {
-                        $localizedValues[$field->name()] = $value;
+                        $localizedFields[] = $field;
+                        foreach ($this->languages as $langCode => $lang) {
+                            if (!isset($entry[$field->name().'_'.$langCode])) {
+                                continue;
+                            }
+
+                            $fieldName = $field->name() . '_' . $langCode;
+                            $value = $entry[$fieldName];
+                            $localizedValues[$fieldName] = json_encode($value);
+                        }
                     } else {
+                        $value = empty($entry[$field->name()]) ? null : json_encode($entry[$field->name()]);
                         $params[$field->name()] = $value;
                     }
                     break;
