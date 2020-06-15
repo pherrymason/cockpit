@@ -225,10 +225,23 @@ final class DBEntriesRepository implements EntriesRepository
             if ($field->localize() === false) {
                 switch ($field->type()) {
                     case Field::TYPE_GALLERY:
+                    case Field::TYPE_SET:
                         $fieldName = $field->name();
                         $value = $data[$fieldName];
-                        $data[$fieldName] = $value === null ? [] : json_decode($data[$fieldName], true);
+                        $data[$fieldName] = $value === null ? [] : json_decode($value, true);
                         break;
+                }
+            } else {
+                foreach ($this->languages as $langCode => $lang) {
+                    switch($field->type()) {
+                        case Field::TYPE_SET:
+                        case Field::TYPE_IMAGE:
+                        case Field::TYPE_ASSET:
+                        case Field::TYPE_GALLERY:
+                            $value = $data['localized'][$langCode][$field->name()];
+                            $data['localized'][$langCode][$field->name()] = $value === null ? [] : json_decode($value, true);
+                            break;
+                    }
                 }
             }
         }
