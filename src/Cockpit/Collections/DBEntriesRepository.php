@@ -238,7 +238,7 @@ final class DBEntriesRepository implements EntriesRepository
                         case Field::TYPE_IMAGE:
                         case Field::TYPE_ASSET:
                         case Field::TYPE_GALLERY:
-                            $value = $data['localized'][$langCode][$field->name()];
+                            $value = $data['localized'][$langCode][$field->name()] ?? null;
                             $data['localized'][$langCode][$field->name()] = $value === null ? [] : json_decode($value, true);
                             break;
                     }
