@@ -200,7 +200,7 @@ riot.tag2('cp-assets', '<div ref="list" show="{mode==\'list\'}"> <div ref="uploa
                 filter : this.filter || null,
                 limit  : this.limit,
                 skip   : (this.page-1) * this.limit,
-                sort   : {created:-1},
+                sort   : {title:1},
                 folder : this.folder
             };
 

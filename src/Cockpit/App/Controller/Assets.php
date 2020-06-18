@@ -61,7 +61,7 @@ final class Assets extends TemplateController
         $contraint = new Constraint(
             $params['filter'] ?? $_REQUEST['filter'] ?? null,
             $params['limit'] ?? null,
-            $params['sort'] ?? ['created' => -1],
+            $params['sort'] ?? ['title' => 1],
             $params['skip'] ?? null
         );
 

@@ -348,7 +348,7 @@
                 filter : this.filter || null,
                 limit  : this.limit,
                 skip   : (this.page-1) * this.limit,
-                sort   : {created:-1},
+                sort   : {title:1},
                 folder : this.folder
             };
 
