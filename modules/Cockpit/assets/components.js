@@ -1973,7 +1973,6 @@ riot.tag2('field-boolean', '<div ref="container" class="uk-display-inline-block"
         this.value = undefined;
 
         this.$updateValue = function(value) {
-
             if (typeof(value) !== 'boolean') {
                 return this.$setValue(!!value);
             }

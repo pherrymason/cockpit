@@ -191,7 +191,6 @@
         var $this = this;
 
         this.mixin(RiotBindMixin);
-
         this.collection   = <?= json_encode($collection) ?>;
         this.fields       = this.collection.fields;
         this.fieldsidx    = {};

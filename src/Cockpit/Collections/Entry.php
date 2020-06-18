@@ -100,6 +100,10 @@ final class Entry implements ContentUnit
                         $data[$fieldName.'_'.$langCode] = json_decode($value, true);
                         break;
 
+                    case FIeld::TYPE_BOOLEAN:
+                        $data[$fieldName.'_'.$langCode] = (bool)$value;
+                        break;
+
                     default:
                         $data[$fieldName.'_'.$langCode] = $value;
                         break;

@@ -25,7 +25,6 @@
         this.value = undefined;
 
         this.$updateValue = function(value) {
-
             if (typeof(value) !== 'boolean') {
                 return this.$setValue(!!value);
             }
