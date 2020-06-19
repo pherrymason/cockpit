@@ -5,9 +5,9 @@ use Cockpit\Singleton\SingletonsModule;
 use Slim\App;
 use Slim\Handlers\Strategies\RequestResponseArgs;
 
-function getCockpitApp(array $configuration): App
+function getCockpitApp(array $configuration, array $services): App
 {
-    $app = AppFactory::createCockpit($configuration);
+    $app = AppFactory::createCockpit($configuration, $services);
     $app->setBasePath(
         (function () {
             $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
@@ -59,7 +59,9 @@ function getCockpitApp(array $configuration): App
 
     $app->addMiddleware($container->get(\Mezzio\Session\SessionMiddleware::class));
     $app->addMiddleware(new \Cockpit\Framework\Middlewares\JsonBodyParserMiddleware());
-    $app->addMiddleware(new Middlewares\Whoops());
+
+    // Whoops
+    $app->addMiddleware($container->get(\Cockpit\Framework\Middlewares\WhoopsMiddleware::class));
 
     return $app;
 }
