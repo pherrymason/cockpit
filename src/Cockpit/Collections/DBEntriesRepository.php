@@ -107,8 +107,19 @@ final class DBEntriesRepository implements EntriesRepository
 
         foreach ($collection->fields() as $field) {
             switch ($field->type()) {
+                case Field::TYPE_BOOLEAN:
+                    $type = ParameterType::BOOLEAN;
+                    break;
                 default:
-                    $types[$field->name()] = ParameterType::STRING;
+                    $type = ParameterType::STRING;
+                    break;
+            }
+
+
+
+            switch ($field->type()) {
+                default:
+                    $types[$field->name()] = $type;
                     if ($field->localize()) {
                         $localizedFields[] = $field;
                         foreach ($this->languages as $langCode => $lang) {
@@ -122,11 +133,22 @@ final class DBEntriesRepository implements EntriesRepository
                     }
                     break;
 
+                /*case Field::TYPE_BOOLEAN:
+                    $types[$field->name()] = ParameterType::STRING;
+                    if ($field->localize()) {
+
+                    } else {
+                        $params[$field->name()] =
+                    }
+
+                    break;
+*/
+
                 case Field::TYPE_IMAGE:
                 case Field::TYPE_ASSET:
                 case Field::TYPE_GALLERY:
                 case Field::TYPE_SET:
-                    $types[$field->name()] = ParameterType::STRING;
+                    $types[$field->name()] = $type;
                     if ($field->localize()) {
                         $localizedFields[] = $field;
                         foreach ($this->languages as $langCode => $lang) {
