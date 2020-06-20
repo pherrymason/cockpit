@@ -14,7 +14,10 @@ trait MysqlConstraintQueryBuilder
                 if ($value === null) {
                     $conditions[] = '`' . $field .'` IS NULL';
                 } else {
-                    $conditions[] = '`' . $field . '`= :value' . $i;
+                    $fieldName = strpos($field, '.')
+                        ? $field
+                        : '`'.$field.'`';
+                    $conditions[] =  $field . '= :value' . $i;
                     $params['value' . $i] = $value;
                 }
                 $i++;
