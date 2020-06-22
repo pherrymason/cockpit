@@ -8,7 +8,7 @@
 </style>
 
 <script>
-    window.__collectionEntry = <?= json_encode($entry) ?>;
+    window.__collectionEntry = <?= empty($entry) ? '{}' : json_encode($entry) ?>;
 </script>
 
 <div riot-view>

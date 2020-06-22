@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\Exception\HttpNotFoundException;
 
 final class Admin extends TemplateController
@@ -362,7 +363,7 @@ final class Admin extends TemplateController
         );
     }
 
-    public function save_entry(RequestInterface $request, ResponseInterface $response, $name)
+    public function save_entry(ServerRequestInterface $request, ResponseInterface $response, $name)
     {
         $collection = $this->collections->byName($name);
 
@@ -432,7 +433,7 @@ final class Admin extends TemplateController
             $this->revisions->add($entry, $user->getDetail('id'), "collections/{$collection->name()}");
         }
 
-        return new JsonResponse($entry);
+        return new JsonResponse($entryArray);
     }
 
     public function revisions($collectionName, $id)
