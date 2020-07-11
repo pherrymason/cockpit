@@ -1,6 +1,6 @@
 <cp-thumbnail>
 
-    <div class="uk-position-relative">
+    <div class="cp-thumbnail uk-position-relative">
         <i ref="spinner" class="uk-icon-spinner uk-icon-spin uk-position-center"></i>
         <canvas ref="canvas" width="{ this.width || ''}" height="{ this.height || ''}" style="background-size:contain;background-position:50% 50%;background-repeat:no-repeat;visibility:hidden;"></canvas>
     </div>

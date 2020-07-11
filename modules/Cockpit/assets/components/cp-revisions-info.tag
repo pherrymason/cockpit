@@ -31,7 +31,6 @@
             this.loading = true;
 
             App.request('/cockpit/utils/revisionsCount', {id:opts.rid}).then(function(data){
-              console.log(data);
                 if (!App.Utils.isNumeric(data.count)) {
                     data.count = 'n/a';
                 }

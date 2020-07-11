@@ -12,7 +12,7 @@
         this.value = null;
 
         this.$updateValue = function(value, field, force) {
-
+            console.log('WYsiwyg update value', field, force);
             if (this.value != value) {
 
                 if (typeof(value) != 'string') {
@@ -21,8 +21,12 @@
 
                 this.value = value;
 
-                if (editor && force) {
+                if (editor /*&& force*/) {
                     editor.setContent(this.value);
+
+
+                    editor.selection.select(editor.getBody(), true); // ed is the editor instance
+                    editor.selection.collapse(false);
                 }
             }
 
@@ -30,7 +34,7 @@
 
 
         this.on('mount', function(){
-
+console.log('mount wysiywg', opts);
             if (opts.editor && opts.editor.language) {
                 lang = opts.editor.language;
             }

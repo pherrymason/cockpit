@@ -6,7 +6,7 @@
 
 <script>
   window.__singletonData = <?= json_encode($data) ?> || {};
-  window.__singleton = <?= json_encode($singleton) ?> || {};
+  window.__singleton = <?= json_encode($singleton, JSON_PRETTY_PRINT) ?> || {};
 </script>
 
 <div riot-view>
@@ -137,7 +137,6 @@
                         <div class="uk-margin-small-top"><span class="uk-badge uk-badge-outline {lang ? 'uk-text-primary' : 'uk-text-muted'}">{ lang ? _.find(languages,{code:lang}).label:App.$data.languageDefaultLabel }</span></div>
 
                         <select bind="lang">
-                            <!--                            <option value="">{App.$data.languageDefaultLabel}</option>-->
                             <option each="{language in languages}" value="{language.code}">{language.label}</option>
                         </select>
                     </div>
@@ -203,7 +202,6 @@
             // fill with default values
 
             this.fields.forEach(function(field){
-
                 $this.fieldsidx[field.name] = field;
 
                 if ($this.data[field.name] === undefined) {
@@ -242,6 +240,8 @@
                 $this.groups[field.group || 'main'].push(field);
             });
 
+            console.log(this.fields);
+
             this._groups = Object.keys(this.groups).sort(function (a, b) {
                 return a.toLowerCase().localeCompare(b.toLowerCase());
             });
@@ -251,7 +251,7 @@
             }
 
             this.on('mount', function(){
-
+console.log('singleton mount');
                 // bind global command + save
                 Mousetrap.bindGlobal(['command+s', 'ctrl+s'], function(e) {
 

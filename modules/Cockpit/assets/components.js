@@ -1372,7 +1372,6 @@ riot.tag2('cp-revisions-info', '<span> <span class="uk-icon-spinner uk-icon-spin
             this.loading = true;
 
             App.request('/cockpit/utils/revisionsCount', {id:opts.rid}).then(function(data){
-              console.log(data);
                 if (!App.Utils.isNumeric(data.count)) {
                     data.count = 'n/a';
                 }
@@ -1425,7 +1424,7 @@ riot.tag2('cp-search', '<div ref="autocomplete" class="uk-autocomplete uk-form u
 
 });
 
-riot.tag2('cp-thumbnail', '<div class="uk-position-relative"> <i ref="spinner" class="uk-icon-spinner uk-icon-spin uk-position-center"></i> <canvas ref="canvas" width="{this.width || \'\'}" height="{this.height || \'\'}" style="background-size:contain;background-position:50% 50%;background-repeat:no-repeat;visibility:hidden;"></canvas> </div>', '', '', function(opts) {
+riot.tag2('cp-thumbnail', '<div class="cp-thumbnail uk-position-relative"> <i ref="spinner" class="uk-icon-spinner uk-icon-spin uk-position-center"></i> <canvas ref="canvas" width="{this.width || \'\'}" height="{this.height || \'\'}" style="background-size:contain;background-position:50% 50%;background-repeat:no-repeat;visibility:hidden;"></canvas> </div>', '', '', function(opts) {
 
         var $this = this, src;
 
@@ -3911,7 +3910,7 @@ riot.tag2('field-wysiwyg', '<textarea ref="input" class="uk-width-1-1" rows="5" 
         this.value = null;
 
         this.$updateValue = function(value, field, force) {
-
+            console.log('WYsiwyg update value', field, force);
             if (this.value != value) {
 
                 if (typeof(value) != 'string') {
@@ -3920,15 +3919,18 @@ riot.tag2('field-wysiwyg', '<textarea ref="input" class="uk-width-1-1" rows="5" 
 
                 this.value = value;
 
-                if (editor && force) {
+                if (editor  ) {
                     editor.setContent(this.value);
+
+                    editor.selection.select(editor.getBody(), true);
+                    editor.selection.collapse(false);
                 }
             }
 
         }.bind(this);
 
         this.on('mount', function(){
-
+console.log('mount wysiywg', opts);
             if (opts.editor && opts.editor.language) {
                 lang = opts.editor.language;
             }
