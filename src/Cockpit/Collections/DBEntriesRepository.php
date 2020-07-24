@@ -143,6 +143,9 @@ final class DBEntriesRepository implements EntriesRepository
 
                     break;
 */
+                case Field::TYPE_TAGS:
+                    $params[$field->name()] = json_encode($entry[$field->name()]);
+                    break;
 
                 case Field::TYPE_IMAGE:
                 case Field::TYPE_ASSET:
@@ -248,6 +251,7 @@ final class DBEntriesRepository implements EntriesRepository
                 switch ($field->type()) {
                     case Field::TYPE_GALLERY:
                     case Field::TYPE_SET:
+                    case Field::TYPE_TAGS:
                         $fieldName = $field->name();
                         $value = $data[$fieldName];
                         $data[$fieldName] = $value === null ? [] : json_decode($value, true);
