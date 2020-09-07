@@ -144,10 +144,8 @@ final class DBEntriesRepository implements EntriesRepository
 
                     break;
 */
-                case Field::TYPE_TAGS:
-                    $params[$field->name()] = json_encode($entry[$field->name()]);
-                    break;
 
+                case Field::TYPE_TAGS:
                 case Field::TYPE_IMAGE:
                 case Field::TYPE_ASSET:
                 case Field::TYPE_GALLERY:
@@ -244,31 +242,16 @@ final class DBEntriesRepository implements EntriesRepository
 
     public function hydrate(array $data, Collection $collection): Entry
     {
-        $revisionID = $data['rev_id'] ?? null;
-        $previousRevisionID = $data['prev_rev_id'] ?? null;
-
         foreach ($collection->fields() as $field) {
+
             if ($field->localize() === false) {
-                switch ($field->type()) {
-                    case Field::TYPE_GALLERY:
-                    case Field::TYPE_SET:
-                    case Field::TYPE_TAGS:
-                        $fieldName = $field->name();
-                        $value = $data[$fieldName];
-                        $data[$fieldName] = $value === null ? [] : json_decode($value, true);
-                        break;
-                }
+                $fieldName = $field->name();
+                $data[$fieldName] = $field->serializeValue($data[$fieldName]);
             } else {
                 foreach ($this->languages as $langCode => $lang) {
-                    switch($field->type()) {
-                        case Field::TYPE_SET:
-                        case Field::TYPE_IMAGE:
-                        case Field::TYPE_ASSET:
-                        case Field::TYPE_GALLERY:
-                            $value = $data['localized'][$langCode][$field->name()] ?? null;
-                            $data['localized'][$langCode][$field->name()] = $value === null ? [] : json_decode($value, true);
-                            break;
-                    }
+                    $fieldName = $field->name();
+                    $serialized = $field->serializeValue($data['localized'][$langCode][$fieldName] ?? null);
+                    $data['localized'][$langCode][$field->name()] = $serialized;
                 }
             }
         }

@@ -160,4 +160,23 @@ final class Field
             'acl' => $this->acl
         ];
     }
+
+    public function serializeValue($value)
+    {
+        $serialized = $value;
+
+        switch ($this->type) {
+            case Field::TYPE_GALLERY:
+            case Field::TYPE_SET:
+            case Field::TYPE_TAGS:
+                $serialized = $value === null ? [] : json_decode($value, true);
+                break;
+
+            default:
+                $serialized = $value;
+                break;
+        }
+
+        return $serialized;
+    }
 }

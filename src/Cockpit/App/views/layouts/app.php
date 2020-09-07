@@ -244,7 +244,7 @@
 
     <!-- RIOT COMPONENTS -->
     <?php foreach($pageAssets->assets('components') as $component): ?>
-    <script type="riot/tag" src="<?= $this->base($component) ?>?nc={{ $app['debug'] ? time() : $app['cockpit/version'] }}"></script>
+    <script type="riot/tag" src="<?= $this->base($component) ?>?nc=<?= time() ?>"></script>
     <?php endforeach; ?>
 
     <?php /*
