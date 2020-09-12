@@ -10,7 +10,8 @@ return [
     },
 
     \League\Flysystem\AdapterInterface::class => function (ContainerInterface $c) {
-        return new \League\Flysystem\Adapter\Local('/');
+        $docRoot = $c->get('docRoot');
+        return new \League\Flysystem\Adapter\Local($docRoot);
     },
 
     \League\Flysystem\Filesystem::class => function (ContainerInterface $c) {
