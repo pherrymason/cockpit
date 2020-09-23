@@ -83,10 +83,10 @@ $services = [
     },
 
     \Cockpit\Framework\PathResolver::class => function (ContainerInterface $c) {
-        //$docsRoot = $c->get('docs_root');
+        $docsRoot = $c->get('docRoot');
         return new \Cockpit\Framework\PathResolver(
             $c->get('paths'),
-            '', //$docsRoot,
+            $docsRoot,
             $c->get('base_url'),
             $c->get('site_url')
         );

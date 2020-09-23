@@ -44,7 +44,10 @@ final class PathResolver
 
     public function assetsPath(): string
     {
-        return rtrim($this->pathMap['assets'][0], '/');
+        $path = rtrim($this->pathMap['assets'][0], '/');
+
+        // Fix for systems with open_basedir restriction in effect
+        return str_replace($this->docsRoot, '', $path);
     }
 
     /**
