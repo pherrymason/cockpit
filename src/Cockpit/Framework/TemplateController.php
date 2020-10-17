@@ -3,6 +3,7 @@
 namespace Cockpit\Framework;
 
 use Cockpit\App\UI\Menu;
+use Cockpit\App\UserRequestExtractor;
 use Cockpit\Framework\Template\PageAssets;
 use Laminas\Diactoros\Response\HtmlResponse;
 use League\Plates\Engine;
@@ -12,6 +13,8 @@ use Psr\Http\Message\ResponseInterface;
 
 abstract class TemplateController
 {
+    use UserRequestExtractor;
+
     /** @var Engine */
     protected $templateEngine;
     /** @var \Psr\Container\ContainerInterface */

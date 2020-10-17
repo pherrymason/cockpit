@@ -254,6 +254,7 @@ $cockpitServices = require(dirname(__DIR__) . '/Cockpit/App/config/services.php'
 $collectionServices = require(dirname(__DIR__) . '/Cockpit/Collections/config/services.php');
 $singletonServices = require(dirname(__DIR__) . '/Cockpit/Singleton/config/services.php');
 $frameworkServices = require(dirname(__DIR__) . '/Cockpit/Framework/config/services.php');
+$userServices = require(dirname(__DIR__) . '/Cockpit/User/config/services.php');
 
 return array_merge(
     $configuration,
@@ -261,5 +262,6 @@ return array_merge(
     $cockpitServices,
     $collectionServices,
     $singletonServices,
-    $frameworkServices
+    $frameworkServices,
+    $userServices,
 );

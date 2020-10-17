@@ -15,7 +15,7 @@ return [
     // Authentication --------------
     \Mezzio\Authentication\UserRepositoryInterface::class => function (ContainerInterface $c) {
 
-        $userFactory = $c->get(\Mezzio\Authentication\DefaultUserFactory::class)->__invoke($c);
+        $userFactory = $c->get(\Cockpit\Framework\Authentication\UserFactory::class)->__invoke($c);
 
         return new MySQLUserRepository(
             $c->get(\Doctrine\DBAL\Connection::class),
@@ -27,14 +27,14 @@ return [
         $responseFactory = new \Slim\Psr7\Factory\ResponseFactory();
         /** @var RouteParserInterface $route */
         $route = $c->get('router');
-        $userFactory = $c->get(\Mezzio\Authentication\DefaultUserFactory::class);
+        $userFactory = $c->get(\Cockpit\Framework\Authentication\UserFactory::class)->__invoke($c);
         return new PhpSession(
             $c->get(\Mezzio\Authentication\UserRepositoryInterface::class),
             [
                 'redirect' => '/admin/auth/login',
             ],
             [$responseFactory, 'createResponse'],
-            $userFactory($c)
+            $userFactory
         );
     },
 

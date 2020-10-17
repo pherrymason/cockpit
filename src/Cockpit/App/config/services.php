@@ -70,6 +70,15 @@ return [
         );
     },
 
+    \Cockpit\App\Controller\Accounts::class => function (ContainerInterface $c) {
+        return new \Cockpit\App\Controller\Accounts(
+            $c->get(\Cockpit\User\UserSerializer::class),
+            $c->get(\Cockpit\User\UserRepository::class),
+            $c->get(\League\Plates\Engine::class),
+            $c
+        );
+    },
+
     \Cockpit\App\Controller\Utils::class => function (ContainerInterface $c) {
         return new \Cockpit\App\Controller\Utils(
             $c->get(\Cockpit\App\Revisions\RevisionsRepository::class),

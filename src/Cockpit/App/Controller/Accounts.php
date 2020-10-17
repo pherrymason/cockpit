@@ -10,12 +10,37 @@
 
 namespace Cockpit\App\Controller;
 
+use Cockpit\App\UserRequestExtractor;
+use Cockpit\Framework\InputValidationHelpers;
+use Cockpit\Framework\TemplateController;
+use Cockpit\User\UserRepository;
+use Cockpit\User\UserSerializer;
+use League\Plates\Engine;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ServerRequestInterface;
+use Slim\Exception\HttpNotFoundException;
 
-class Accounts
+class Accounts extends TemplateController
 {
+    /** @var UserRepository */
+    private $users;
+    /** @var UserSerializer */
+    private $userSerializer;
+
+    public function __construct(
+        \Cockpit\User\UserSerializer $userSerializer,
+        UserRepository $users,
+        Engine $templateEngine,
+        \Psr\Container\ContainerInterface $container
+    ) {
+        parent::__construct($templateEngine, $container);
+        $this->users = $users;
+        $this->userSerializer = $userSerializer;
+    }
+
+
     public function index() {
 
         if (!$this->module('cockpit')->hasaccess('cockpit', 'accounts')) {
@@ -29,39 +54,58 @@ class Accounts
     }
 
 
-    public function account($uid=null) {
-
-        if (!$uid) {
-            $uid = $this->user['_id'];
+    public function account(ServerRequestInterface $request, $response)
+    {
+        $user = $this->extractUser($request);
+        if (!$user) {
+            throw new HttpNotFoundException($request);
         }
 
-        if (!$this->module('cockpit')->hasaccess('cockpit', 'accounts') && $uid != $this->user['_id']) {
-            return $this->helper('admin')->denyRequest();
-        }
+        $uid = $user->id();
 
-        $account = $this->app->storage->findOne('cockpit/accounts', ['_id' => $uid]);
+//        if (!$this->module('cockpit')->hasaccess('cockpit', 'accounts') && $uid != $this->user['_id']) {
+//            return $this->helper('admin')->denyRequest();
+//        }
 
-        $this->app['user'] = $this->user;
-
+        $account = $this->users->byId($uid);
         if (!$account) {
-            return false;
+            throw new HttpNotFoundException($request);
         }
+//
+//        $this->app['user'] = $this->user;
+//
+//        if (!$account) {
+//            return false;
+//        }
 
-        unset($account["password"]);
+//        unset($account["password"]);
 
-        $fields    = $this->app->retrieve('config/account/fields', null);
+//        $fields    = $this->app->retrieve('config/account/fields', null);
         $languages = $this->getLanguages();
-        $groups    = $this->module('cockpit')->getGroups();
+//        $groups    = $this->module('cockpit')->getGroups();
 
-        if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($uid, $meta)) {
-            return $this->render('cockpit:views/base/locked.php', compact('meta'));
-        }
+//        if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($uid, $meta)) {
+//            return $this->render('cockpit:views/base/locked.php', compact('meta'));
+//        }
+//
+//        $this->app->helper('admin')->lockResourceId($uid);
+//
+//        $this->app->trigger('cockpit.account.fields', [&$fields, &$account]);
 
-        $this->app->helper('admin')->lockResourceId($uid);
+        return $this->renderResponse(
+            $request,
+            'cockpit::views/accounts/account',
+            [
+                'userSerializer' => $this->userSerializer,
+                'visitor' => $user,
+                'account' => $account,
+                'languages' => [],
+                'groups' => [],
+                'fields' => []
+            ]
+        );
 
-        $this->app->trigger('cockpit.account.fields', [&$fields, &$account]);
-
-        return $this->render('cockpit:views/accounts/account.php', compact('account', 'uid', 'languages', 'groups', 'fields'));
+//        return $this->render('cockpit:views/accounts/account.php', compact('account', 'uid', 'languages', 'groups', 'fields'));
     }
 
     public function create() {
@@ -88,110 +132,112 @@ class Accounts
         return $this->render('cockpit:views/accounts/account.php', compact('account', 'uid', 'languages', 'groups', 'fields'));
     }
 
-    public function save() {
+    public function save(ServerRequestInterface $request)
+    {
+        $user = $this->extractUser($request);
+        $data = $request->getParsedBody()['account'] ?? [];
 
-        if ($data = $this->param('account', false)) {
 
             // check rights
-            if (!$this->module('cockpit')->hasaccess('cockpit', 'accounts')) {
-
-                if (!isset($data['_id']) || $data['_id'] != $this->user['_id']) {
-                    return $this->helper('admin')->denyRequest();
-                }
-            }
+//            if (!$this->module('cockpit')->hasaccess('cockpit', 'accounts')) {
+//
+//                if (!isset($data['_id']) || $data['_id'] != $this->user['_id']) {
+//                    return $this->helper('admin')->denyRequest();
+//                }
+//            }
 
             $data['_modified'] = time();
             $isUpdate = false;
 
             if (!isset($data['_id'])) {
-
                 // new user needs a password
                 if (!isset($data['password']) || !trim($data['password'])) {
-                    return $this->stop(['error' => 'User password required'], 412);
+                    return new JsonResponse(['error' => 'User password required'], 412);
                 }
 
                 if (!isset($data['user']) || !trim($data['user'])) {
-                    return $this->stop(['error' => 'Username required'], 412);
+                    return new JsonResponse(['error' => 'User required'], 412);
                 }
 
                 $data['_created'] = $data['_modified'];
-                
             } else {
-                
-                if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($data['_id'])) {
-                    $this->stop(['error' => "Saving failed! Account is locked!"], 412);
-                }
+//                if (!$this->app->helper('admin')->isResourceEditableByCurrentUser($data['_id'])) {
+//                    $this->stop(['error' => "Saving failed! Account is locked!"], 412);
+//                }
 
                 $isUpdate = true;
             }
 
-            if (isset($data['group']) && !$this->module('cockpit')->hasaccess('cockpit', 'accounts')) {
-                unset($data['group']);
-            }
+//            if (isset($data['group']) && !$this->module('cockpit')->hasaccess('cockpit', 'accounts')) {
+//                unset($data['group']);
+//            }
 
             if (isset($data['password'])) {
-
                 if (strlen($data['password'])){
-                    $data['password'] = $this->app->hash($data['password']);
+                    $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
                 } else {
                     unset($data['password']);
                 }
             }
 
-            if (isset($data['email']) && !$this->helper('utils')->isEmail($data['email'])) {
-                return $this->stop(['error' => 'Valid email required'], 412);
+            if (isset($data['email']) && !InputValidationHelpers::isEmail($data['email'])) {
+                return new JsonResponse(['error' => 'Valid email required'], 412);
             }
 
             if (isset($data['user']) && !trim($data['user'])) {
-                return $this->stop(['error' => 'Username cannot be empty!'], 412);
+                return new JsonResponse(['error' => 'Username cannot be empty!'], 412);
             }
 
             foreach (['name', 'user', 'email'] as $key) {
-                if (isset($data[$key])) $data[$key] = strip_tags(trim($data[$key]));
+                if (isset($data[$key])) {
+                    $data[$key] = strip_tags(trim($data[$key]));
+                }
             }
 
             // unique check
             // --
             if (isset($data['user'])) {
 
-                $_account = $this->app->storage->findOne('cockpit/accounts', ['user'  => $data['user']]);
+                $_account = $this->users->byUser($data['user']);
 
-                if ($_account && (!isset($data['_id']) || $data['_id'] != $_account['_id'])) {
-                    $this->app->stop(['error' =>  'Username is already used!'], 412);
+                if ($_account && (!isset($data['_id']) || $data['_id'] != $_account->id())) {
+                    return new JsonResponse(['error' =>  'Username is already used!'], 412);
                 }
             }
 
             if (isset($data['email'])) {
 
-                $_account = $this->app->storage->findOne('cockpit/accounts', ['email'  => $data['email']]);
+                $_account = $this->users->byEmail($data['email']);
 
-                if ($_account && (!isset($data['_id']) || $data['_id'] != $_account['_id'])) {
-                    $this->app->stop(['error' =>  'Email is already used!'], 412);
+                if ($_account && (!isset($data['_id']) || $data['_id'] != $_account->id())) {
+                    return new JsonResponse(['error' =>  'Email is already used!'], 412);
                 }
             }
             // --
 
-            $this->app->trigger('cockpit.accounts.save', [&$data, isset($data['_id'])]);
-            $this->app->storage->save('cockpit/accounts', $data);
+//            $this->app->trigger('cockpit.accounts.save', [&$data, isset($data['_id'])]);
+            $this->users->save($data);
 
-            $data = $this->app->storage->findOne('cockpit/accounts', ['_id' => $data['_id']]);
+            $userSaved = $this->users->byId($data['_id']);
 
-            if (isset($data['password'])) unset($data['password']);
-            if (isset($data['_reset_token'])) unset($data['_reset_token']);
+//            if (isset($data['password'])) {
+//                unset($data['password']);
+//            }
+//
+//            if (isset($data['_reset_token'])) {
+//                unset($data['_reset_token']);
+//            }
 
-            if ($data['_id'] == $this->user['_id']) {
-                $this->module('cockpit')->setUser($data);
+            if ($userSaved->id() == $user->id()) {
+                // TODO Update session user.
+                //$this->module('cockpit')->setUser($userSaved);
             }
 
-            if (!$isUpdate) {
-                $this->app->helper('admin')->lockResourceId($data['_id']);
-            }
+//            if (!$isUpdate) {
+//                $this->app->helper('admin')->lockResourceId($data['_id']);
+//            }
 
-            return json_encode($data);
-        }
-
-        return false;
-
+            return new JsonResponse($this->userSerializer->serialize($userSaved));
     }
 
     public function remove() {
@@ -269,7 +315,7 @@ class Accounts
     protected function getLanguages() {
 
         $languages = [['i18n' => 'en', 'language' => 'English']];
-
+        /*
         foreach ($this->app->helper('fs')->ls('*.php', '#config:cockpit/i18n') as $file) {
 
             $lang     = include($file->getRealPath());
@@ -277,7 +323,7 @@ class Accounts
             $language = $lang['@meta']['language'] ?? $i18n;
 
             $languages[] = ['i18n' => $i18n, 'language'=> $language];
-        }
+        }*/
 
         return $languages;
     }
