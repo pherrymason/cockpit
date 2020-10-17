@@ -37,7 +37,7 @@
 
             <?php if(count($singletons) > 5): ?>
             <div class="uk-panel-box-footer uk-text-center">
-                <a class="uk-button uk-button-small uk-button-link" href="<?= $this->route('/singletons') ?>"><?= $this->lang('Show all') ?></a>
+                <a class="uk-button uk-button-small uk-button-link" href="<?= $this->route('singletons') ?>"><?= $this->lang('Show all') ?></a>
             </div>
             <?php endif ?>
 
