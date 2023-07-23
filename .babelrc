@@ -4,8 +4,9 @@
       "useBuiltIns": "usage",
       "corejs": "3.4.0"
     }],
-    "@babel/preset-react",
-    "@babel/preset-typescript"
+    ["@babel/preset-react", {
+      "runtime": "automatic"
+    }]
   ],
   "sourceType": "unambiguous"
 }

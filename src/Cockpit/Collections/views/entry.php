@@ -120,13 +120,12 @@
                         </cp-fieldcontainer>
 
                     </div>
-
                 </div>
 
                 <cp-actionbar>
                     <div class="uk-container uk-container-center">
                         <button class="uk-button uk-button-large uk-button-primary"><?= $this->lang('Save') ?></button>
-                        <a class="uk-button uk-button-link" href="<?= $this->route('/collections/entries/'.$collection['name']) ?>">
+                        <a class="uk-button uk-button-link" href="<?= $this->route('collections_entries', ['name' => $collection['name']]) ?>">
                             <span show="{ !entry._id }"><?= $this->lang('Cancel') ?></span>
                             <span show="{ entry._id }"><?= $this->lang('Close') ?></span>
                         </a>

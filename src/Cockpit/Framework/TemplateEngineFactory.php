@@ -30,7 +30,6 @@ class TemplateEngineFactory
             } catch (\Exception $e) {
                 return '#';
             }
-
         });
 
         $engine->registerFunction('asset', function ($resource) {

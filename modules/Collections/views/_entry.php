@@ -126,7 +126,7 @@
                 <cp-actionbar>
                     <div class="uk-container uk-container-center">
                         <button class="uk-button uk-button-large uk-button-primary">@lang('Save')</button>
-                        <a class="uk-button uk-button-link" href="@route('/collections/entries/'.$collection['name'])">
+                        <a class="uk-button uk-button-link" href="<?= $this->route('/collections/entries/'.$collection['name']) ?>">
                             <span show="{ !entry._id }">@lang('Cancel')</span>
                             <span show="{ entry._id }">@lang('Close')</span>
                         </a>
