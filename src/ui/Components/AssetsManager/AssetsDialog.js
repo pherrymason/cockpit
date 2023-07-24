@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useMount } from 'react-use';
 import { dispatch } from 'reffects';
 import PathBreadCrumb from './PathBreadCrumb';
@@ -9,7 +9,7 @@ import Paginator from './Paginator';
 import Modal from '../Modal';
 import {ASSET_DIALOG_ASSETS_INIT, ASSET_DIALOG_ASSETS_REQUESTED} from "./events";
 import {useSelector} from "reffects-store";
-import {assetsDialogShowModeSelector} from "./selectors";
+import {assetsDialogLoading, assetsDialogShowModeSelector} from "./selectors";
 
 
 
@@ -28,9 +28,11 @@ function Progress() {
 
 function AssetsDialog({showFunction, externalController}) {
     const [open, setOpen] = useState(true);
-    const listMode = useSelector(assetsDialogShowModeSelector)
+    const listMode = useSelector(assetsDialogShowModeSelector);
+    const loading = useSelector(assetsDialogLoading);
+    const assetManagerRef = useRef(null);
     useMount(() => {
-        dispatch(ASSET_DIALOG_ASSETS_INIT);
+        dispatch({id:ASSET_DIALOG_ASSETS_INIT, payload:{ref: assetManagerRef}});
     });
 
     showFunction(setOpen);
@@ -39,13 +41,13 @@ function AssetsDialog({showFunction, externalController}) {
 
     return (
         <Modal title="Select assets" open={open}>
-            <div refo="list">
+            <div ref={assetManagerRef}>
                 <Progress/>
 
-                <div className="uk-form" if="{ mode=='list' }">
+                <div className="uk-form">
                     <TopBar listMode={listMode} />
                     <PathBreadCrumb />
-                    <div className="uk-text-center uk-margin-large-top" show="{ loading }">
+                    <div className="uk-text-center uk-margin-large-top" style={{display: loading ? 'block' : 'none'}}>
                         <cp-preloader className="uk-container-center"></cp-preloader>
                     </div>
                     <Folders modal={modal} />

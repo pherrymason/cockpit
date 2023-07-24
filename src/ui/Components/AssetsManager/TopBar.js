@@ -1,14 +1,12 @@
 import {dispatch} from 'reffects';
 import {ASSET_DIALOG_TOGGLE_SHOWMODE} from "./events";
+import {addFolder} from './Folders';
 
 function getRefValue() {
 }
 
 function updateFilter() {
     dispatch(ASSET_DIALOG_UPDATE_FILTER);
-}
-
-function addFolder() {
 }
 
 function removeSelected() {

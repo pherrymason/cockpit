@@ -57,7 +57,6 @@ final class Assets extends TemplateController
     public function listAssets(RequestInterface $request)
     {
         $params = $request->getParsedBody();
-
         $contraint = new Constraint(
             $params['filter'] ?? $_REQUEST['filter'] ?? null,
             $params['limit'] ?? null,

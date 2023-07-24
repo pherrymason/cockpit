@@ -1,6 +1,7 @@
 import {effects, registerEventHandler} from 'reffects';
 import {state} from 'reffects-store';
 import {http} from 'reffects-batteries';
+import {dispatch} from 'reffects';
 import {environment} from '../../environment';
 
 require('../../../../assets/lib/uikit/js/components/upload.js');
@@ -21,7 +22,7 @@ const defaultAssetDialog = {
     filter: {},
     page: firstPage,
     pages: 0,
-    currentFolder: null,
+    currentFolder: {_id:null},
     foldersPath: [],
     limit: DEFAULT_ASSETS_PER_PAGE,
     skip: (firstPage - 1) * DEFAULT_ASSETS_PER_PAGE,
@@ -30,67 +31,75 @@ const defaultAssetDialog = {
     selectedAssets: []
 };
 
-function configureUpload(assetsDialog) {
+function configureUpload(assetsDialogElm, assetsDialog) {
     var uploadSettings = {
             action: App.route('/assetsmanager/upload'),
             type: 'json',
             before: function(options) {
-                options.params.folder = assetsDialog.currentFolder
+                options.params.folder = assetsDialog.currentFolder._id
             },
             loadstart: function() {
-                $this.refs.uploadprogress.classList.remove('uk-hidden');
+                console.log('LOAD START');
+                //$this.refs.uploadprogress.classList.remove('uk-hidden');
             },
             progress: function(percent) {
-
                 percent = Math.ceil(percent) + '%';
-
-                $this.refs.progressbar.innerHTML   = '<span>'+percent+'</span>';
-                $this.refs.progressbar.style.width = percent;
+                console.log(percent+'%');
+                //$this.refs.progressbar.innerHTML   = '<span>'+percent+'</span>';
+                //$this.refs.progressbar.style.width = percent;
             },
             allcomplete: function(response) {
-
-                $this.refs.uploadprogress.classList.add('uk-hidden');
-
+                console.log('COMPLETE');
+                //$this.refs.uploadprogress.classList.add('uk-hidden');
                 if (response && response.failed && response.failed.length) {
                     App.ui.notify("File(s) failed to upload.", "danger");
                 }
 
                 if (response && Array.isArray(response.assets) && response.assets.length) {
-
                     if (!Array.isArray($this.assets)) {
                         $this.assets = [];
                     }
 
                     App.ui.notify("File(s) uploaded.", "success");
-
                     response.assets.forEach(function(asset){
                         $this.assets.unshift(asset);
                     });
 
-                    $this.listAssets(1);
+                    //$this.listAssets(1);
+                    dispatch(ASSET_DIALOG_ASSETS_REQUESTED);
                 }
 
                 if (!response) {
                     App.ui.notify("Something went wrong.", "danger");
                 }
-
             }
         },
 
-        uploadselect = UIkit.uploadSelect(App.$('.js-upload-select', $this.root)[0], uploadSettings),
-        uploaddrop   = UIkit.uploadDrop($this.refs.list, uploadSettings);
+        uploadselect = UIkit.uploadSelect(App.$('.js-upload-select', assetsDialogElm)[0], uploadSettings),
+        uploaddrop   = UIkit.uploadDrop(assetsDialogElm, uploadSettings);
 
-    UIkit.init(this.root);
+    UIkit.init(assetsDialogElm);
 }
 
 registerEventHandler(
     ASSET_DIALOG_ASSETS_INIT,
-    () => {
+    ({state:{assetsDialog}},{ref}) => {
+
+        if (!assetsDialog) {
+            assetsDialog = defaultAssetDialog;
+            configureUpload(ref.current, assetsDialog)
+        }
+
         return {
-            ...state.set({assetsDialog: defaultAssetDialog}),
+            ...state.set({assetsDialog: assetsDialog}),
             ...effects.dispatch({id: ASSET_DIALOG_ASSETS_REQUESTED})
         }
-    }
+    },
+    [
+        state.get({
+            assetsDialog: 'assetsDialog',
+        })
+    ]
 )
 
 registerEventHandler(
@@ -105,11 +114,13 @@ registerEventHandler(
             limit: assetsDialog.limit,
             skip: assetsDialog.skip,
             sort: assetsDialog.sort,
-            folder: assetsDialog.currentFolder,
+            folder: assetsDialog.currentFolder._id,
         };
 
+        payload.filter.folder = assetsDialog.currentFolder._id;
+
         return {
-            ...state.set({assetsDialog: assetsDialog}),
+            //...state.set({assetsDialog: assetsDialog}),
             ...http.post({
                 url: `${apiEndpoint}assetsmanager/listAssets`,
                 body: payload,

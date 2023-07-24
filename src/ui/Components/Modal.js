@@ -1,5 +1,5 @@
 function Modal({open, title, children}) {
-    const style = open ? {display: 'block', 'overflow-y': 'scroll'}:{};
+    const style = open ? {display: 'block', 'overflowY': 'scroll'}:{};
 
 
     return (

@@ -1,10 +1,9 @@
 import {useSelector} from 'reffects-store';
 import {dispatch} from 'reffects';
 import {assetsDialogFolders, assetsDialogLoading} from './selectors';
-import {ASSET_DIALOG_FOLDER_CHANGE_DIR} from './events.folder';
+import {ASSET_DIALOG_FOLDER_CHANGE_DIR, ASSET_DIALOG_FOLDER_ADD_DIR} from './events.folder';
 
 export function changeDir(folder) {
-    console.log(folder);
     dispatch({id: ASSET_DIALOG_FOLDER_CHANGE_DIR, payload: {folder}});
 }
 
@@ -12,10 +11,14 @@ function renameFolder() {
 
 }
 
+export function addFolder() {
+    dispatch({id: ASSET_DIALOG_FOLDER_ADD_DIR});
+}
+
 export function Folders({modal}) {
     const folders = useSelector(assetsDialogFolders);
     const loading = useSelector(assetsDialogLoading);
-    console.log('Folders:', folders);
+
     if (loading && folders.length < 1) {
         return null;
     }
