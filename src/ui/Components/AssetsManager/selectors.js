@@ -25,3 +25,10 @@ export function assetsDialogPageSelector(state) {
 export function assetsDialogPagesSelector(state) {
     return state.assetsDialog?.pages ?? 0;
 }
+export function assetsDialogShowModeSelector(state) {
+    return state.assetsDialog?.showMode ?? 'list';
+}
+
+export function assetsDialogFoldersPath(state) {
+    return state.assetsDialog?.foldersPath ?? [];
+}

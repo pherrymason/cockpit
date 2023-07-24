@@ -1,10 +1,25 @@
-function getRefValue() {}
+import {dispatch} from 'reffects';
+import {ASSET_DIALOG_TOGGLE_SHOWMODE} from "./events";
 
-function updateFilter() {}
-function addFolder() {}
-function removeSelected() {}
+function getRefValue() {
+}
 
-function TopBar({selected = [], toggleListMode = () => {}}) {
+function updateFilter() {
+    dispatch(ASSET_DIALOG_UPDATE_FILTER);
+}
+
+function addFolder() {
+}
+
+function removeSelected() {
+}
+
+function toggleListMode() {
+    dispatch(ASSET_DIALOG_TOGGLE_SHOWMODE);
+}
+
+
+function TopBar({selected = [], listMode}) {
     return (
         <div className="uk-grid uk-grid-width-1-2">
             <div>
@@ -17,8 +32,8 @@ function TopBar({selected = [], toggleListMode = () => {}}) {
                                 {getRefValue('filtertype') || App.i18n.get('All')}
                             </span>
 
-                            <select refo="filtertype" onChange={updateFilter }
-                                    aria-label="{App.i18n.get('Mime Type')}">
+                            <select refo="filtertype" onChange={updateFilter}
+                                    aria-label={App.i18n.get('Mime Type')}>
                                 <option value="">All</option>
                                 <option value="image">Image</option>
                                 <option value="video">Video</option>
@@ -33,16 +48,16 @@ function TopBar({selected = [], toggleListMode = () => {}}) {
                         <div className="uk-form-icon uk-display-block uk-width-1-1">
                             <i className="uk-icon-search"></i>
                             <input className="uk-width-1-1 uk-form-large" type="text"
-                                   aria-label="{ App.i18n.get('Search assets') }" refo="filtertitle"
-                                   onChange={ updateFilter } />
+                                   aria-label={App.i18n.get('Search assets')} refo="filtertitle"
+                                   onChange={updateFilter}/>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="uk-text-right">
                 <button className="uk-button uk-button-large uk-button-danger" type="button"
-                        onClick={ removeSelected }
-                        show={ selected.length }>
+                        onClick={removeSelected}
+                        show={selected.length}>
                     {App.i18n.get('Delete')} <span
                     className="uk-badge uk-badge-contrast uk-margin-small-left">{selected.length}</span>
                 </button>
@@ -51,21 +66,23 @@ function TopBar({selected = [], toggleListMode = () => {}}) {
                         onClick={addFolder}>{App.i18n.get('Add folder')}</button>
 
                 <span className="uk-button-group uk-button-large">
-                        <button className="uk-button uk-button-large {listmode=='list' && 'uk-button-primary'}"
-                                type="button" onClick={ toggleListMode }
-                                aria-label="{ App.i18n.get('Switch to list-mode') }"><i
-                            className="uk-icon-list"></i></button>
-                        <button className="uk-button uk-button-large {listmode=='grid' && 'uk-button-primary'}"
-                                type="button" onClick={ toggleListMode }
-                                aria-label="{ App.i18n.get('Switch to tile-mode') }"><i
-                            className="uk-icon-th"></i></button>
-                    </span>
+                    <button className={'uk-button uk-button-large '+ (listMode=='list' && 'uk-button-primary')}
+                            type="button" onClick={toggleListMode}
+                            aria-label={App.i18n.get('Switch to list-mode')}>
+                        <i className="uk-icon-list"></i>
+                    </button>
+                    <button className={'uk-button uk-button-large ' + (listMode=='grid' && 'uk-button-primary')}
+                            type="button" onClick={toggleListMode}
+                            aria-label={App.i18n.get('Switch to tile-mode')}>
+                        <i className="uk-icon-th"></i>
+                    </button>
+                </span>
 
                 <span className="uk-button uk-button-large uk-button-primary uk-form-file">
-                        <input className="js-upload-select" aria-label="{ App.i18n.get('Select file') }" type="file"
-                               multiple={true} />
-                        <i className="uk-icon-upload"></i>
-                    </span>
+                    <input className="js-upload-select" aria-label={ App.i18n.get('Select file') } type="file"
+                               multiple={true}/>
+                    <i className="uk-icon-upload"></i>
+                </span>
             </div>
         </div>
     )

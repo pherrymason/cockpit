@@ -6,6 +6,7 @@ import {
     assetsDialogSelectedAssets
 } from './selectors';
 import {Thumbnail} from './Thumbnail';
+import Asset from './Asset';
 
 function selectAsset() {
 }
@@ -53,26 +54,26 @@ function AssetsList({listMode}) {
     const assets = useSelector(assetsDialogAssets);
     const count = useSelector(assetsDialogTotalAssetsSelector);
     const selectedAssets = useSelector(assetsDialogSelectedAssets);
-    const show = useSelector(assetsDialogLoading);
+    const loading = useSelector(assetsDialogLoading);
+    const show = !loading && assets.length;
 
     return (
         <>
-            <div className="uk-margin-large-top uk-panel-space uk-text-center"
-                 style={{display: show ? 'block' : 'none'}}>
+            {loading && <div className="uk-margin-large-top uk-panel-space uk-text-center">
                 <span className="uk-text-muted uk-h2">{App.i18n.get('No Assets found')}</span>
-            </div>
-            <div className="uk-margin" if="{ !loading && assets.length }">
+            </div>}
+            {show && <div className="uk-margin">
                 <strong className="uk-text-small uk-text-muted">
                     <i className="uk-icon-file-o uk-margin-small-right"></i> {count} {App.i18n.get('Assets')}
                 </strong>
                 {listMode == 'grid' && (
                     <div className="uk-grid uk-grid-match uk-grid-small uk-grid-width-medium-1-5">
                         {
-                            assets.map((asset) => <Asset asset={asset}/>)
+                            assets.map((asset) => <Asset asset={asset} key={`grid_asset_${asset._id}`}/>)
                         }
                     </div>
                 )}
-            </div>
+            </div>}
             {listMode == 'list' && (
                 <table className="uk-table uk-table-tabbed">
                     <thead>
@@ -91,7 +92,9 @@ function AssetsList({listMode}) {
                             const isImage = asset.mime.match(/^image\//);
                             return (
                                 <tr className={selectedAssets.length && selectedAssets.indexOf(asset) != -1 ? 'uk-selected' : ''}
-                                    onClick={selectAsset} key={`asset_${asset._id}`}>
+                                    onClick={selectAsset} key={`asset_${asset._id}`}
+                                    key={`asset_${asset._id}`}
+                                >
                                     <td className="uk-text-center">
                                         {!isImage && (<span><i
                                             className={`uk-text-muted uk-icon-${getIconCls(asset.path)}`}></i></span>)}

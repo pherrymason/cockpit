@@ -16,6 +16,7 @@ const config = {
     },
     module: {
         rules: [
+            { parser: { amd: false } },
             {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
