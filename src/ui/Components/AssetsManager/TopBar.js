@@ -1,6 +1,8 @@
+import {useSelector} from 'reffects-store';
 import {dispatch} from 'reffects';
 import {ASSET_DIALOG_TOGGLE_SHOWMODE} from "./events";
 import {addFolder} from './Folders';
+import {assetsDialogSelectedAssets} from "./selectors";
 
 function getRefValue() {
 }
@@ -17,7 +19,9 @@ function toggleListMode() {
 }
 
 
-function TopBar({selected = [], listMode}) {
+function TopBar({listMode}) {
+    const selected = useSelector(assetsDialogSelectedAssets);
+
     return (
         <div className="uk-grid uk-grid-width-1-2">
             <div>
@@ -53,12 +57,11 @@ function TopBar({selected = [], listMode}) {
                 </div>
             </div>
             <div className="uk-text-right">
-                <button className="uk-button uk-button-large uk-button-danger" type="button"
-                        onClick={removeSelected}
-                        show={selected.length}>
+                {selected.length > 0 && (<button className="uk-button uk-button-large uk-button-danger" type="button"
+                        onClick={removeSelected}>
                     {App.i18n.get('Delete')} <span
                     className="uk-badge uk-badge-contrast uk-margin-small-left">{selected.length}</span>
-                </button>
+                </button>)}
 
                 <button className="uk-button uk-button-large uk-button-link"
                         onClick={addFolder}>{App.i18n.get('Add folder')}</button>

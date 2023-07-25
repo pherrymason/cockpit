@@ -13,6 +13,8 @@ export const ASSET_DIALOG_ASSETS_LOAD_FAILED = 'ASSET_DIALOG_ASSETS_LOAD_FAILED'
 export const ASSET_DIALOG_TOGGLE_SHOWMODE = 'ASSET_DIALOG_TOGGLE_SHOWMODE';
 export const ASSET_DIALOG_UPDATE_FILTER = 'ASSET_DIALOG_UPDATE_FILTER';
 
+export const ASSET_DIALOG_SELECT_ASSET = 'ASSET_DIALOG_SELECT_ASSET';
+
 
 const DEFAULT_ASSETS_PER_PAGE = 15;
 const firstPage = 1;
@@ -117,10 +119,13 @@ registerEventHandler(
             folder: assetsDialog.currentFolder._id,
         };
 
-        payload.filter.folder = assetsDialog.currentFolder._id;
+        if (assetsDialog.currentFolder._id) {
+            payload.filter.folder = assetsDialog.currentFolder._id;
+        } else {
+            delete payload.filter.folder;
+        }
 
         return {
-            //...state.set({assetsDialog: assetsDialog}),
             ...http.post({
                 url: `${apiEndpoint}assetsmanager/listAssets`,
                 body: payload,
@@ -179,5 +184,25 @@ registerEventHandler(ASSET_DIALOG_TOGGLE_SHOWMODE,
 
 registerEventHandler(ASSET_DIALOG_UPDATE_FILTER, () => {
    let filter = {};
-   
 });
+
+registerEventHandler(
+    ASSET_DIALOG_SELECT_ASSET,
+    ({state: {selectedAssets}}, {asset}) => {
+    var idx = selectedAssets.findIndex((a) => a._id == asset._id);
+    let copy = structuredClone(selectedAssets);
+
+    if (idx == -1) {
+        copy.push(asset);
+    } else {
+        copy.splice(idx, 1);
+    }
+
+    return {
+        ...state.set({
+            'assetsDialog.selectedAssets': copy,
+        })
+    }
+}, [
+    state.get({selectedAssets: 'assetsDialog.selectedAssets'})
+]);

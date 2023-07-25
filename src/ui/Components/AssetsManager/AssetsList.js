@@ -1,4 +1,5 @@
 import {useSelector} from 'reffects-store';
+import {dispatch} from 'reffects';
 import {
     assetsDialogAssets,
     assetsDialogTotalAssetsSelector,
@@ -7,8 +8,14 @@ import {
 } from './selectors';
 import {Thumbnail} from './Thumbnail';
 import Asset from './Asset';
+import {ASSET_DIALOG_SELECT_ASSET} from "./events";
 
-function selectAsset() {
+function selectAsset(e, asset) {
+    if (App.$(e.target).is('a') || App.$(e.target).parents('a').length) {
+        return;
+    }
+
+    dispatch({id: ASSET_DIALOG_SELECT_ASSET, payload: {asset}});
 }
 
 function editAsset() {
@@ -57,6 +64,12 @@ function AssetsList({listMode}) {
     const loading = useSelector(assetsDialogLoading);
     const show = !loading && assets.length;
 
+    function isSelected(asset) {
+        return selectedAssets.some((elm) => {
+            return elm._id==asset._id;
+        })
+    }
+
     return (
         <>
             {loading && <div className="uk-margin-large-top uk-panel-space uk-text-center">
@@ -91,8 +104,8 @@ function AssetsList({listMode}) {
                         assets.map((asset) => {
                             const isImage = asset.mime.match(/^image\//);
                             return (
-                                <tr className={selectedAssets.length && selectedAssets.indexOf(asset) != -1 ? 'uk-selected' : ''}
-                                    onClick={selectAsset} key={`asset_${asset._id}`}
+                                <tr className={selectedAssets.length && isSelected(asset) ? 'uk-selected' : ''}
+                                    onClick={(e) => selectAsset(e,asset)} key={`asset_${asset._id}`}
                                     key={`asset_${asset._id}`}
                                 >
                                     <td className="uk-text-center">
