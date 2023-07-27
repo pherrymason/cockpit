@@ -96,8 +96,14 @@
         },
 
         assets: {
-
             select: function(callback, options){
+                console.log('ASSETS.SELECT!');
+                window.AssetsDialogController.displayAssetsDialog(true);
+                window.AssetsDialogController.onSubmit = (data) => {
+                    console.log('Raul on submit!', data);
+                    callback(data);
+                }
+                return;
 
                 options  = App.$.extend({
                     selected : []

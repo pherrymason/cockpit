@@ -2386,7 +2386,8 @@ riot.tag2('field-gallery', '<div ref="uploadprogress" class="uk-margin uk-hidden
         }.bind(this)
 
         this.selectAssetsImages = function() {
-console.log('selectAssetsImages');
+            console.log('selectAssetsImages');
+
             App.assets.select(function(assets){
                 if (Array.isArray(assets)) {
 

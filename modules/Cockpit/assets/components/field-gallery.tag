@@ -262,7 +262,8 @@
         }
 
         selectAssetsImages() {
-console.log('selectAssetsImages');
+            console.log('selectAssetsImages');
+
             App.assets.select(function(assets){
                 if (Array.isArray(assets)) {
 

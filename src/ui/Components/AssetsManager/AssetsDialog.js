@@ -1,63 +1,69 @@
-import { useState, useRef } from 'react';
-import { useMount } from 'react-use';
-import { dispatch } from 'reffects';
+import {useState, useRef} from 'react';
+import {useMount} from 'react-use';
+import {dispatch} from 'reffects';
 import PathBreadCrumb from './PathBreadCrumb';
 import TopBar from './TopBar';
 import {Folders} from './Folders';
 import AssetsList from './AssetsList';
 import Paginator from './Paginator';
 import Modal from '../Modal';
-import {ASSET_DIALOG_ASSETS_INIT, ASSET_DIALOG_ASSETS_REQUESTED} from "./events";
+import {ASSET_DIALOG_ASSETS_INIT, ASSET_DIALOG_ASSETS_REQUESTED, ASSET_DIALOG_SUBMIT, ASSET_DIALOG_OPEN} from "./events";
 import {useSelector} from "reffects-store";
-import {assetsDialogLoading, assetsDialogShowModeSelector} from "./selectors";
+import {assetsDialogLoading, assetsDialogOpen, assetsDialogShowModeSelector} from "./selectors";
+import AssetEditor from '../AssetEditor/AssetEditor';
+import Progress from '../Progress';
 
-
-
-function Progress() {
-    return (
-        <div refo="uploadprogress" className="uk-margin uk-hidden">
-            <div className="uk-progress">
-                <div refo="progressbar" className="uk-progress-bar" style={{width: '0%'}}>&nbsp;</div>
-            </div>
-        </div>
-    )
+function selectAssets(callback) {
+    dispatch({id: ASSET_DIALOG_SUBMIT, payload: {callback}});
 }
 
+function cancel() {}
 
-
+function openDialog() {
+    dispatch(ASSET_DIALOG_OPEN);
+}
 
 function AssetsDialog({showFunction, externalController}) {
-    const [open, setOpen] = useState(true);
-    const listMode = useSelector(assetsDialogShowModeSelector);
+    const open = useSelector(assetsDialogOpen);
+    const mode = useSelector(assetsDialogShowModeSelector);
     const loading = useSelector(assetsDialogLoading);
     const assetManagerRef = useRef(null);
     useMount(() => {
-        dispatch({id:ASSET_DIALOG_ASSETS_INIT, payload:{ref: assetManagerRef}});
+        dispatch({id: ASSET_DIALOG_ASSETS_INIT, payload: {ref: assetManagerRef}});
     });
 
-    showFunction(setOpen);
-    console.log('re-render');
+    showFunction(openDialog);
     const modal = true;
 
     return (
         <Modal title="Select assets" open={open}>
             <div ref={assetManagerRef}>
-                <Progress/>
-
-                <div className="uk-form">
-                    <TopBar listMode={listMode} />
-                    <PathBreadCrumb />
-                    <div className="uk-text-center uk-margin-large-top" style={{display: loading ? 'block' : 'none'}}>
-                        <cp-preloader className="uk-container-center"></cp-preloader>
-                    </div>
-                    <Folders modal={modal} />
-                    <AssetsList listMode={listMode} />
-                </div>
-                
-                <Paginator />
+                {(mode == 'list' || mode == 'grid') &&
+                    <>
+                        <Progress/>
+                        <div className="uk-form">
+                            <TopBar listMode={mode}/>
+                            <PathBreadCrumb/>
+                            <div className="uk-text-center uk-margin-large-top"
+                                 style={{display: loading ? 'block' : 'none'}}>
+                                <cp-preloader className="uk-container-center"></cp-preloader>
+                            </div>
+                            <Folders modal={modal}/>
+                            <AssetsList listMode={mode} modal={modal}/>
+                        </div>
+                        <Paginator/>
+                        <div className="uk-margin-top">
+                            <button type="button" className="uk-button uk-button-large uk-button-primary"
+                                onClick={() => selectAssets(externalController.onSubmit)}>{App.i18n.get('Save')}</button>
+                            <a className="uk-button uk-button-large uk-button-link"
+                           onClick={cancel}>{App.i18n.get('Cancel')}</a>
+                        </div>
+                    </>
+                }
+                {mode == 'edit' && <AssetEditor modal={modal} /> }
             </div>
         </Modal>
-)
+    )
 }
 
 export default AssetsDialog;

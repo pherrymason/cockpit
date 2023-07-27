@@ -8,7 +8,8 @@ import {
 } from './selectors';
 import {Thumbnail} from './Thumbnail';
 import Asset from './Asset';
-import {ASSET_DIALOG_SELECT_ASSET} from "./events";
+import {ASSET_DIALOG_SELECT_ASSET, ASSET_DIALOG_EDIT_ASSET, ASSET_DIALOG_REMOVE_ASSET} from "./events";
+import {getIconCls} from '../assets.utils';
 
 function selectAsset(e, asset) {
     if (App.$(e.target).is('a') || App.$(e.target).parents('a').length) {
@@ -18,46 +19,17 @@ function selectAsset(e, asset) {
     dispatch({id: ASSET_DIALOG_SELECT_ASSET, payload: {asset}});
 }
 
-function editAsset() {
+function editAsset(e, asset) {
+    dispatch({id: ASSET_DIALOG_EDIT_ASSET, payload: {asset}});
 }
 
-function removeAsset() {
+function removeAsset(asset) {
+    App.ui.confirm("Are you sure?", function() {
+        dispatch({id: ASSET_DIALOG_REMOVE_ASSET, payload: {asset}});
+    });
 }
 
-function getIconCls(path) {
-
-    var name = path.toLowerCase();
-
-    if (name.match(typefilters.image)) {
-
-        return 'image';
-
-    } else if (name.match(typefilters.video)) {
-
-        return 'video-camera';
-
-    } else if (name.match(typefilters.audio)) {
-
-        return 'music';
-
-    } else if (name.match(typefilters.document)) {
-
-        return 'file-text-o';
-
-    } else if (name.match(typefilters.code)) {
-
-        return 'code';
-
-    } else if (name.match(typefilters.archive)) {
-
-        return 'archive';
-
-    } else {
-        return 'paperclip';
-    }
-}
-
-function AssetsList({listMode}) {
+function AssetsList({listMode, modal}) {
     const assets = useSelector(assetsDialogAssets);
     const count = useSelector(assetsDialogTotalAssetsSelector);
     const selectedAssets = useSelector(assetsDialogSelectedAssets);
@@ -66,7 +38,7 @@ function AssetsList({listMode}) {
 
     function isSelected(asset) {
         return selectedAssets.some((elm) => {
-            return elm._id==asset._id;
+            return elm._id == asset._id;
         })
     }
 
@@ -105,7 +77,7 @@ function AssetsList({listMode}) {
                             const isImage = asset.mime.match(/^image\//);
                             return (
                                 <tr className={selectedAssets.length && isSelected(asset) ? 'uk-selected' : ''}
-                                    onClick={(e) => selectAsset(e,asset)} key={`asset_${asset._id}`}
+                                    onClick={(e) => selectAsset(e, asset)} key={`asset_${asset._id}`}
                                     key={`asset_${asset._id}`}
                                 >
                                     <td className="uk-text-center">
@@ -119,12 +91,12 @@ function AssetsList({listMode}) {
                                         </a>)}
                                     </td>
                                     <td>
-                                        <a if="{!parent.modal}" onClick={editAsset}>{asset.title}</a>
-                                        <span if="{parent.modal}">{asset.title}</span>
+                                        {!modal && <a onClick={(e) => editAsset(e, asset)}>{asset.title}</a>}
+                                        {modal && <span>{asset.title}</span>}
                                     </td>
                                     <td className="uk-text-small">{asset.mime}</td>
                                     <td className="uk-text-small">{App.Utils.formatSize(asset.size)}</td>
-                                    <td className="uk-text-small">{App.Utils.dateformat(new Date(1000 * asset.modified))}</td>
+                                    <td className="uk-text-small">{App.Utils.dateformat(new Date(asset.modified))}</td>
                                     <td>
                                 <span className="uk-float-right" data-uk-dropdown="mode:'click'">
 
@@ -134,9 +106,9 @@ function AssetsList({listMode}) {
                                         <ul className="uk-nav uk-nav-dropdown">
                                             <li className="uk-nav-header">{App.i18n.get('Actions')}</li>
                                             <li><a className="uk-dropdown-close"
-                                                   onClick={editAsset}>{App.i18n.get('Edit')}</a></li>
+                                                   onClick={(e) => editAsset(e, asset)}>{App.i18n.get('Edit')}</a></li>
                                             <li><a className="uk-dropdown-close"
-                                                   onClick={removeAsset}>{App.i18n.get('Delete')}</a></li>
+                                                   onClick={() => removeAsset(asset)}>{App.i18n.get('Delete')}</a></li>
                                         </ul>
                                     </div>
                                 </span>

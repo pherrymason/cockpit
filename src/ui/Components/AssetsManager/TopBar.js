@@ -1,6 +1,6 @@
 import {useSelector} from 'reffects-store';
 import {dispatch} from 'reffects';
-import {ASSET_DIALOG_TOGGLE_SHOWMODE} from "./events";
+import {ASSET_DIALOG_TOGGLE_SHOWMODE, ASSET_DIALOG_UPLOAD_FILE} from "./events";
 import {addFolder} from './Folders';
 import {assetsDialogSelectedAssets} from "./selectors";
 
@@ -12,12 +12,31 @@ function updateFilter() {
 }
 
 function removeSelected() {
+    App.ui.confirm("Are you sure?", function() {
+        dispatch(ASSET_DIALOG_REMOVE_SELECTED);
+    });
 }
 
 function toggleListMode() {
     dispatch(ASSET_DIALOG_TOGGLE_SHOWMODE);
 }
 
+function onUploadFile(event) {
+    console.log(event.target.files[0]);
+    /*
+    let fileReader = new FileReader();
+    fileReader.onloadend = (e) => {
+        var arrayBuffer = e.target.result;
+        var fileType = $('#file-type').value;
+        var blob = blobUtil.arrayBufferToBlob(arrayBuffer, fileType)
+        console.log('here is a blob', blob);
+        console.log('its size is', blob.size);
+        console.log('its type is', blob.type);
+    }
+    fileReader.readAsArrayBuffer(event.target.files[0]);
+    */
+    dispatch({id: ASSET_DIALOG_UPLOAD_FILE, payload: {files: event.target.files}});
+}
 
 function TopBar({listMode}) {
     const selected = useSelector(assetsDialogSelectedAssets);
@@ -80,8 +99,8 @@ function TopBar({listMode}) {
                 </span>
 
                 <span className="uk-button uk-button-large uk-button-primary uk-form-file">
-                    <input className="js-upload-select" aria-label={ App.i18n.get('Select file') } type="file"
-                               multiple={true}/>
+                    <input className="js-upload-selecto" aria-label={ App.i18n.get('Select file') } type="file"
+                               multiple={true} onChange={onUploadFile}/>
                     <i className="uk-icon-upload"></i>
                 </span>
             </div>

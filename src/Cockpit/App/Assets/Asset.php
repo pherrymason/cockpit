@@ -26,8 +26,10 @@ final class Asset
     private $userID;
     /** @var Folder */
     private $folder;
+    private $author;
 
-    public function __construct(string $id, Folder $folder, string $filename, string $title, string $description, array $tags, string $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID)
+    public function __construct(
+        string $id, Folder $folder, string $filename, string $title, string $description, array $tags, string $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID, $width, $height, Author $author, array $colors = [])
     {
         $this->folder = $folder;
         $this->filename = $filename;
@@ -40,6 +42,32 @@ final class Asset
         $this->userID = $userID;
         $this->id = $id;
         $this->mime = $mime;
+        $this->width = $width;
+        $this->height = $height;
+        $this->colors = $colors;
+        $this->author = $author;
+    }
+
+    public static function fromFrontendArray($data, Folder $folder): Asset
+    {
+        $filename = explode('/', $data['path']);
+        return new self(
+            $data['_id'],
+            $folder,
+            end($filename),
+            $data['title'],
+            $data['description'],
+            $data['tags'],
+            $data['size'],
+            $data['mime'],
+            new \DateTimeImmutable($data['created']),
+            $data['modified'],
+            $data['_by']['_id'],
+            $data['width'],
+            $data['height'],
+            new Author($data['_by']['_id'], $data['_by']['name'], $data['_by']['email']),
+            $data['colors'] ?? []
+        );
     }
 
     public function id(): string
@@ -130,6 +158,21 @@ final class Asset
     public function isCode(): bool
     {
         return preg_match('/\.(htm|html|php|css|less|js|json|md|markdown|yaml|xml|htaccess)$/i', $this->filename) ? true:false;
+    }
+
+    public function width()
+    {
+        return $this->width;
+    }
+
+    public function height()
+    {
+        return $this->height;
+    }
+
+    public function colors()
+    {
+        return $this->colors;
     }
 
     public function toArray(): array

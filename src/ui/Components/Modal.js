@@ -16,11 +16,6 @@ function Modal({open, title, children}) {
                     <div className="modal-body">
                         {children}
                     </div>
-
-                    <div className="uk-modal-footer uk-text-right">
-                        <button type="button" className="uk-button uk-button-large uk-button-link uk-modal-close" data-bs-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary">Save changes</button>
-                    </div>
                 </div>
             </div>
         </div>

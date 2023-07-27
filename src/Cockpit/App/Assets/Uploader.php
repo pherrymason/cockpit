@@ -177,7 +177,10 @@ final class Uploader
             $mime,
             new \DateTimeImmutable(),
             new \DateTimeImmutable(),
-            $userID
+            $userID,
+            10,
+            10,
+            new Author($userID,'x','x')
         );
     }
 }

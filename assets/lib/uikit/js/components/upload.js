@@ -29,7 +29,7 @@
                 $this.element.replaceWith(twin);
                 $this.element = twin;
             });
-        }
+        },
     });
 
     UI.component('uploadDrop', {

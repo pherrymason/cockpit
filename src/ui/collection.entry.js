@@ -19,7 +19,7 @@ registerEnvironmentCoeffect({
 
 window.AssetsDialogController = {
     displayAssetsDialog: undefined,
-    onSubmit: () => {}
+    onSubmit: undefined,
 };
 const displayAssetsDialogSetter = function (showDialog) {
     window.AssetsDialogController.displayAssetsDialog = showDialog;

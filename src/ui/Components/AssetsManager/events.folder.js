@@ -4,6 +4,7 @@ import {state} from 'reffects-store';
 import {http} from 'reffects-batteries';
 import {environment} from '../../environment';
 import {ASSET_DIALOG_ASSETS_REQUESTED} from "./events";
+import {changeUploadFolder, createUploader} from "./upload";
 
 export const ASSET_DIALOG_FOLDER_CHANGE_DIR = 'ASSET_DIALOG_FOLDER_CHANGE_DIR';
 export const ASSET_DIALOG_FOLDER_ADD_DIR = 'ASSET_DIALOG_FOLDER_ADD_DIR';
@@ -48,7 +49,7 @@ registerEventHandler(ASSET_DIALOG_FOLDER_DIR_ADDED, ({state: {folders}}, {folder
 
 registerEventHandler(
     ASSET_DIALOG_FOLDER_CHANGE_DIR,
-    ({state: {currentFolder, foldersPath}}, {folder}) => {
+    ({state: {uploader, currentFolder, foldersPath}}, {folder}) => {
 
         if (folder._id !== null && currentFolder == folder._id) {
             return;
@@ -68,10 +69,11 @@ registerEventHandler(
         } else {
             newFoldersPath = [];
         }
-
+        uploader.setMeta({ folder: folder._id });
 
         return {
             ...state.set({
+                'assetsDialog.uploader': uploader,
                 'assetsDialog.currentFolder': folder,
                 'assetsDialog.foldersPath': newFoldersPath
             }),
@@ -82,6 +84,7 @@ registerEventHandler(
     },
 
     [state.get({
+        uploader: 'assetsDialog.uploader',
         folder: 'assetsDialog.currentFolder',
         foldersPath: 'assetsDialog.foldersPath',
     })]

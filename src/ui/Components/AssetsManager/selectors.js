@@ -1,6 +1,9 @@
 export function assetsDialogLoading(state) {
     return state.assetsDialog?.loading ?? false;
 }
+export function assetsDialogOpen(state) {
+    return state.assetsDialog?.open ?? false;
+}
 
 export function assetsDialogFolders(state) {
     return state.assetsDialog?.folders ?? [];

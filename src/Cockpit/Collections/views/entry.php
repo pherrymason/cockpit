@@ -1,6 +1,5 @@
 
 <script type="riot/tag" src="<?= $this->base('assets:collections/collection-entrypreview.tag') ?>"></script>
-
 <style>
     <?php if(isset($collection['color']) && $collection['color']): ?>
     .app-header { border-top: 8px <?= $collection['color'] ?> solid; }
@@ -10,7 +9,7 @@
 <script>
     window.__collectionEntry = <?= empty($entry) ? '{}' : json_encode($entry) ?>;
 </script>
-
+<div id="vue-app"></div>
 <div riot-view>
 
     <div class="header-sub-panel">
@@ -414,3 +413,4 @@
     </script>
 
 </div>
+<script src="<?= "/admin/assets/app/js/collection.entry.js" ?>"></script>

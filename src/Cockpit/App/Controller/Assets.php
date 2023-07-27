@@ -5,6 +5,7 @@ namespace Cockpit\App\Controller;
 use Cockpit\App\Assets\Asset;
 use Cockpit\App\Assets\AssetRepository;
 use Cockpit\App\Assets\Folder;
+use Cockpit\App\Assets\Author;
 use Cockpit\App\Assets\FolderRepository;
 use Cockpit\App\Assets\Uploader;
 use Cockpit\Framework\Database\Constraint;
@@ -16,6 +17,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpNotFoundException;
 use Laminas\Diactoros\Response\JsonResponse;
+use \Cockpit\App\Assets\FrontendAssetsSerializer;
 
 final class Assets extends TemplateController
 {
@@ -36,7 +38,15 @@ final class Assets extends TemplateController
      */
     private $engine;
 
-    public function __construct(AssetRepository $assets, FolderRepository $folders, Uploader $uploader, EventSystem $eventSystem, Filesystem $fileSystem, string $assetsAbsolutePath, \League\Plates\Engine $engine, \Psr\Container\ContainerInterface $container)
+    public function __construct(
+        AssetRepository $assets,
+        FolderRepository $folders,
+        Uploader $uploader,
+        EventSystem $eventSystem,
+        Filesystem $fileSystem,
+        string $assetsAbsolutePath,
+        \League\Plates\Engine $engine,
+        \Psr\Container\ContainerInterface $container)
     {
         $this->assets = $assets;
         $this->folders = $folders;
@@ -47,6 +57,7 @@ final class Assets extends TemplateController
         parent::__construct($engine, $container);
         $this->engine = $engine;
         $this->container = $container;
+        $this->frontendSerializer = new FrontendAssetsSerializer();
     }
 
     public function index(RequestInterface $request, ResponseInterface $response)
@@ -57,8 +68,13 @@ final class Assets extends TemplateController
     public function listAssets(RequestInterface $request)
     {
         $params = $request->getParsedBody();
+
+        $params['filter'] = $params['filter'] ?? $_REQUEST['filter'] ?? null;
+        $folderFilter = $params['folder'] ?? null;
+        $params['filter']['folder'] = $params['folder'];
+
         $contraint = new Constraint(
-            $params['filter'] ?? $_REQUEST['filter'] ?? null,
+            $params['filter'],
             $params['limit'] ?? null,
             $params['sort'] ?? ['title' => 1],
             $params['skip'] ?? null
@@ -68,14 +84,17 @@ final class Assets extends TemplateController
         $this->eventSystem->trigger('cockpit.assets.list', [$assets]);
 
         // virtual folders
-        $folderFilter = $params['folder'] ?? null;
         $filters = [];
         /*if ($folderFilter) {
             $filters = ['_p' => $folderFilter];
         }*/
         $folders = $this->folders->children(new Constraint($filters, null, ['name' => 1]), $folderFilter);
 
-        return new JsonResponse(['assets' => $assets['assets'], 'folders' => $folders, 'total' => $assets['total']]);
+        return new JsonResponse([
+            'assets' => $this->frontendSerializer->serializeCollection($assets['assets']),
+            'folders' => $folders,
+            'total' => $assets['total']
+        ]);
     }
 
     public function asset(RequestInterface $request, ResponseInterface $response, $id)
@@ -110,7 +129,7 @@ final class Assets extends TemplateController
         $params = $request->getParsedBody();
         $assets = $params['assets'] ?? false;
         if (!$assets) {
-            return new HttpNotFoundException($request);
+            throw new HttpNotFoundException($request);
         }
 
         $assets = isset($assets[0]) ? $assets : [$assets];
@@ -142,12 +161,12 @@ final class Assets extends TemplateController
         return new JsonResponse($assets);
     }
 
-    public function updateAsset(RequestInterface $request)
+    public function updateAsset(RequestInterface $request): ResponseInterface
     {
         $params = $request->getParsedBody();
         $asset = $params['asset'] ?? false;
         if (!$asset) {
-            return new HttpNotFoundException($request);
+            throw new HttpNotFoundException($request);
         }
 
         /** @var UserInterface $user */
@@ -155,17 +174,21 @@ final class Assets extends TemplateController
         $assets = isset($asset[0]) ? $asset : [$asset];
 
         foreach ($assets as &$asset) {
-
             $existingAsset = $this->assets->byId($asset['_id']);
             if (!$existingAsset) {
                 continue;
             }
 
-            $asset['modified'] = time();
-            $asset['_by'] = $user->getDetail('id');
-
+            $asset['modified'] = new \DateTimeImmutable();
+            $asset['_by'] = [
+                '_id' => $user->getDetail('id'),
+                'name' => 'unknown',
+                'email' => 'unknown',
+            ];
             $this->eventSystem->trigger('cockpit.asset.save', [&$asset]);
-//            $this->assets->save($asset);
+
+            $folder = $this->folders->byID($asset['folder']);
+            $this->assets->save(Asset::fromFrontendArray($asset, $folder));
         }
 
         return new JsonResponse($assets);

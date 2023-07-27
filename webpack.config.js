@@ -31,7 +31,8 @@ const config = {
             systemvars: true,
             path: '../../../.env'
         }),
-        ]
+        ],
+    devtool: 'eval'
 };
 
 module.exports = config;

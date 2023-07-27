@@ -37,7 +37,8 @@ final class DBAssetRepository implements AssetRepository
 
     public function byConstraint(Constraint $constraints)
     {
-        $sql = 'SELECT * FROM '.self::TABLE.' ';
+        $sql = 'SELECT assets.*, ca._id as userId, ca.name as userName, ca.email as userEmail FROM cockpit_assets assets ';
+        $sql.= ' JOIN cockpit_accounts ca ON ca._id=assets._by ';
         list($sql, $params) = $this->applyConstraints($constraints, $sql);
 
         $stmt = $this->db->executeQuery($sql, $params);
@@ -95,6 +96,9 @@ final class DBAssetRepository implements AssetRepository
             'code' => (int)$asset->isCode(),
             'created' => $asset->created()->format('Y-m-d H:i:s'),
             'modified' => $asset->modified()->format('Y-m-d H:i:s'),
+            'width' => $asset->width(),
+            'height' => $asset->height(),
+            'colors' => json_encode($asset->colors()),
             '_by' => $asset->userID()
         ];
 
@@ -102,16 +106,49 @@ final class DBAssetRepository implements AssetRepository
             return ParameterType::STRING;
         }, array_keys($params));
 
-        $fieldNames = array_map(function ($key) {
-            return '`' . $key . '`';
-        }, array_keys($params));
-
-        $placeholders = array_map(function ($key) {
-            return ':'.$key;
-        }, array_keys($params));
-
-        $sql = 'INSERT INTO '.self::TABLE.' ('. implode(', ', $fieldNames) .') ' .
-                'VALUES (' . implode(', ', $placeholders) . ')';
+        $sql = <<<SQL
+            INSERT INTO cockpit_assets SET 
+                _id=:_id,
+                _by=:_by,
+                folder=:folder,
+                path=:path,
+                title=:title,
+                mime=:mime,
+                description=:description,
+                tags=:tags,
+                size=:size,
+                image=:image,
+                video=:video,
+                audio=:audio,
+                archive=:archive,
+                document=:document,
+                code=:code,
+                width=:width,
+                height=:height,
+                colors=:colors,
+                created=:created,
+                modified=:modified
+            ON DUPLICATE KEY UPDATE
+                _by=:_by,
+                folder=:folder,
+                path=:path,
+                title=:title,
+                mime=:mime,
+                description=:description,
+                tags=:tags,
+                size=:size,
+                image=:image,
+                video=:video,
+                audio=:audio,
+                archive=:archive,
+                document=:document,
+                code=:code,
+                width=:width,
+                height=:height,
+                colors=:colors,
+                created=:created,
+                modified=:modified
+        SQL;
 
         $this->db->executeUpdate($sql, $params, $types);
     }
