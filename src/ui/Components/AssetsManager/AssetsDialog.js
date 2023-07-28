@@ -47,7 +47,7 @@ function AssetsDialog({showFunction, externalController}) {
     const modal = true;
 
     return (
-        <Modal title="Select assets" open={open}>
+        <Modal title="Select assets" open={open} onClose={cancel}>
             <div ref={assetManagerRef}>
                 {(mode == 'list' || mode == 'grid') &&
                     <>
