@@ -9,6 +9,12 @@ import {changeUploadFolder, createUploader} from "./upload";
 export const ASSET_DIALOG_FOLDER_CHANGE_DIR = 'ASSET_DIALOG_FOLDER_CHANGE_DIR';
 export const ASSET_DIALOG_FOLDER_ADD_DIR = 'ASSET_DIALOG_FOLDER_ADD_DIR';
 export const ASSET_DIALOG_FOLDER_DIR_ADDED = 'ASSET_DIALOG_FOLDER_DIR_ADDED';
+export const ASSET_DIALOG_FOLDER_RENAMED = 'ASSET_DIALOG_FOLDER_RENAMED';
+export const ASSET_DIALOG_FOLDER_RENAMED_SUCCESS = 'ASSET_DIALOG_FOLDER_RENAMED_SUCCESS';
+export const ASSET_DIALOG_FOLDER_RENAMED_FAILED = 'ASSET_DIALOG_FOLDER_RENAMED_FAILED';
+export const ASSET_DIALOG_FOLDER_REMOVED = 'ASSET_DIALOG_FOLDER_REMOVED';
+export const ASSET_DIALOG_FOLDER_REMOVED_SUCCESS = 'ASSET_DIALOG_FOLDER_REMOVED_SUCCESS';
+export const ASSET_DIALOG_FOLDER_REMOVED_FAILED = 'ASSET_DIALOG_FOLDER_REMOVED_FAILED';
 
 registerEventHandler(
     ASSET_DIALOG_FOLDER_ADD_DIR,
@@ -89,3 +95,70 @@ registerEventHandler(
         foldersPath: 'assetsDialog.foldersPath',
     })]
 )
+
+registerEventHandler(
+    ASSET_DIALOG_FOLDER_RENAMED,
+    ({environment: {apiEndpoint}}, {folder, name}) => {
+        return {
+            ...http.post({
+                url: `${apiEndpoint}assetsmanager/renameFolder`,
+                body: {
+                    name,
+                    folder
+                },
+                successEvent: ASSET_DIALOG_FOLDER_RENAMED_SUCCESS,
+                errorEvent: ASSET_DIALOG_FOLDER_RENAMED_FAILED,
+            })
+        }
+    },
+    [environment()]
+);
+
+registerEventHandler(
+    ASSET_DIALOG_FOLDER_RENAMED_SUCCESS,
+    () => {
+        return {
+            ...effects.dispatch(ASSET_DIALOG_ASSETS_REQUESTED)
+        }
+    }
+);
+
+registerEventHandler(
+    ASSET_DIALOG_FOLDER_RENAMED_FAILED,
+    () => {
+        return {}
+    }
+);
+
+registerEventHandler(
+    ASSET_DIALOG_FOLDER_REMOVED,
+    ({environment: {apiEndpoint}}, {folder}) => {
+        return {
+            ...http.post({
+                url: `${apiEndpoint}assetsmanager/removeFolder`,
+                body: {
+                    folder
+                },
+                successEvent: ASSET_DIALOG_FOLDER_REMOVED_SUCCESS,
+                errorEvent: ASSET_DIALOG_FOLDER_REMOVED_FAILED,
+            })
+        }
+    },
+    [environment()]
+);
+
+registerEventHandler(
+    ASSET_DIALOG_FOLDER_REMOVED_SUCCESS,
+    () => {
+        return {
+            ...effects.dispatch(ASSET_DIALOG_ASSETS_REQUESTED)
+        }
+    }
+);
+
+registerEventHandler(
+    ASSET_DIALOG_FOLDER_REMOVED_FAILED,
+    () => {
+        return {}
+    }
+);

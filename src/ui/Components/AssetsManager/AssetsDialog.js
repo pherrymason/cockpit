@@ -9,7 +9,13 @@ import Paginator from './Paginator';
 import Modal from '../Modal';
 import {ASSET_DIALOG_ASSETS_INIT, ASSET_DIALOG_ASSETS_REQUESTED, ASSET_DIALOG_SUBMIT, ASSET_DIALOG_OPEN,ASSET_DIALOG_CLOSE} from "./events";
 import {useSelector} from "reffects-store";
-import {assetsDialogLoading, assetsDialogOpen, assetsDialogShowModeSelector} from "./selectors";
+import {
+    assetsDialogIsUploadingSelector,
+    assetsDialogLoading,
+    assetsDialogOpen,
+    assetsDialogShowModeSelector,
+    assetsDialogUploadProgressSelector
+} from "./selectors";
 import AssetEditor from '../AssetEditor/AssetEditor';
 import Progress from '../Progress';
 
@@ -29,7 +35,10 @@ function AssetsDialog({showFunction, externalController}) {
     const open = useSelector(assetsDialogOpen);
     const mode = useSelector(assetsDialogShowModeSelector);
     const loading = useSelector(assetsDialogLoading);
+    const uploading = useSelector(assetsDialogIsUploadingSelector);
+    const uploadProgress = useSelector(assetsDialogUploadProgressSelector);
     const assetManagerRef = useRef(null);
+
     useMount(() => {
         dispatch({id: ASSET_DIALOG_ASSETS_INIT, payload: {ref: assetManagerRef}});
     });
@@ -42,7 +51,7 @@ function AssetsDialog({showFunction, externalController}) {
             <div ref={assetManagerRef}>
                 {(mode == 'list' || mode == 'grid') &&
                     <>
-                        <Progress/>
+                        { uploading && <Progress progress={uploadProgress}/> }
                         <div className="uk-form">
                             <TopBar listMode={mode}/>
                             <PathBreadCrumb/>
@@ -50,8 +59,10 @@ function AssetsDialog({showFunction, externalController}) {
                                  style={{display: loading ? 'block' : 'none'}}>
                                 <cp-preloader className="uk-container-center"></cp-preloader>
                             </div>
-                            <Folders modal={modal}/>
-                            <AssetsList listMode={mode} modal={modal}/>
+                            <div className={modal && 'uk-overflow-container'} style={{padding: '1px 1px'}}>
+                                <Folders modal={modal}/>
+                                <AssetsList listMode={mode} modal={modal}/>
+                            </div>
                         </div>
                         <Paginator/>
                         <div className="uk-margin-top">

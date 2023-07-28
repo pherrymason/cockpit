@@ -35,9 +35,10 @@ final class DBAssetRepository implements AssetRepository
         return $result !== false ? $result : null;
     }
 
-    public function byConstraint(Constraint $constraints)
+    public function byConstraint(Constraint $constraints): array
     {
-        $sql = 'SELECT assets.*, ca._id as userId, ca.name as userName, ca.email as userEmail FROM cockpit_assets assets ';
+        $sql = 'SELECT assets.*, 
+       ca._id as userId, ca.name as userName, ca.email as userEmail FROM cockpit_assets assets ';
         $sql.= ' JOIN cockpit_accounts ca ON ca._id=assets._by ';
         list($sql, $params) = $this->applyConstraints($constraints, $sql);
 
@@ -51,9 +52,34 @@ final class DBAssetRepository implements AssetRepository
         $assets = $stmt->fetchAll();
 
         return [
-            'assets' => $assets,
+            'assets' => array_map(function ($asset) {
+                    return $this->mapRowToAsset($asset);
+                },
+                $assets),
             'total' => $total
         ];
+    }
+
+    public function mapRowToAsset(array $row): Asset
+    {
+        return new Asset(
+            $row['_id'],
+            new Folder($row['folder'], $row['path']),
+            $row['path'],
+            $row['title'],
+            $row['description'],
+            json_decode($row['tags'],true),
+            $row['size'],
+            $row['mime'],
+            new \DateTimeImmutable($row['created']),
+            new \DateTimeImmutable($row['modified']),
+            $row['_by'],
+            $row['width'],
+            $row['height'],
+            new Author($row['userId'], $row['userName'], $row['userEmail']),
+            $row['type'],
+            json_decode($row['colors'], true),
+        );
     }
 
     public function countAll(): int
@@ -88,12 +114,7 @@ final class DBAssetRepository implements AssetRepository
             'description' => $asset->description(),
             'tags' => json_encode($asset->tags()),
             'size' => $asset->size(),
-            'image' => (int)$asset->isImage(),
-            'video' => (int)$asset->isVideo(),
-            'audio' => (int)$asset->isAudio(),
-            'archive' => (int)$asset->isArchive(),
-            'document' => (int)$asset->isDocument(),
-            'code' => (int)$asset->isCode(),
+            'type' => $asset->type(),
             'created' => $asset->created()->format('Y-m-d H:i:s'),
             'modified' => $asset->modified()->format('Y-m-d H:i:s'),
             'width' => $asset->width(),
@@ -117,12 +138,7 @@ final class DBAssetRepository implements AssetRepository
                 description=:description,
                 tags=:tags,
                 size=:size,
-                image=:image,
-                video=:video,
-                audio=:audio,
-                archive=:archive,
-                document=:document,
-                code=:code,
+                type=:type,
                 width=:width,
                 height=:height,
                 colors=:colors,
@@ -137,12 +153,7 @@ final class DBAssetRepository implements AssetRepository
                 description=:description,
                 tags=:tags,
                 size=:size,
-                image=:image,
-                video=:video,
-                audio=:audio,
-                archive=:archive,
-                document=:document,
-                code=:code,
+                type=:type,
                 width=:width,
                 height=:height,
                 colors=:colors,

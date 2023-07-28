@@ -1,6 +1,7 @@
-import {ASSET_DIALOG_ASSETS_REQUESTED} from "./events";
 import Uppy from '@uppy/core';
 import XHRUpload from '@uppy/xhr-upload';
+import {dispatch} from 'reffects';
+import {ASSET_DIALOG_ASSETS_REQUESTED, ASSET_DIALOG_UPLOAD_PROGRESSED, ASSET_DIALOG_UPLOAD_STARTED, ASSET_DIALOG_UPLOAD_FINISHED} from "./events";
 
 export function createUploader({endpoint, folder}) {
     const uppy = new Uppy({
@@ -21,11 +22,40 @@ export function createUploader({endpoint, folder}) {
         bundle: true,
     });
 
+    uppy.on('upload', (data) => {
+        dispatch(ASSET_DIALOG_UPLOAD_STARTED);
+    });
+    uppy.on('progress', (progress) => {
+        dispatch({id: ASSET_DIALOG_UPLOAD_PROGRESSED, payload:{progress}});
+    });
+
+    uppy.on('restriction-failed', (file, error) => {
+        // do some customized logic like showing system notice to users
+        App.ui.notify(error.message, "danger");
+        resetUploader(uppy);
+    });
+
+    uppy.on('error', (error) => {
+        resetUploader(uppy);
+        App.ui.notify(error.message, "danger");
+    });
+
     uppy.on('upload-error', (file, error, response) => {
-        App.ui.notify(`Filed to upload file ${file.name}: ${error}`, "danger");
-    })
+        resetUploader(uppy);
+        App.ui.notify(`Filed to upload file ${file.name}: ${error.message}`, "danger");
+    });
+
+    uppy.on('complete', () => {
+        resetUploader(uppy);
+    });
 
     return uppy;
+}
+
+function resetUploader(uppy) {
+    const files = uppy.getFiles();
+    uppy.cancelAll();
+    dispatch(ASSET_DIALOG_UPLOAD_FINISHED);
 }
 
 

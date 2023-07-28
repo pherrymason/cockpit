@@ -11,7 +11,7 @@
 namespace Cockpit\Controller;
 
 /**
- * @deprecated
+ * @deprecated Check \Cockpit\App\Controller\Assets instead
  */
 class Assets extends \Cockpit\AuthController {
 

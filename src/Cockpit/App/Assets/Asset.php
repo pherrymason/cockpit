@@ -27,9 +27,10 @@ final class Asset
     /** @var Folder */
     private $folder;
     private $author;
+    private $type;
 
     public function __construct(
-        string $id, Folder $folder, string $filename, string $title, string $description, array $tags, string $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID, $width, $height, Author $author, array $colors = [])
+        string $id, Folder $folder, string $filename, string $title, string $description, array $tags, string $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID, $width, $height, Author $author, $type, array $colors = [])
     {
         $this->folder = $folder;
         $this->filename = $filename;
@@ -46,6 +47,7 @@ final class Asset
         $this->height = $height;
         $this->colors = $colors;
         $this->author = $author;
+        $this->type = $type;
     }
 
     public static function fromFrontendArray($data, Folder $folder): Asset
@@ -66,6 +68,7 @@ final class Asset
             $data['width'],
             $data['height'],
             new Author($data['_by']['_id'], $data['_by']['name'], $data['_by']['email']),
+            $data['type'],
             $data['colors'] ?? []
         );
     }
@@ -80,14 +83,19 @@ final class Asset
         return $this->folder;
     }
 
+    public function folderId(): string
+    {
+        return $this->folder->id();
+    }
+
     public function filename(): string
     {
         return $this->filename;
     }
 
-    public function filenamePath(): string
+    public function path(): string
     {
-        return $this->folder->path().$this->filename;
+        return $this->filename;
     }
 
     public function title(): string
@@ -128,6 +136,11 @@ final class Asset
     public function userID(): string
     {
         return $this->userID;
+    }
+
+    public function type(): string
+    {
+        return $this->type;
     }
 
     public function isImage(): bool
@@ -173,6 +186,21 @@ final class Asset
     public function colors()
     {
         return $this->colors;
+    }
+
+    public function authorId(): string
+    {
+        return $this->author->id();
+    }
+
+    public function authorName(): string
+    {
+        return $this->author->name();
+    }
+
+    public function authorEmail(): string
+    {
+        return $this->author->email();
     }
 
     public function toArray(): array

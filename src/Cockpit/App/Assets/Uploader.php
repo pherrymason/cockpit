@@ -165,6 +165,17 @@ final class Uploader
     private function createAsset(string $fullFilenamePath, string $filesize, string $mime, string $userID, Folder $folder): Asset
     {
         $filename = basename($fullFilenamePath);
+        $images = [
+            'image/jpeg', 'image/jpg', 'image/png', 'image/gif'
+        ];
+        $docs = ['application/pdf'];
+        if (in_array($mime, $images)) {
+            $type = 'image';
+        } else if ($mime == 'application/zip') {
+            $type = 'archive';
+        } else if (in_array($mime, $docs)) {
+            $type = 'document';
+        }
 
         return new Asset(
             IDs::new(),
@@ -180,7 +191,8 @@ final class Uploader
             $userID,
             10,
             10,
-            new Author($userID,'x','x')
+            new Author($userID,'x','x'),
+            $type
         );
     }
 }

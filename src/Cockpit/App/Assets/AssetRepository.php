@@ -8,7 +8,11 @@ interface AssetRepository
 {
     public function byId(string $assetID): ?array;
 
-    public function byConstraint(Constraint $constraints);
+    /**
+     * @param Constraint $constraints
+     * @return Asset[]
+     */
+    public function byConstraint(Constraint $constraints): array;
 
     public function countAll(): int;
 

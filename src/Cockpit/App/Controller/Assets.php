@@ -119,9 +119,6 @@ final class Assets extends TemplateController
         $result = $this->uploader->upload('files', $folder, $user);
 
         return $result;
-        // Register uploaded assets
-
-//        return $this->module('cockpit')->uploadAssets('files', $meta);
     }
 
     public function removeAssets(RequestInterface $request)
@@ -135,7 +132,6 @@ final class Assets extends TemplateController
         $assets = isset($assets[0]) ? $assets : [$assets];
 
         foreach($assets as &$inputAsset) {
-
             if (!isset($inputAsset['_id'])) {
                 continue;
             }
@@ -147,8 +143,9 @@ final class Assets extends TemplateController
                 continue;
             }
 
+            $this->fileSystem->delete(/*$this->assetsAbsolutePath . */'/public/' . $asset['path']);
             $this->assets->delete($asset['_id']);
-            $this->fileSystem->delete($this->assetsAbsolutePath.'/'.$asset['path']);
+
 
 //            if ($this->app->filestorage->has('assets://'.trim($asset['path'], '/'))) {
 //                $this->app->filestorage->delete('assets://'.trim($asset['path'], '/'));
@@ -213,8 +210,9 @@ final class Assets extends TemplateController
         return new JsonResponse($folder->toArray());
     }
 
-    public function renameFolder()
+    public function renameFolder(RequestInterface $request)
     {
+        $params = $request->getParsedBody();
         $folder = $params['folder'];
         $name = $params['name'];
 
@@ -222,15 +220,19 @@ final class Assets extends TemplateController
             return false;
         }
 
+        $folderD = $this->folders->byID($folder['_id']);
+        $folderD->rename($name);
         $folder['name'] = $name;
 
-        $this->app->storage->save('cockpit/assets_folders', $folder);
+        //$this->app->storage->save('cockpit/assets_folders', $folder);
+        $this->folders->save($folderD);
 
-        return $folder;
+        return new JsonResponse($folderD->toArray());;
     }
 
-    public function removeFolder()
+    public function removeFolder(RequestInterface $request)
     {
+        $params = $request->getParsedBody();
         $folder = $params['folder'];
 
         if (!$folder || !isset($folder['_id'])) {
@@ -240,13 +242,19 @@ final class Assets extends TemplateController
         $ids = [$folder['_id']];
         $f = ['_id' => $folder['_id']];
 
-        while ($f = $this->app->storage->findOne('cockpit/assets_folders', ['_p' => $f['_id']])) {
+        while ($f = $this->folders->children(new Constraint([], null, ['name' => 1]), $f['_id'])) {
             $ids[] = $f['_id'];
         }
+        /*
+        while ($f = $this->app->storage->findOne('cockpit/assets_folders', ['_p' => $f['_id']])) {
+            $ids[] = $f['_id'];
+        }*/
+        foreach ($ids as $id) {
+            $this->folders->remove($id);
+        }
+        //$this->app->storage->remove('cockpit/assets_folders', ['_id' => ['$in' => $ids]]);
 
-        $this->app->storage->remove('cockpit/assets_folders', ['_id' => ['$in' => $ids]]);
-
-        return $ids;
+        return new JsonResponse($ids);
     }
 
     public function _folders()

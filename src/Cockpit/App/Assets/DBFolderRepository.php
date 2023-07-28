@@ -102,7 +102,20 @@ final class DBFolderRepository implements FolderRepository
             return ':'.$key;
         }, array_keys($params));
 
-        $sql = 'INSERT INTO `' . self::TABLE . '` (`_id`, `_p`, `name`, `path`) VALUES (' . implode(', ', $placeholders) . ')';
+        $sql = 'INSERT INTO `' . self::TABLE . '` 
+            SET `_id`=:id, 
+            `_p`=:_p, 
+            `name`=:=name, 
+            `path`=:path
+             ON DUPLICATE KEY UPDATE 
+                `_p`=:_p,
+                name=:name,
+                path=:path';
         $this->db->executeUpdate($sql, $params, $types);
+    }
+
+    public function remove(string $folderID)
+    {
+        $this->db->executeUpdate('DELETE FROM '.self::TABLE.' WHERE _id=:id', ['id' => $folderID]);
     }
 }

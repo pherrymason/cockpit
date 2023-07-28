@@ -6,7 +6,7 @@ use Cockpit\Framework\Database\Constraint;
 
 interface FolderRepository
 {
-    public function byID(string $parent): ?Folder;
+    public function byID(string $folderID): ?Folder;
 
     public function byConstraint(Constraint $constraints): array;
 
@@ -14,4 +14,5 @@ interface FolderRepository
 
     public function save(Folder $folder): void;
 
+    public function remove(string $folderID);
 }

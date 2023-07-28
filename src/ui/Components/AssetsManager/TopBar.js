@@ -1,14 +1,14 @@
 import {useSelector} from 'reffects-store';
 import {dispatch} from 'reffects';
-import {ASSET_DIALOG_TOGGLE_SHOWMODE, ASSET_DIALOG_UPLOAD_FILE} from "./events";
+import {ASSET_DIALOG_TOGGLE_SHOWMODE, ASSET_DIALOG_UPLOAD_FILE, ASSET_DIALOG_REMOVE_SELECTED, ASSET_DIALOG_UPDATE_FILTER} from "./events";
 import {addFolder} from './Folders';
 import {assetsDialogSelectedAssets} from "./selectors";
 
 function getRefValue() {
 }
 
-function updateFilter() {
-    dispatch(ASSET_DIALOG_UPDATE_FILTER);
+function updateFilter(event) {
+    dispatch({id: ASSET_DIALOG_UPDATE_FILTER, payload: {name: event.target.name, value: event.target.value}});
 }
 
 function removeSelected() {
@@ -22,19 +22,6 @@ function toggleListMode() {
 }
 
 function onUploadFile(event) {
-    console.log(event.target.files[0]);
-    /*
-    let fileReader = new FileReader();
-    fileReader.onloadend = (e) => {
-        var arrayBuffer = e.target.result;
-        var fileType = $('#file-type').value;
-        var blob = blobUtil.arrayBufferToBlob(arrayBuffer, fileType)
-        console.log('here is a blob', blob);
-        console.log('its size is', blob.size);
-        console.log('its type is', blob.type);
-    }
-    fileReader.readAsArrayBuffer(event.target.files[0]);
-    */
     dispatch({id: ASSET_DIALOG_UPLOAD_FILE, payload: {files: event.target.files}});
 }
 
@@ -53,8 +40,7 @@ function TopBar({listMode}) {
                                 {getRefValue('filtertype') || App.i18n.get('All')}
                             </span>
 
-                            <select refo="filtertype" onChange={updateFilter}
-                                    aria-label={App.i18n.get('Mime Type')}>
+                            <select name="type" onChange={updateFilter} aria-label={App.i18n.get('Mime Type')}>
                                 <option value="">All</option>
                                 <option value="image">Image</option>
                                 <option value="video">Video</option>
@@ -69,7 +55,8 @@ function TopBar({listMode}) {
                         <div className="uk-form-icon uk-display-block uk-width-1-1">
                             <i className="uk-icon-search"></i>
                             <input className="uk-width-1-1 uk-form-large" type="text"
-                                   aria-label={App.i18n.get('Search assets')} refo="filtertitle"
+                                   name="title"
+                                   aria-label={App.i18n.get('Search assets')}
                                    onChange={updateFilter}/>
                         </div>
                     </div>

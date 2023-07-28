@@ -26,6 +26,9 @@ export const ASSET_DIALOG_EDIT_ASSET = 'ASSET_DIALOG_EDIT_ASSET';
 export const ASSET_DIALOG_REMOVE_ASSET = 'ASSET_DIALOG_REMOVE_ASSET';
 export const ASSET_DIALOG_SUBMIT = 'ASSET_DIALOG_SUBMIT';
 export const ASSET_DIALOG_UPLOAD_FILE = 'ASSET_DIALOG_UPLOAD_FILE';
+export const ASSET_DIALOG_UPLOAD_STARTED = 'ASSET_DIALOG_UPLOAD_STARTED';
+export const ASSET_DIALOG_UPLOAD_PROGRESSED = 'ASSET_DIALOG_UPLOAD_PROGRESSED';
+export const ASSET_DIALOG_UPLOAD_FINISHED = 'ASSET_DIALOG_UPLOAD_FINISHED';
 
 
 const DEFAULT_ASSETS_PER_PAGE = 15;
@@ -44,7 +47,6 @@ const defaultAssetDialog = {
     assets: [],
     selectedAssets: []
 };
-const hello = '';
 
 
 registerEventHandler(ASSET_DIALOG_OPEN, () => {
@@ -171,9 +173,25 @@ registerEventHandler(ASSET_DIALOG_TOGGLE_SHOWMODE,
     }, [state.get({showMode: 'assetsDialog.showMode'})]
 );
 
-registerEventHandler(ASSET_DIALOG_UPDATE_FILTER, () => {
-    let filter = {};
-});
+registerEventHandler(
+    ASSET_DIALOG_UPDATE_FILTER,
+    ({state:{filter}}, {name, value}) => {
+
+        let newFilter = structuredClone(filter);
+        if (value.length) {
+            newFilter[name] = value;
+        } else {
+            delete newFilter[name];
+        }
+
+        return {
+        ...state.set({
+            'assetsDialog.filter': newFilter
+        }),
+        ...effects.dispatch(ASSET_DIALOG_ASSETS_REQUESTED)
+    }
+},
+    [state.get({filter: 'assetsDialog.filter'})]);
 
 registerEventHandler(
     ASSET_DIALOG_SELECT_ASSET,
@@ -219,7 +237,8 @@ registerEventHandler(ASSETS_DIALOG_REMOVE_COMPLETED,
         return {
             ...state.set({
                 'assetsDialog.selectedAssets': [],
-            })
+            }),
+            ...effects.dispatch(ASSET_DIALOG_ASSETS_REQUESTED)
         }
     });
 
@@ -300,4 +319,37 @@ registerEventHandler(
             });
     },
     [state.get({uploader: 'assetsDialog.uploader'})]
-)
+);
+
+registerEventHandler(
+    ASSET_DIALOG_UPLOAD_STARTED,
+    () => {
+        return {
+            ...state.set({
+                'assetsDialog.upload_started': true,
+            })
+        }
+    }
+);
+
+registerEventHandler(
+    ASSET_DIALOG_UPLOAD_FINISHED,
+    () => {
+        return {
+            ...state.set({
+                'assetsDialog.upload_started': false,
+            })
+        }
+    }
+);
+
+registerEventHandler(
+    ASSET_DIALOG_UPLOAD_PROGRESSED,
+    (_, {progress}) => {
+        return {
+            ...state.set({
+                'assetsDialog.upload_progress': progress,
+            })
+        }
+    }
+);

@@ -35,3 +35,11 @@ export function assetsDialogShowModeSelector(state) {
 export function assetsDialogFoldersPath(state) {
     return state.assetsDialog?.foldersPath ?? [];
 }
+
+export function assetsDialogIsUploadingSelector(state) {
+    return state.assetsDialog?.upload_started ?? false;
+}
+
+export function assetsDialogUploadProgressSelector(state) {
+    return state.assetsDialog?.upload_progress ?? null;
+}
