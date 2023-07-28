@@ -7,7 +7,7 @@ import {Folders} from './Folders';
 import AssetsList from './AssetsList';
 import Paginator from './Paginator';
 import Modal from '../Modal';
-import {ASSET_DIALOG_ASSETS_INIT, ASSET_DIALOG_ASSETS_REQUESTED, ASSET_DIALOG_SUBMIT, ASSET_DIALOG_OPEN} from "./events";
+import {ASSET_DIALOG_ASSETS_INIT, ASSET_DIALOG_ASSETS_REQUESTED, ASSET_DIALOG_SUBMIT, ASSET_DIALOG_OPEN,ASSET_DIALOG_CLOSE} from "./events";
 import {useSelector} from "reffects-store";
 import {assetsDialogLoading, assetsDialogOpen, assetsDialogShowModeSelector} from "./selectors";
 import AssetEditor from '../AssetEditor/AssetEditor';
@@ -17,7 +17,9 @@ function selectAssets(callback) {
     dispatch({id: ASSET_DIALOG_SUBMIT, payload: {callback}});
 }
 
-function cancel() {}
+function cancel() {
+    dispatch(ASSET_DIALOG_CLOSE);
+}
 
 function openDialog() {
     dispatch(ASSET_DIALOG_OPEN);

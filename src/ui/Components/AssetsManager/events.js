@@ -8,6 +8,7 @@ import {changeUploadFolder, configureUpload, createUploader} from './upload';
 require('../../../../assets/lib/uikit/js/components/upload.js');
 
 export const ASSET_DIALOG_OPEN = 'ASSET_DIALOG_OPEN';
+export const ASSET_DIALOG_CLOSE = 'ASSET_DIALOG_CLOSE';
 export const ASSET_DIALOG_ASSETS_INIT = 'ASSET_DIALOG_ASSETS_INIT';
 export const ASSET_DIALOG_ASSETS_REQUESTED = 'ASSET_DIALOG_ASSETS_REQUESTED';
 export const ASSET_DIALOG_ASSETS_LOADED = 'ASSET_DIALOG_ASSETS_LOADED';
@@ -43,16 +44,27 @@ const defaultAssetDialog = {
     assets: [],
     selectedAssets: []
 };
+const hello = '';
 
 
 registerEventHandler(ASSET_DIALOG_OPEN, () => {
     return {
         ...state.set({
             'assetsDialog.open': true,
+            'assetsDialog.selectedAssets': [],
         }),
         //...effects.dispatch(ASSET_DIALOG_ASSETS_INIT)
     }
-})
+});
+
+registerEventHandler(ASSET_DIALOG_CLOSE, () => {
+    return {
+        ...state.set({
+            'assetsDialog.open': false,
+            'assetsDialog.selectedAssets': [],
+        }),
+    }
+});
 
 registerEventHandler(
     ASSET_DIALOG_ASSETS_INIT,
