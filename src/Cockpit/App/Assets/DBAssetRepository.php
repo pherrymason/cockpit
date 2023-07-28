@@ -78,7 +78,7 @@ final class DBAssetRepository implements AssetRepository
             $row['height'],
             new Author($row['userId'], $row['userName'], $row['userEmail']),
             $row['type'],
-            json_decode($row['colors'], true),
+            $row['colors'] !== null ? json_decode($row['colors'], true) : [],
         );
     }
 
