@@ -4,7 +4,7 @@
     "license": "MIT",
     "scripts": {
         "build-dev": "webpack --mode=development --watch",
-        "build": "npm run build-style && npm run build-components",
+        "build": "npm run build-style && npm run build-components && webpack --mode=production",
         "build-style": "lessc assets/app/css/style.less > assets/app/css/style.css -x",
         "build-components": "riot modules/Cockpit/assets/components modules/Cockpit/assets/components.js",
         "watch": "npm run watch-style & npm run watch-components",
