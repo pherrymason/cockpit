@@ -87,7 +87,7 @@
                                     <li><a href="<?= $this->route('/collections/entries') ?>/{collection.name}"><?= $this->lang('Entries') ?></a></li>
                                     <li><a href="<?= $this->route('/collections/entry') ?>/{collection.name}" if="{ collection.meta.allowed.entries_create }"><?= $this->lang('Add entry') ?></a></li>
                                     <li if="{ collection.meta.allowed.edit || collection.meta.allowed.delete }" class="uk-nav-divider"></li>
-                                    <li if="{ collection.meta.allowed.edit }"><a href="<?= $this->route('/collections/collection') ?>/{ collection.name }"><?= $this->lang('Edit') ?></a></li>
+                                    <li if="{ collection.meta.allowed.edit }"><a href="<?= $this->base('/collections/collection') ?>/{ collection.name }"><?= $this->lang('Edit') ?></a></li>
                                     <?php if($this->hasAccess('collections', 'delete')): ?>
                                     <li class="uk-nav-item-danger" if="{ collection.meta.allowed.delete }"><a class="uk-dropdown-close" onclick="{ parent.remove }"><?= $this->lang('Delete') ?></a></li>
                                     <?php endif; ?>

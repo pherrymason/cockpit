@@ -17,7 +17,9 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ServerRequestInterface;
+use Sepia\Framework\Request;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Routing\RoutingResults;
 
 final class Admin extends TemplateController
 {
@@ -29,13 +31,22 @@ final class Admin extends TemplateController
     private $revisions;
     /** @var EventSystem */
     private $eventSystem;
+    private $limeFileSystem;
 
-    public function __construct(CollectionRepository $collections, EntriesRepository $entries, Revisions $revisions, Engine $engine, EventSystem $eventSystem, ContainerInterface $container)
+    public function __construct(
+        CollectionRepository $collections,
+        EntriesRepository $entries,
+        Revisions $revisions,
+        Engine $engine,
+        EventSystem $eventSystem,
+        ContainerInterface $container,
+        \Lime\Helper\Filesystem $limeFileSystem)
     {
         $this->collections = $collections;
         $this->entries = $entries;
         $this->revisions = $revisions;
         $this->eventSystem = $eventSystem;
+        $this->limeFileSystem = $limeFileSystem;
         parent::__construct($engine, $container);
     }
 
@@ -52,8 +63,12 @@ final class Admin extends TemplateController
         return $this->renderResponse($request, 'collections::views/index', ['collections' => $frontendData]);
     }
 
-    public function collection($name = null)
+    public function collection(RequestInterface $request, ResponseInterface $response)
     {
+        /** @var RoutingResults $routingResults */
+        $routingResults = $request->getAttribute('__routingResults__');
+        $args = $routingResults->getRouteArguments();
+        $name = $args['name'];
         if ($name) {
             /** @var string $name */
             $collection = $this->collections->byName($name);
@@ -109,53 +124,60 @@ final class Admin extends TemplateController
         // get field templates
         $templates = [];
 
-        foreach ($this->app->helper('fs')->ls('*.php', 'collections:fields-templates') as $file) {
+        //foreach ($this->app->helper('fs')->ls('*.php', 'collections:fields-templates') as $file) {
+        foreach ($this->limeFileSystem->ls('*.php', 'collections:fields-templates') as $file) {
             $templates[] = include($file->getRealPath());
         }
 
-        foreach ($this->app->module('collections')->collections() as $col) {
+        //foreach ($this->app->module('collections')->collections() as $col) {
+        foreach ($this->collections->all() as $col) {
             $templates[] = $col;
         }
 
         // acl groups
         $aclgroups = [];
+        /*
 
         foreach ($this->app->helper('acl')->getGroups() as $group => $superAdmin) {
 
-            if (!$superAdmin) $aclgroups[] = $group;
-        }
+            if (!$superAdmin)
+                $aclgroups[] = $group;
+        }*/
 
         // rules
         $rules = [
-            'create' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read(
+            'create' => !$name ? "<?php\n\n" : $this->limeFileSystem->read(
                 "#storage:collections/rules/{$name}.create.php"
             ),
-            'read' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read(
+            'read' => !$name ? "<?php\n\n" : $this->limeFileSystem->read(
                 "#storage:collections/rules/{$name}.read.php"
             ),
-            'update' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read(
+            'update' => !$name ? "<?php\n\n" : $this->limeFileSystem->read(
                 "#storage:collections/rules/{$name}.update.php"
             ),
-            'delete' => !$name ? "<?php\n\n" : $this->app->helper('fs')->read(
+            'delete' => !$name ? "<?php\n\n" : $this->limeFileSystem->read(
                 "#storage:collections/rules/{$name}.delete.php"
             ),
         ];
 
-        return $this->render(
-            'collections:views/collection.php',
+        return $this->renderResponse(
+            $request,
+            'collections::views/collection',
             [
                 'collection' => $collection->toArray(),
                 'templates' => $templates,
                 'aclgroups' => $aclgroups,
-                'rules' => $rules
+                'rules' => $rules,
+                'icons' => $this->limeFileSystem->ls('*.svg', 'assets:app/media/icons')
             ]
         );
     }
 
-    public function save_collection()
+    public function save_collection(RequestInterface $request)
     {
-        $collection = $this->param('collection');
-        $rules = $this->param('rules', null);
+        $params = $request->getParsedBody();
+        $collection = $params['collection'];
+        $rules = isset($param['rules']) ? $param['rules'] : null;
 
         if (!$collection) {
             return false;
@@ -185,7 +207,7 @@ final class Admin extends TemplateController
 //            $this->app->helper('admin')->lockResourceId($collection['_id']);
         }
 
-        return $collection;
+        return new JsonResponse($collection);
     }
 
     public function entries(RequestInterface $request, ResponseInterface $response, string $name)

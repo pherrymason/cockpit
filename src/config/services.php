@@ -91,6 +91,7 @@ $services = [
             $c->get('site_url')
         );
     },
+    'path' => DI\get(\Cockpit\Framework\PathResolver::class),
 
     'filestorage' => function (ContainerInterface $c) {
         /** @var \Cockpit\Framework\PathResolver $pathResolver */
@@ -173,6 +174,10 @@ $services = [
 
     'fs' => function (ContainerInterface $c) {
         return new \Lime\Helper\Filesystem($c->get('path'));
+    },
+
+    \Lime\Helper\Filesystem::class => function (ContainerInterface $c) {
+        return new \Lime\Helper\Filesystem($c->get(\Cockpit\Framework\PathResolver::class));
     },
 
     'image' => function (ContainerInterface $c) {

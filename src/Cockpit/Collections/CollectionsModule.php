@@ -59,6 +59,8 @@ final class CollectionsModule implements Module
             '/collections',
             function (RouteCollectorProxy $group) {
                 $group->get('', Admin::class . ':index')->setName('collections');
+                $group->get('/collection/{name:[0-9a-z\-]+}', Admin::class . ':collection')->setName('collection');
+                $group->post('/save_collection', Admin::class . ':save_collection')->setName('save_collection');
                 $group->post('/find', Admin::class . ':find')->setName('collections_find');
                 $group->get('/entries/{name:[0-9a-z\-]+}', Admin::class . ':entries')->setName('collections_entries');
                 $group->get('/entry/{name:[0-9a-z\-]+}', Admin::class . ':entry')->setName('collections_entry');
