@@ -11,7 +11,7 @@ import {ASSET_DIALOG_ASSETS_INIT, ASSET_DIALOG_ASSETS_REQUESTED, ASSET_DIALOG_SU
 import {useSelector} from "reffects-store";
 import {
     assetsDialogIsUploadingSelector,
-    assetsDialogLoading,
+    assetsDialogLoadingSelector,
     assetsDialogOpen,
     assetsDialogShowModeSelector,
     assetsDialogUploadProgressSelector
@@ -34,7 +34,7 @@ function openDialog() {
 function AssetsDialog({showFunction, externalController}) {
     const open = useSelector(assetsDialogOpen);
     const mode = useSelector(assetsDialogShowModeSelector);
-    const loading = useSelector(assetsDialogLoading);
+    const loading = useSelector(assetsDialogLoadingSelector);
     const uploading = useSelector(assetsDialogIsUploadingSelector);
     const uploadProgress = useSelector(assetsDialogUploadProgressSelector);
     const assetManagerRef = useRef(null);

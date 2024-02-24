@@ -1,6 +1,6 @@
 import {useSelector} from "reffects-store";
 import {dispatch} from 'reffects';
-import {assetsDialogLoading, assetsDialogPageSelector, assetsDialogPagesSelector} from './selectors';
+import {assetsDialogLoadingSelector, assetsDialogPageSelector, assetsDialogPagesSelector} from './selectors';
 import {ASSET_DIALOG_ASSETS_INIT, ASSET_DIALOG_ASSETS_PAGE_CHANGED} from "./events";
 
 function loadPage(page) {
@@ -8,7 +8,7 @@ function loadPage(page) {
 }
 
 function Paginator() {
-    const loading = useSelector(assetsDialogLoading);
+    const loading = useSelector(assetsDialogLoadingSelector);
     const page = useSelector(assetsDialogPageSelector);
     const pages = useSelector(assetsDialogPagesSelector);
 

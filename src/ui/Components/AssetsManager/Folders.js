@@ -1,6 +1,6 @@
 import {useSelector} from 'reffects-store';
 import {dispatch} from 'reffects';
-import {assetsDialogFolders, assetsDialogLoading} from './selectors';
+import {assetsDialogFoldersSelector, assetsDialogLoadingSelector} from './selectors';
 import {
     ASSET_DIALOG_FOLDER_CHANGE_DIR,
     ASSET_DIALOG_FOLDER_ADD_DIR,
@@ -29,8 +29,8 @@ export function addFolder() {
 }
 
 export function Folders({modal}) {
-    const folders = useSelector(assetsDialogFolders);
-    const loading = useSelector(assetsDialogLoading);
+    const folders = useSelector(assetsDialogFoldersSelector);
+    const loading = useSelector(assetsDialogLoadingSelector);
 
     if (loading && folders.length < 1) {
         return null;

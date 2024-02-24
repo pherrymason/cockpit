@@ -41,12 +41,9 @@ registerEventHandler(
 )
 
 registerEventHandler(ASSET_DIALOG_FOLDER_DIR_ADDED, ({state: {folders}}, {folder}) => {
-    console.log('NEW FOLDER:',folder)
-    folders.push(folder);
-
     return {
         ...state.set({
-            'assetsDialog.folders': folders
+            'assetsDialog.folders': [...folders, folder]
         })
     }
 }, [

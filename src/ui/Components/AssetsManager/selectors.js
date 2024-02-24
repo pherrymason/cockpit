@@ -1,11 +1,11 @@
-export function assetsDialogLoading(state) {
+export function assetsDialogLoadingSelector(state) {
     return state.assetsDialog?.loading ?? false;
 }
 export function assetsDialogOpen(state) {
     return state.assetsDialog?.open ?? false;
 }
 
-export function assetsDialogFolders(state) {
+export function assetsDialogFoldersSelector(state) {
     return state.assetsDialog?.folders ?? [];
 }
 

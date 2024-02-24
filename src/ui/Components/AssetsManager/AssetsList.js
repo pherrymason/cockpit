@@ -3,7 +3,7 @@ import {dispatch} from 'reffects';
 import {
     assetsDialogAssets,
     assetsDialogTotalAssetsSelector,
-    assetsDialogLoading,
+    assetsDialogLoadingSelector,
     assetsDialogSelectedAssets
 } from './selectors';
 import {Thumbnail} from './Thumbnail';
@@ -33,7 +33,7 @@ function AssetsList({listMode, modal}) {
     const assets = useSelector(assetsDialogAssets);
     const count = useSelector(assetsDialogTotalAssetsSelector);
     const selectedAssets = useSelector(assetsDialogSelectedAssets);
-    const loading = useSelector(assetsDialogLoading);
+    const loading = useSelector(assetsDialogLoadingSelector);
     const show = !loading && assets.length;
 
     function isSelected(asset) {
