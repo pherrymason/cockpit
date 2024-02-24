@@ -9,7 +9,7 @@
 <script>
     window.__collectionEntry = <?= empty($entry) ? '{}' : json_encode($entry) ?>;
 </script>
-<div id="vue-app"></div>
+<div id="sepia-app"></div>
 <div riot-view>
 
     <div class="header-sub-panel">

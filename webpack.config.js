@@ -1,11 +1,10 @@
 const path = require('path');
-const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
 
 const config = {
     entry: {
-       // 'collection.entries': ['./src/ui/collection.entries.ts'],
-        'collection.entry': ['./src/ui/collection.entry.js']
+        'collection.entry': ['./src/ui/collection.entry.js'],
+        'singleton.form': ['./src/ui/singleton.form.js'],
     },
     output: {
         path: path.resolve(__dirname, 'assets/app/js'),

@@ -1,10 +1,12 @@
-import ReactDOM from 'react-dom';
-import AssetsDialog from './Components/AssetsManager/AssetsDialog';
-import { dispatch } from 'reffects';
-import httpClient from './httpClient';
-import { registerStateBatteries, store } from 'reffects-store';
-import registerHttpEffects from './effects/http';
-import registerEnvironmentCoeffect from './environment';
+import {registerStateBatteries, store} from "reffects-store";
+import registerHttpEffects from "./effects/http";
+import {dispatch} from "reffects";
+import httpClient from "./httpClient";
+import registerEnvironmentCoeffect from "./environment";
+import AssetsDialog from "./Components/AssetsManager/AssetsDialog";
+import ReactDOM from "react-dom";
+
+console.log('sinleton.form!');
 
 store.initialize({});
 registerStateBatteries();
@@ -20,7 +22,6 @@ window.AssetsDialogController = {
     displayAssetsDialog: undefined,
     onSubmit: undefined,
 };
-
 const displayAssetsDialogSetter = function (showDialog) {
     window.AssetsDialogController.displayAssetsDialog = showDialog;
 }

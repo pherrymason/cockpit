@@ -1,10 +1,6 @@
 (function($){
-
-
     var Cockpit = {
-
         Utils: {},
-
         callmodule: function (module, method, args, acl) {
 
             if (module.indexOf(':') !== -1) {
@@ -97,7 +93,6 @@
 
         assets: {
             select: function(callback, options){
-                console.log('ASSETS.SELECT!');
                 window.AssetsDialogController.displayAssetsDialog(true);
                 window.AssetsDialogController.onSubmit = (data) => {
                     console.log('Raul on submit!', data);

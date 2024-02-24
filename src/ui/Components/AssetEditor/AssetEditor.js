@@ -31,7 +31,7 @@ function onAddTag() {}
 
 export default function AssetEditor({modal}) {
     const asset = useSelector(editingAssetSelector);
-console.log(asset);
+
     return (
         <div className="uk-form">
             <h3 className="uk-text-bold">{App.i18n.get('Edit Asset')}</h3>

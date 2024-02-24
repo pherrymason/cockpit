@@ -8,7 +8,7 @@
   window.__singletonData = <?= json_encode($data) ?> || {};
   window.__singleton = <?= json_encode($singleton, JSON_PRETTY_PRINT) ?> || {};
 </script>
-
+<div id="sepia-app"></div>
 <div riot-view>
 
     <div class="header-sub-panel">
@@ -389,3 +389,4 @@ console.log('singleton mount');
     </div>
 
 </div>
+<script src="<?= "/admin/assets/app/js/singleton.form.js" ?>"></script>
