@@ -88,7 +88,7 @@ final class DBFolderRepository implements FolderRepository
     public function save(Folder $folder): void
     {
         $params = [
-            '_id' => $folder->id(),
+            'id' => $folder->id(),
             '_p' => ($folder->parentFolder() !== null) ? $folder->parentFolder()->id() : null,
             'name' => $folder->name(),
             'path' => $folder->path()
@@ -105,7 +105,7 @@ final class DBFolderRepository implements FolderRepository
         $sql = 'INSERT INTO `' . self::TABLE . '` 
             SET `_id`=:id, 
             `_p`=:_p, 
-            `name`=:=name, 
+            `name`=:name, 
             `path`=:path
              ON DUPLICATE KEY UPDATE 
                 `_p`=:_p,
