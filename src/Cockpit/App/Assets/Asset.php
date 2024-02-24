@@ -138,7 +138,7 @@ final class Asset
         return $this->userID;
     }
 
-    public function type(): string
+    public function type(): ?string
     {
         return $this->type;
     }
