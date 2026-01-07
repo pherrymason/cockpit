@@ -191,16 +191,16 @@ $services = [
         return \strtolower(\substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
     },
     'i18n' => function (ContainerInterface $c) {
-        return new\Lime\Helper\I18n($c->get('user.language'));
+        return new \Lime\Helper\I18n($c->get('user.language'));
     },
     'utils' => function (ContainerInterface $c) {
-        return new\Lime\Helper\Utils();
+        return new \Lime\Helper\Utils();
     },
     'coockie' => function (ContainerInterface $c) {
-        return new\Lime\Helper\Cookie();
+        return new \Lime\Helper\Cookie();
     },
     'yaml' => function (ContainerInterface $c) {
-        return new\Lime\Helper\YAML();
+        return new \Lime\Helper\YAML();
     },
     'session' => function (ContainerInterface $c) {
         return new \Lime\Session($c->get('session.name'));
