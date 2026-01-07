@@ -11,7 +11,7 @@ class AppFactory extends \Slim\Factory\AppFactory
     {
         $services = require(dirname(__DIR__, 2) . '/config/services.php');
         $builder = new ContainerBuilder();
-        $builder->useAnnotations(false);
+        //$builder->useAnnotations(false);
         $builder->addDefinitions($services);
         $builder->addDefinitions($extraServices);
 //        $builder->enableCompilation($configuration['paths']['#tmp']);
