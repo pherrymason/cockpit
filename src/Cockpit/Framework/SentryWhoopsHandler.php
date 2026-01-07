@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Sentry\State\HubInterface;
 use Whoops\Exception\Inspector;
 use Whoops\Handler\HandlerInterface;
+use Whoops\Inspector\InspectorInterface;
 use Whoops\RunInterface;
 
 class SentryWhoopsHandler implements HandlerInterface
@@ -44,7 +45,7 @@ class SentryWhoopsHandler implements HandlerInterface
         $this->exception = $exception;
     }
 
-    public function setInspector(Inspector $inspector)
+    public function setInspector(InspectorInterface $inspector)
     {
         $this->inspector = $inspector;
     }
