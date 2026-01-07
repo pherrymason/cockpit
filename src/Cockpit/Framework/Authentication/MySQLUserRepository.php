@@ -33,17 +33,7 @@ final class MySQLUserRepository implements UserRepositoryInterface
             'user'
         );
 
-        $stmt = $this->connection->prepare($sql);
-        if (false === $stmt) {
-            throw new Exception\RuntimeException(
-                'An error occurred when preparing to fetch user details from ' .
-                'the repository; please verify your configuration'
-            );
-        }
-        $stmt->bindParam(':identity', $credential);
-        $stmt->execute();
-
-        $result = $stmt->fetch();
+        $result = $this->connection->executeQuery($sql, ['identity' => $credential])->fetchAssociative();
         if (!$result) {
             return null;
         }
