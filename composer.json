@@ -51,7 +51,7 @@
         "slim/psr7": "^1.8",
         "vlucas/phpdotenv": "^4.1",
         "mezzio/mezzio-authentication": "^1.1",
-        "doctrine/dbal": "^3.60",
+        "doctrine/dbal": "^3.6",
         "middlewares/whoops": "^2.0",
         "laminas/laminas-diactoros": "^2.3",
         "mezzio/mezzio-authentication-session": "^1.0",
