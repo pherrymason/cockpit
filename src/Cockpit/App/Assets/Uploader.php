@@ -94,7 +94,7 @@ final class Uploader
 
                 $asset = $this->createAsset(
                     $assetsPath . $path,
-                    (string)$filesize,
+                    $filesize,
                     mime_content_type($files['tmp_name'][$i]),
                     $user->getDetail('id'),
                     $folder
@@ -162,7 +162,7 @@ final class Uploader
         return $matched === 1;
     }
 
-    private function createAsset(string $fullFilenamePath, string $filesize, string $mime, string $userID, Folder $folder): Asset
+    private function createAsset(string $fullFilenamePath, int $filesize, string $mime, string $userID, Folder $folder): Asset
     {
         $filename = basename($fullFilenamePath);
         $images = [
@@ -184,7 +184,7 @@ final class Uploader
             $filename,
             '',
             [],
-            (string)$filesize,
+            $filesize,
             $mime,
             new \DateTimeImmutable(),
             new \DateTimeImmutable(),
