@@ -103,7 +103,7 @@ final class DBAssetRepository implements AssetRepository
         return (int)$data['id'];
     }
 
-    public function save(Asset $asset, string $folderID = null)
+    public function save(Asset $asset, ?string $folderID = null)
     {
         $params = [
             '_id' => $asset->id(),

@@ -16,7 +16,7 @@ interface AssetRepository
 
     public function countAll(): int;
 
-    public function save(Asset $asset, string $folderID = null);
+    public function save(Asset $asset, ?string $folderID = null);
 
     public function delete(string $assetID);
 }

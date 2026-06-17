@@ -24,7 +24,7 @@ final class MySQLUserRepository implements UserRepositoryInterface
         $this->userFactory = $userFactory;
     }
 
-    public function authenticate(string $credential, string $password = null): ?UserInterface
+    public function authenticate(string $credential, ?string $password = null): ?UserInterface
     {
         $sql = sprintf(
             "SELECT %s FROM %s WHERE %s = :identity",
