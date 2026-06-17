@@ -69,7 +69,7 @@ final class DBAssetRepository implements AssetRepository
             $row['title'],
             $row['description'],
             json_decode($row['tags'],true),
-            $row['size'],
+            (int) $row['size'],
             $row['mime'],
             new \DateTimeImmutable($row['created']),
             new \DateTimeImmutable($row['modified']),

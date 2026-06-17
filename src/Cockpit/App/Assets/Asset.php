@@ -16,7 +16,7 @@ final class Asset
     private $mime;
     /** @var string[] */
     private $tags;
-    /** @var string */
+    /** @var int */
     private $size;
     /** @var \DateTimeImmutable */
     private $created;
@@ -30,7 +30,7 @@ final class Asset
     private $type;
 
     public function __construct(
-        string $id, Folder $folder, string $filename, string $title, string $description, array $tags, string $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID, $width, $height, Author $author, $type, array $colors = [])
+        string $id, Folder $folder, string $filename, string $title, string $description, array $tags, int $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID, $width, $height, Author $author, $type, array $colors = [])
     {
         $this->folder = $folder;
         $this->filename = $filename;
@@ -60,7 +60,7 @@ final class Asset
             $data['title'],
             $data['description'],
             $data['tags'],
-            $data['size'],
+            (int) $data['size'],
             $data['mime'],
             new \DateTimeImmutable($data['created']),
             $data['modified'],
@@ -113,7 +113,7 @@ final class Asset
         return $this->tags;
     }
 
-    public function size(): string
+    public function size(): int
     {
         return $this->size;
     }
