@@ -28,6 +28,10 @@ final class Asset
     private $folder;
     private $author;
     private $type;
+    private $width;
+    private $height;
+    /** @var array */
+    private $colors;
 
     public function __construct(
         string $id, Folder $folder, string $filename, string $title, string $description, array $tags, int $size, string $mime, \DateTimeImmutable $created, \DateTimeImmutable $modified, string $userID, $width, $height, Author $author, $type, array $colors = [])
